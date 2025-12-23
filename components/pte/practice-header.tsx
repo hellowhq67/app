@@ -1,0 +1,148 @@
+'use client'
+
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { ChevronRight, Filter, Home } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { ExamCountdownMini } from '@/components/pte/practice/exam-countdown-mini'
+
+interface AcademicPracticeHeaderProps {
+  section?: string
+  showFilters?: boolean
+}
+
+export function AcademicPracticeHeader({
+  section,
+  showFilters = true,
+}: AcademicPracticeHeaderProps) {
+  const pathname = usePathname()
+
+  const formatSectionName = (section: string) => {
+    return section.charAt(0).toUpperCase() + section.slice(1)
+  }
+
+  const formatQuestionTypeName = (code: string) => {
+    return code
+      .split('_')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  }
+
+  const pathSegments = pathname.split('/').filter(Boolean)
+  const isQuestionType = pathSegments.length >= 5
+
+  return (
+    <div className="border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-800 dark:bg-gray-950">
+      <div className="flex flex-col space-y-4">
+        {/* Breadcrumb Navigation */}
+        <nav className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+          <Link
+            href="/pte/academic/practice"
+            className="flex items-center gap-1 hover:text-blue-600"
+          >
+            <Home className="h-4 w-4" />
+            Practice Hub
+          </Link>
+          {section && (
+            <>
+              <ChevronRight className="h-4 w-4" />
+              <Link
+                href={`/pte/academic/practice/${section}`}
+                className="hover:text-blue-600"
+              >
+                {formatSectionName(section)}
+              </Link>
+            </>
+          )}
+          {isQuestionType && section && (
+            <>
+              <ChevronRight className="h-4 w-4" />
+              <span className="font-medium text-gray-900 dark:text-gray-100">
+                {formatQuestionTypeName(
+                  pathSegments[pathSegments.length - 1] || ''
+                )}
+              </span>
+            </>
+          )}
+        </nav>
+
+        {/* Header Content */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center space-x-4">
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {section
+                  ? `${formatSectionName(section)} Practice`
+                  : 'PTE Academic Practice'}
+              </h1>
+              <Badge variant="secondary">AI-Powered</Badge>
+            </div>
+            <ExamCountdownMini />
+          </div>
+
+          {/* Filters */}
+          {showFilters && (
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <Filter className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm text-gray-600 dark:text-gray-400">Filter:</span>
+              </div>
+
+              <Select defaultValue="all">
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Difficulty Level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Levels</SelectItem>
+                  <SelectItem value="beginner">Beginner</SelectItem>
+                  <SelectItem value="intermediate">Intermediate</SelectItem>
+                  <SelectItem value="advanced">Advanced</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select defaultValue="all">
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Time Limit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Any Duration</SelectItem>
+                  <SelectItem value="short">Short (≤2 min)</SelectItem>
+                  <SelectItem value="medium">Medium (2-5 min)</SelectItem>
+                  <SelectItem value="long">Long (≥5 min)</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Button variant="outline" size="sm">
+                Reset Filters
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Practice Stats */}
+        <div className="flex items-center space-x-6 text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center space-x-2">
+            <div className="h-2 w-2 rounded-full bg-green-500"></div>
+            <span>AI Scoring Available</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+            <span>Real-time Feedback</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="h-2 w-2 rounded-full bg-purple-500"></div>
+            <span>Progress Tracking</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

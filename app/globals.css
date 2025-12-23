@@ -1,0 +1,144 @@
+@import "tailwindcss";
+
+@theme {
+  --radius: 0.75rem;
+
+  /* ---------- LIGHT MODE ---------- */
+
+  --color-background: oklch(0.985 0.01 240); /* Soft Sky White */
+  --color-foreground: oklch(0.18 0.04 265); /* Deep Ink */
+
+  --color-card: oklch(1 0 0);
+  --color-card-foreground: oklch(0.18 0.04 265);
+
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.18 0.04 265);
+
+  /* Primary – Violet */
+  --color-primary: oklch(0.471 0.19 272.1); /* 272.1° 71.7% 47.1% */
+  --color-primary-foreground: oklch(0.98 0.01 250);
+
+  /* Secondary – Sky Blue */
+  --color-secondary: oklch(0.93 0.04 230);
+  --color-secondary-foreground: oklch(0.28 0.07 255);
+
+  --color-muted: oklch(0.96 0.02 240);
+  --color-muted-foreground: oklch(0.55 0.05 260);
+
+  /* Accent – Ice Blue */
+  --color-accent: oklch(0.88 0.08 220);
+  --color-accent-foreground: oklch(0.22 0.06 255);
+
+  --color-destructive: oklch(0.55 0.22 25);
+  --color-destructive-foreground: oklch(0.98 0.01 25);
+
+  --color-border: oklch(0.9 0.03 250);
+  --color-input: oklch(0.9 0.03 250);
+  --color-ring: oklch(0.471 0.19 272.1);
+
+  /* Charts */
+  --color-chart-1: oklch(0.471 0.19 272.1); /* Violet */
+  --color-chart-2: oklch(0.62 0.14 230);   /* Sky */
+  --color-chart-3: oklch(0.75 0.12 210);   /* Light Blue */
+  --color-chart-4: oklch(0.55 0.16 260);   /* Indigo */
+  --color-chart-5: oklch(0.65 0.1 290);    /* Soft Purple */
+
+  /* Sidebar */
+  --color-sidebar: oklch(0.97 0.02 240);
+  --color-sidebar-foreground: oklch(0.18 0.04 265);
+  --color-sidebar-primary: oklch(0.471 0.19 272.1);
+  --color-sidebar-primary-foreground: oklch(0.98 0.01 250);
+  --color-sidebar-accent: oklch(0.93 0.04 230);
+  --color-sidebar-accent-foreground: oklch(0.28 0.07 255);
+  --color-sidebar-border: oklch(0.9 0.03 250);
+  --color-sidebar-ring: oklch(0.471 0.19 272.1);
+}
+
+/* ---------- DARK MODE ---------- */
+
+.dark {
+  --color-background: oklch(0.14 0.04 265); /* Deep Night Indigo */
+  --color-foreground: oklch(0.95 0.02 240);
+
+  --color-card: oklch(0.18 0.04 265);
+  --color-card-foreground: oklch(0.95 0.02 240);
+
+  --color-popover: oklch(0.18 0.04 265);
+  --color-popover-foreground: oklch(0.95 0.02 240);
+
+  --color-primary: oklch(0.62 0.22 272.1); /* Glowing Violet */
+  --color-primary-foreground: oklch(0.98 0.01 250);
+
+  --color-secondary: oklch(0.28 0.06 240);
+  --color-secondary-foreground: oklch(0.95 0.02 240);
+
+  --color-muted: oklch(0.25 0.04 260);
+  --color-muted-foreground: oklch(0.7 0.05 250);
+
+  --color-accent: oklch(0.45 0.12 230);
+  --color-accent-foreground: oklch(0.95 0.02 240);
+
+  --color-destructive: oklch(0.5 0.2 25);
+  --color-destructive-foreground: oklch(0.95 0.01 25);
+
+  --color-border: oklch(0.3 0.04 260);
+  --color-input: oklch(0.3 0.04 260);
+  --color-ring: oklch(0.62 0.22 272.1);
+
+  --color-sidebar: oklch(0.12 0.04 265);
+  --color-sidebar-foreground: oklch(0.95 0.02 240);
+  --color-sidebar-primary: oklch(0.62 0.22 272.1);
+  --color-sidebar-primary-foreground: oklch(0.98 0.01 250);
+  --color-sidebar-accent: oklch(0.28 0.06 240);
+  --color-sidebar-accent-foreground: oklch(0.95 0.02 240);
+  --color-sidebar-border: oklch(0.3 0.04 260);
+  --color-sidebar-ring: oklch(0.62 0.22 272.1);
+}
+
+/* Base */
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* Optional shimmer */
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+}
+
+/* Premium Spinner */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 2s linear infinite;
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.98); }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 2s ease-in-out infinite;
+}
+
+/* Smooth Input Focus */
+.input-focus-ring {
+  transition: all 0.2s ease-in-out;
+}
+.input-focus-ring:focus {
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-primary);
+  transform: translateY(-1px);
+}

@@ -1,0 +1,17 @@
+ignoredBuiltDependencies:
+  - msw
+
+onlyBuiltDependencies:
+  - '@firebase/util'
+  - '@swc/core'
+  - '@tailwindcss/oxide'
+  - esbuild
+  - protobufjs
+  - sharp
+  - unrs-resolver
+
+overrides:
+  cookie@<0.7.0: '>=0.7.0'
+  esbuild@<=0.24.2: '>=0.25.0'
+  next@>=16.0.0-beta.0 <16.0.9: '>=16.0.9'
+  path-to-regexp@>=4.0.0 <6.3.0: '>=6.3.0'
