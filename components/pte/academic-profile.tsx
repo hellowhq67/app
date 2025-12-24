@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useOptimistic, useTransition } from 'react'
-import { useAuth } from '@/lib/auth/auth-client'
-import { updateProfile } from '@/lib/auth/profile-actions'
+import { useAuth } from '@/lib/auth/client'
 import { Button } from '../ui/button'
 import {
   Card,

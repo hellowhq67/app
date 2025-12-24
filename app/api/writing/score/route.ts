@@ -1,7 +1,8 @@
-import { NextResponse } from 'next/server'
-import { auth } from '@/lib/auth/auth'
-import { submitWritingAttempt } from '@/lib/actions/ai-writing-score'
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
+import { QuestionType } from '@/lib/types'
+import { submitWritingAttempt } from '@/lib/actions/ai-writing-score'
 
 export async function POST(request: Request) {
   const session = await auth.api.getSession({

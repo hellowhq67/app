@@ -1,10 +1,9 @@
 import { Metadata } from "next";
-import { createMetadata } from "@/lib/auth/metadata";
 
-export const metadata: Metadata = createMetadata({
+export const metadata: Metadata = {
 	title: "Authentication",
 	description: "Authentication pages for Pedagogist's PTE.",
-});
+};
 
 export default function AuthLayout({
 	children,

@@ -13,18 +13,18 @@ export default function SignInPage() {
 	const params = useSearchParams();
 
 	useEffect(() => {
-		authClient.oneTap({
-			fetchOptions: {
-				onError: ({ error }) => {
-					// Silent error for one-tap if it fails to load
-					console.debug("One-tap error:", error.message);
-				},
-				onSuccess: () => {
-					toast.success("Successfully signed in!");
-					router.push(getCallbackURL(params));
-				},
-			},
-		});
+		// authClient.oneTap({
+		// 	fetchOptions: {
+		// 		onError: ({ error }) => {
+		// 			// Silent error for one-tap if it fails to load
+		// 			console.debug("One-tap error:", error.message);
+		// 		},
+		// 		onSuccess: () => {
+		// 			toast.success("Successfully signed in!");
+		// 			router.push(getCallbackURL(params));
+		// 		},
+		// 	},
+		// });
 	}, [router, params]);
 
 	return (

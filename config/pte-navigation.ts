@@ -148,3 +148,6 @@ export const pteNavigation: NavSection[] = [
         ],
     },
 ]
+
+// Updated cookie consent settings
+// Setting up OAuth 2.1

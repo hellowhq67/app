@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { speakingAttempts } from '@/lib/db/schema'
 import { eq, and } from 'drizzle-orm'
-import { getCurrentUser } from '@/lib/auth/server'
+import { getSession } from '@/lib/auth/session'
 
 
 export async function PATCH(
@@ -10,8 +10,8 @@ export async function PATCH(
   context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
+    const session = await getSession()
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -40,7 +40,7 @@ export async function PATCH(
       .where(
         and(
           eq(speakingAttempts.id, attemptId),
-          eq(speakingAttempts.userId, user.id)
+          eq(speakingAttempts.userId, session.user.id)
         )
       )
       .limit(1)

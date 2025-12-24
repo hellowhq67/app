@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { MessageSquare, Trophy, User, Lock, History } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { useAuth } from '@/lib/auth/auth-client' // Assuming this exists from context
+import { useAuth } from '@/lib/auth/client' // Assuming this exists from context
 import { cn } from '@/lib/utils'
 
 interface PracticeCommunityTabsProps {

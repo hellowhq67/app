@@ -385,4 +385,3 @@ export const SCORING_ZOD_SCHEMA: Record<QuestionType, any> = {
   [QuestionType.WRITE_FROM_DICTATION]: AIFeedbackData,
   // Add other schemas here...
 }
-`

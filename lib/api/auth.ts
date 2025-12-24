@@ -1,5 +1,12 @@
-import { getSession } from '@/lib/auth/server'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 import { Errors } from './errors'
+
+async function getSession() {
+  return auth.api.getSession({
+    headers: await headers()
+  })
+}
 
 export type AuthResult = {
   userId: string

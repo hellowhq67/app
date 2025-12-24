@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { authClient, useAuth } from '@/lib/auth/auth-client'
+import { authClient, useAuth } from '@/lib/auth/client'
 
 export function UserNav() {
   const { user, isAuthenticated, isPending } = useAuth()

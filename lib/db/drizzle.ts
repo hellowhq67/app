@@ -3,26 +3,44 @@ import { Pool } from 'pg';
 import * as schema from './schema';
 import { env } from '@/lib/env';
 
-// Get database URL from environment
-const connectionString = env.DATABASE_URL;
+// Get database URL from environment, prefer pooled URL if available
+let connectionString = env.DATABASE_URL || env.DATABASE_URL_POOLED || process.env.DATABASE_URL || process.env.DATABASE_URL_POOLED;
 
 if (!connectionString) {
-  throw new Error('❌ DATABASE_URL is not set in environment variables. Please check your .env.local file.');
-}
+  console.warn('❌ DATABASE_URL is not set in environment variables. Many features (auth, migrations) will fail until you provide one.');
+} else {
+  if (connectionString.includes('railway.internal')) {
+    console.warn('⚠️  Warning: Using a Railway internal database URL. This will not work outside the Railway network.');
+    console.warn('👉 Use the Public TCP connection string from the Railway dashboard for local development.');
+  }
 
-if (connectionString.includes('railway.internal')) {
-  console.warn('⚠️  Warning: Using a Railway internal database URL. This will not work outside the Railway network.');
-  console.warn('👉 Use the Public TCP connection string from the Railway dashboard for local development.');
+  // Prefer IPv4 resolution for localhost to avoid ::1 connection refusals on some setups
+  if (connectionString.includes('localhost')) {
+    connectionString = connectionString.replace('localhost', '127.0.0.1');
+  }
 }
 
 // Create PostgreSQL pool for connections
 const pool = new Pool({
   connectionString,
   connectionTimeoutMillis: 5000,
-  ssl: {
-    rejectUnauthorized: false,
-  }
+  ssl: connectionString && connectionString.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
 });
+
+// Test database connection
+(async () => {
+  try {
+    const client = await pool.connect();
+    try {
+      const result = await client.query('SELECT 1 as ok');
+      console.log('DB OK', result.rows);
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('DB ERR', error);
+  }
+})();
 
 // Export the Drizzle ORM instance with schema for relational queries
 export const db = drizzle(pool, { schema });
