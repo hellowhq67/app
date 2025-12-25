@@ -1,335 +1,265 @@
 import { relations, sql } from 'drizzle-orm';
 import {
-  boolean,
-  decimal,
-  index,
-  integer,
-  jsonb,
-  pgEnum,
-  pgTable,
-  text,
-  timestamp,
-  uuid,
+    boolean,
+    index,
+    integer,
+    jsonb,
+    pgTable,
+    text,
+    timestamp,
+    uuid,
 } from 'drizzle-orm/pg-core';
-import { users } from './users';
-import { speakingQuestions } from './speaking';
-import { readingQuestions } from './reading';
-import { writingQuestions } from './writing';
-import { listeningQuestions } from './listening';
+import { difficultyEnum } from './users';
+import { pteQuestionTypes } from './pte-categories';
 
-// Enums
-export const speakingTypeEnum = pgEnum('speaking_type', [
-  'read_aloud',
-  'repeat_sentence',
-  'describe_image',
-  'retell_lecture',
-  'answer_short_question',
-  'summarize_group_discussion',
-  'respond_to_a_situation',
-]);
+// Main PTE Questions Table (Base table for all question types)
+export const pteQuestions = pgTable(
+    'pte_questions',
+    {
+        id: uuid('id')
+            .primaryKey()
+            .default(sql`gen_random_uuid()`),
+        questionTypeId: uuid('question_type_id')
+            .notNull()
+            .references(() => pteQuestionTypes.id, { onDelete: 'cascade' }),
 
-export const readingQuestionTypeEnum = pgEnum('reading_question_type', [
-  'multiple_choice_single',
-  'multiple_choice_multiple',
-  'reorder_paragraphs',
-  'fill_in_blanks',
-  'reading_writing_fill_blanks',
-]);
+        // Question content
+        title: text('title').notNull(),
+        content: text('content'), // Main text content (passage, prompt, etc.)
+        audioUrl: text('audio_url'), // Vercel Blob URL for audio
+        imageUrl: text('image_url'), // Vercel Blob URL for image
 
-export const writingQuestionTypeEnum = pgEnum('writing_question_type', [
-  'summarize_written_text',
-  'write_essay',
-]);
+        // Difficulty and metadata
+        difficulty: difficultyEnum('difficulty').notNull().default('Medium'),
+        tags: jsonb('tags').$type<string[]>(),
 
-export const listeningQuestionTypeEnum = pgEnum('listening_question_type', [
-  'summarize_spoken_text',
-  'multiple_choice_single',
-  'multiple_choice_multiple',
-  'fill_in_blanks',
-  'highlight_correct_summary',
-  'select_missing_word',
-  'highlight_incorrect_words',
-  'write_from_dictation',
-]);
+        // Answer and scoring
+        correctAnswer: jsonb('correct_answer').$type<{
+            text?: string;
+            options?: string[];
+            order?: number[];
+            blanks?: { [key: string]: string };
+            [key: string]: any;
+        }>(),
+        sampleAnswer: text('sample_answer'), // For AI scoring reference
+        scoringRubric: jsonb('scoring_rubric').$type<{
+            pronunciation?: string;
+            fluency?: string;
+            content?: string;
+            grammar?: string;
+            vocabulary?: string;
+            [key: string]: any;
+        }>(),
 
-// PTE Tests table
-export const pteTests = pgTable('pte_tests', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  title: text('title').notNull(),
-  description: text('description'),
-  testType: text('test_type').notNull(), // 'mock', 'practice', 'scored'
-  section: text('section'), // 'speaking', 'writing', 'reading', 'listening'
-  isPremium: text('is_premium').default('false'),
-  duration: integer('duration'), // in minutes
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+        // Admin and status
+        isActive: boolean('is_active').default(true).notNull(),
+        isPremium: boolean('is_premium').default(false).notNull(),
+        usageCount: integer('usage_count').default(0).notNull(),
+        averageScore: integer('average_score'),
+
+        // Metadata
+        metadata: jsonb('metadata').$type<{
+            source?: string;
+            author?: string;
+            lastReviewed?: string;
+            [key: string]: any;
+        }>(),
+
+        createdAt: timestamp('created_at').defaultNow().notNull(),
+        updatedAt: timestamp('updated_at')
+            .defaultNow()
+            .$onUpdate(() => new Date())
+            .notNull(),
+    },
+    (table) => ({
+        questionTypeIdIdx: index('idx_pte_questions_question_type_id').on(
+            table.questionTypeId
+        ),
+        difficultyIdx: index('idx_pte_questions_difficulty').on(table.difficulty),
+        isActiveIdx: index('idx_pte_questions_is_active').on(table.isActive),
+        isPremiumIdx: index('idx_pte_questions_is_premium').on(table.isPremium),
+    })
+);
+
+// Speaking Questions Extended Table
+export const pteSpeakingQuestions = pgTable('pte_speaking_questions', {
+    id: uuid('id')
+        .primaryKey()
+        .default(sql`gen_random_uuid()`),
+    questionId: uuid('question_id')
+        .notNull()
+        .references(() => pteQuestions.id, { onDelete: 'cascade' })
+        .unique(),
+
+    // Speaking-specific fields
+    audioPromptUrl: text('audio_prompt_url'), // For Repeat Sentence, Retell Lecture
+    expectedDuration: integer('expected_duration'), // Expected response time in seconds
+    sampleTranscript: text('sample_transcript'), // Sample answer transcript
+    keyPoints: jsonb('key_points').$type<string[]>(), // For Retell Lecture
+
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
 });
 
-// PTE Questions table
-export const pteQuestions = pgTable('pte_questions', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  testId: uuid('test_id').references(() => pteTests.id, {
-    onDelete: 'cascade',
-  }),
-  // External source identity to support mirroring from external APIs
-  externalId: text('external_id'),
-  source: text('source').default('local'),
-  question: text('question').notNull(),
-  questionType: text('question_type').notNull(), // e.g., s_read_aloud, s_repeat_sentence, etc.
-  section: text('section').notNull(), // speaking, writing, reading, listening
-  questionData: jsonb('question_data'), // JSON for options, audio URLs, images, etc.
-  tags: jsonb('tags'),
-  correctAnswer: text('correct_answer'),
-  points: integer('points').default(1),
-  orderIndex: integer('order_index').default(0),
-  difficulty: text('difficulty'), // 'easy', 'medium', 'hard'
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+// Writing Questions Extended Table
+export const pteWritingQuestions = pgTable('pte_writing_questions', {
+    id: uuid('id')
+        .primaryKey()
+        .default(sql`gen_random_uuid()`),
+    questionId: uuid('question_id')
+        .notNull()
+        .references(() => pteQuestions.id, { onDelete: 'cascade' })
+        .unique(),
 
+    // Writing-specific fields
+    promptText: text('prompt_text').notNull(),
+    passageText: text('passage_text'), // For Summarize Written Text
+    wordCountMin: integer('word_count_min').notNull(),
+    wordCountMax: integer('word_count_max').notNull(),
+    essayType: text('essay_type'), // 'argumentative', 'descriptive', 'narrative', etc.
+    keyThemes: jsonb('key_themes').$type<string[]>(),
+
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
 });
 
-// PTE Question Types (Configuration)
-export const pteQuestionTypes = pgTable('pte_question_types', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  code: text('code').notNull().unique(), // e.g. 's_read_aloud'
-  title: text('title').notNull(),
-  description: text('description'),
-  icon: text('icon'),
-  color: text('color'),
-  shortName: text('short_name'),
-  scoringType: text('scoring_type'), // 'ai' | 'auto'
-  videoLink: text('video_link'),
+// Reading Questions Extended Table
+export const pteReadingQuestions = pgTable('pte_reading_questions', {
+    id: uuid('id')
+        .primaryKey()
+        .default(sql`gen_random_uuid()`),
+    questionId: uuid('question_id')
+        .notNull()
+        .references(() => pteQuestions.id, { onDelete: 'cascade' })
+        .unique(),
 
-  // Timers
-  timerPrepMs: integer('timer_prep_ms').default(0),
-  timerRecordMs: integer('timer_record_ms').default(0),
+    // Reading-specific fields
+    passageText: text('passage_text').notNull(),
+    questionText: text('question_text'),
+    options: jsonb('options').$type<{
+        choices?: string[];
+        blanks?: { position: number; options: string[] }[];
+        paragraphs?: string[];
+        [key: string]: any;
+    }>(),
+    correctAnswerPositions: jsonb('correct_answer_positions').$type<number[]>(),
+    explanation: text('explanation'),
 
-  // Organization
-  section: text('section'), // 'speaking', 'reading', etc.
-  parentCode: text('parent_code'), // Code of the parent category, e.g. 'speaking'
-
-  // Metadata
-  firstQuestionId: integer('first_question_id'), // Legacy ID ref
-  questionCount: integer('question_count').default(0),
-
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
 });
 
-// Test Attempts table
-export const testAttempts = pgTable('test_attempts', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: text('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  testId: uuid('test_id')
-    .notNull()
-    .references(() => pteTests.id, { onDelete: 'cascade' }),
-  status: text('status').default('in_progress'), // 'in_progress', 'completed', 'abandoned'
-  startedAt: timestamp('started_at').defaultNow().notNull(),
-  completedAt: timestamp('completed_at'),
-  totalScore: text('total_score'),
-  speakingScore: text('speaking_score'),
-  writingScore: text('writing_score'),
-  readingScore: text('reading_score'),
-  listeningScore: text('listening_score'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
-});
+// Listening Questions Extended Table
+export const pteListeningQuestions = pgTable('pte_listening_questions', {
+    id: uuid('id')
+        .primaryKey()
+        .default(sql`gen_random_uuid()`),
+    questionId: uuid('question_id')
+        .notNull()
+        .references(() => pteQuestions.id, { onDelete: 'cascade' })
+        .unique(),
 
-// Test Answers table
-export const testAnswers = pgTable('test_answers', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  attemptId: uuid('attempt_id')
-    .notNull()
-    .references(() => testAttempts.id, { onDelete: 'cascade' }),
-  questionId: uuid('question_id')
-    .notNull()
-    .references(() => pteQuestions.id, { onDelete: 'cascade' }),
-  userAnswer: text('user_answer'),
-  isCorrect: boolean('is_correct'),
-  pointsEarned: integer('points_earned').default(0),
-  aiFeedback: text('ai_feedback'),
-  submittedAt: timestamp('submitted_at').defaultNow().notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
+    // Listening-specific fields
+    audioFileUrl: text('audio_file_url').notNull(), // Vercel Blob URL
+    audioDuration: integer('audio_duration'), // in seconds
+    transcript: text('transcript'), // For admin reference
+    questionText: text('question_text'),
+    options: jsonb('options').$type<{
+        choices?: string[];
+        blanks?: { position: number; answer: string }[];
+        summaries?: string[];
+        [key: string]: any;
+    }>(),
+    correctAnswerPositions: jsonb('correct_answer_positions').$type<number[]>(),
 
-// Practice Sessions table
-export const practiceSessions = pgTable('practice_sessions', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: text('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  questionId: uuid('question_id')
-    .notNull()
-    .references(() => pteQuestions.id, { onDelete: 'cascade' }),
-  score: integer('score'),
-  submittedAt: timestamp('submitted_at').defaultNow().notNull(),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-// Media linked to questions (audio, image, video)
-export const pteQuestionMedia = pgTable('pte_question_media', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  questionId: uuid('question_id')
-    .notNull()
-    .references(() => pteQuestions.id, { onDelete: 'cascade' }),
-  kind: text('kind').notNull(), // 'audio' | 'image' | 'video'
-  url: text('url').notNull(),
-  metadata: jsonb('metadata'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-// Sync job tracking for external imports
-export const pteSyncJobs = pgTable('pte_sync_jobs', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  jobType: text('job_type').notNull(), // 'speaking' | 'writing' | 'reading' | 'listening'
-  questionType: text('question_type'),
-  status: text('status').notNull().default('pending'), // 'pending' | 'running' | 'success' | 'error'
-  startedAt: timestamp('started_at').defaultNow().notNull(),
-  finishedAt: timestamp('finished_at'),
-  stats: jsonb('stats'),
-  error: text('error'),
-});
-
-// User exam settings that influence question selection
-export const pteUserExamSettings = pgTable('pte_user_exam_settings', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
-  userId: text('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  examDate: timestamp('exam_date'),
-  targetScore: integer('target_score'),
-  preferences: jsonb('preferences'), // e.g., preferred difficulty, time per session, module toggles
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+        .defaultNow()
+        .$onUpdate(() => new Date())
+        .notNull(),
 });
 
 // Relations
-export const pteTestsRelations = relations(pteTests, ({ many }) => ({
-  questions: many(pteQuestions),
-  attempts: many(testAttempts),
+export const pteQuestionsRelations = relations(pteQuestions, ({ one }) => ({
+    questionType: one(pteQuestionTypes, {
+        fields: [pteQuestions.questionTypeId],
+        references: [pteQuestionTypes.id],
+    }),
+    speakingDetails: one(pteSpeakingQuestions, {
+        fields: [pteQuestions.id],
+        references: [pteSpeakingQuestions.questionId],
+    }),
+    writingDetails: one(pteWritingQuestions, {
+        fields: [pteQuestions.id],
+        references: [pteWritingQuestions.questionId],
+    }),
+    readingDetails: one(pteReadingQuestions, {
+        fields: [pteQuestions.id],
+        references: [pteReadingQuestions.questionId],
+    }),
+    listeningDetails: one(pteListeningQuestions, {
+        fields: [pteQuestions.id],
+        references: [pteListeningQuestions.questionId],
+    }),
 }));
 
-export const pteQuestionsRelations = relations(
-  pteQuestions,
-  ({ one, many }) => ({
-    test: one(pteTests, {
-      fields: [pteQuestions.testId],
-      references: [pteTests.id],
-    }),
-    answers: many(testAnswers),
-    practiceSessions: many(practiceSessions),
-  })
+export const pteSpeakingQuestionsRelations = relations(
+    pteSpeakingQuestions,
+    ({ one }) => ({
+        question: one(pteQuestions, {
+            fields: [pteSpeakingQuestions.questionId],
+            references: [pteQuestions.id],
+        }),
+    })
 );
 
-// Relations for question media
-export const pteQuestionMediaRelations = relations(
-  pteQuestionMedia,
-  ({ one }) => ({
-    question: one(pteQuestions, {
-      fields: [pteQuestionMedia.questionId],
-      references: [pteQuestions.id],
-    }),
-  })
+export const pteWritingQuestionsRelations = relations(
+    pteWritingQuestions,
+    ({ one }) => ({
+        question: one(pteQuestions, {
+            fields: [pteWritingQuestions.questionId],
+            references: [pteQuestions.id],
+        }),
+    })
 );
 
-export const pteQuestionTypesRelations = relations(
-  pteQuestionTypes,
-  ({ one, many }) => ({
-    parent: one(pteQuestionTypes, {
-      fields: [pteQuestionTypes.parentCode],
-      references: [pteQuestionTypes.code],
-      relationName: 'category_hierarchy',
-    }),
-    children: many(pteQuestionTypes, { relationName: 'category_hierarchy' }),
-  })
+export const pteReadingQuestionsRelations = relations(
+    pteReadingQuestions,
+    ({ one }) => ({
+        question: one(pteQuestions, {
+            fields: [pteReadingQuestions.questionId],
+            references: [pteQuestions.id],
+        }),
+    })
 );
 
-export const pteUserExamSettingsRelations = relations(
-  pteUserExamSettings,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [pteUserExamSettings.userId],
-      references: [users.id],
-    }),
-  })
-);
-
-export const testAttemptsRelations = relations(
-  testAttempts,
-  ({ one, many }) => ({
-    user: one(users, {
-      fields: [testAttempts.userId],
-      references: [users.id],
-    }),
-    test: one(pteTests, {
-      fields: [testAttempts.testId],
-      references: [pteTests.id],
-    }),
-    answers: many(testAnswers),
-  })
-);
-
-export const testAnswersRelations = relations(testAnswers, ({ one }) => ({
-  attempt: one(testAttempts, {
-    fields: [testAnswers.attemptId],
-    references: [testAttempts.id],
-  }),
-  question: one(pteQuestions, {
-    fields: [testAnswers.questionId],
-    references: [pteQuestions.id],
-  }),
-}));
-
-export const practiceSessionsRelations = relations(
-  practiceSessions,
-  ({ one }) => ({
-    user: one(users, {
-      fields: [practiceSessions.userId],
-      references: [users.id],
-    }),
-    question: one(pteQuestions, {
-      fields: [practiceSessions.questionId],
-      references: [pteQuestions.id],
-    }),
-  })
+export const pteListeningQuestionsRelations = relations(
+    pteListeningQuestions,
+    ({ one }) => ({
+        question: one(pteQuestions, {
+            fields: [pteListeningQuestions.questionId],
+            references: [pteQuestions.id],
+        }),
+    })
 );
 
 // Type exports
-export type PteTest = typeof pteTests.$inferSelect
-export type NewPteTest = typeof pteTests.$inferInsert
-export type PteQuestion = typeof pteQuestions.$inferSelect
-export type NewPteQuestion = typeof pteQuestions.$inferInsert
-export type PteQuestionType = typeof pteQuestionTypes.$inferSelect
-export type NewPteQuestionType = typeof pteQuestionTypes.$inferInsert
-export type TestAttempt = typeof testAttempts.$inferSelect
-export type NewTestAttempt = typeof testAttempts.$inferInsert
-export type TestAnswer = typeof testAnswers.$inferSelect
-export type NewTestAnswer = typeof testAnswers.$inferInsert
-export type PracticeSession = typeof practiceSessions.$inferSelect
-export type NewPracticeSession = typeof practiceSessions.$inferInsert
-export type PteQuestionMedia = typeof pteQuestionMedia.$inferSelect
-export type NewPteQuestionMedia = typeof pteQuestionMedia.$inferInsert
-export type PteSyncJob = typeof pteSyncJobs.$inferSelect
-export type NewPteSyncJob = typeof pteSyncJobs.$inferInsert
-export type PteUserExamSettings = typeof pteUserExamSettings.$inferSelect
-export type NewPteUserExamSettings = typeof pteUserExamSettings.$inferInsert
+export type PteQuestion = typeof pteQuestions.$inferSelect;
+export type NewPteQuestion = typeof pteQuestions.$inferInsert;
+export type PteSpeakingQuestion = typeof pteSpeakingQuestions.$inferSelect;
+export type NewPteSpeakingQuestion = typeof pteSpeakingQuestions.$inferInsert;
+export type PteWritingQuestion = typeof pteWritingQuestions.$inferSelect;
+export type NewPteWritingQuestion = typeof pteWritingQuestions.$inferInsert;
+export type PteReadingQuestion = typeof pteReadingQuestions.$inferSelect;
+export type NewPteReadingQuestion = typeof pteReadingQuestions.$inferInsert;
+export type PteListeningQuestion = typeof pteListeningQuestions.$inferSelect;
+export type NewPteListeningQuestion = typeof pteListeningQuestions.$inferInsert;

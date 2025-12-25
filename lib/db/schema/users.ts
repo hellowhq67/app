@@ -10,14 +10,26 @@ import {
   timestamp,
   uuid,
 } from 'drizzle-orm/pg-core';
-import { userSubscriptions } from './subscriptions';
-import { testAttempts, practiceSessions } from './pte-questions';
 
 // Enums
 export const difficultyEnum = pgEnum('difficulty_level', [
   'Easy',
   'Medium',
   'Hard',
+]);
+
+export const subscriptionTierEnum = pgEnum('subscription_tier', [
+  'free',
+  'basic',
+  'premium',
+  'unlimited',
+]);
+
+export const subscriptionStatusEnum = pgEnum('subscription_status', [
+  'active',
+  'expired',
+  'cancelled',
+  'trial',
 ]);
 
 // Better Auth: User table
@@ -32,10 +44,25 @@ export const users = pgTable('users', {
     .defaultNow()
     .$onUpdate(() => new Date())
     .notNull(),
-  
+
   // Role field (user, admin, teacher)
   role: text('role').notNull().default('user'),
-  
+
+  // Subscription fields
+  subscriptionTier: subscriptionTierEnum('subscription_tier')
+    .notNull()
+    .default('free'),
+  subscriptionStatus: subscriptionStatusEnum('subscription_status')
+    .notNull()
+    .default('active'),
+  subscriptionExpiresAt: timestamp('subscription_expires_at'),
+  examDate: timestamp('exam_date'),
+  monthlyPracticeLimit: integer('monthly_practice_limit').notNull().default(10),
+  practiceQuestionsThisMonth: integer('practice_questions_this_month')
+    .notNull()
+    .default(0),
+  lastMonthlyReset: timestamp('last_monthly_reset').defaultNow(),
+
   // Custom fields for your app
   dailyAiCredits: integer('daily_ai_credits').notNull().default(10),
   aiCreditsUsed: integer('ai_credits_used').notNull().default(0),
@@ -96,15 +123,6 @@ export const verifications = pgTable('verifications', {
 });
 
 
-
-// Relations
-export const usersRelations = relations(users, ({ one, many }) => ({
-  accounts: many(accounts),
-  sessions: many(sessions),
-  subscriptions: many(userSubscriptions),
-  testAttempts: many(testAttempts),
-  practiceSessions: many(practiceSessions),
-}));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, {

@@ -1,5 +1,5 @@
 import { db } from '../drizzle'
-import { users, pteTests, pteQuestions, pteAttempts, userProgress, testAttempts } from '../schema'
+import { users, pteMockTests, pteQuestions, pteAttempts, userProgress } from '../schema'
 import { count, eq, sql } from 'drizzle-orm'
 
 /**
@@ -8,7 +8,7 @@ import { count, eq, sql } from 'drizzle-orm'
 export async function getBasicStats() {
     try {
         const [userCount] = await db.select({ value: count() }).from(users)
-        const [testCount] = await db.select({ value: count() }).from(pteTests)
+        const [testCount] = await db.select({ value: count() }).from(pteMockTests)
         const [questionCount] = await db.select({ value: count() }).from(pteQuestions)
         const [attemptCount] = await db.select({ value: count() }).from(pteAttempts)
 

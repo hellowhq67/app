@@ -40,25 +40,25 @@ const navMain = [
   },
   {
     title: "Practice",
-    url: "/pte/academic/practice",
+    url: "/pte/practice",
     icon: BookOpen,
     isActive: true,
     items: [
       {
         title: "Speaking",
-        url: "/pte/academic/practice/speaking",
+        url: "/pte/practice/speaking",
       },
       {
         title: "Writing",
-        url: "/pte/academic/practice/writing",
+        url: "/pte/practice/writing",
       },
       {
         title: "Reading",
-        url: "/pte/academic/practice/reading",
+        url: "/pte/practice/reading",
       },
       {
         title: "Listening",
-        url: "/pte/academic/practice/listening",
+        url: "/pte/practice/listening",
       },
     ],
   },

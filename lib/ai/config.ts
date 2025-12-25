@@ -1,6 +1,13 @@
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { google } from '@ai-sdk/google';
+import { env } from '@/lib/env';
 
-export const proModel = openai('gpt-4o');
-export const fastModel = openai('gpt-4o-mini');
+// Vercel AI Gateway configuration
+const gateway = createOpenAI({
+    apiKey: env.AI_GATEWAY_API_KEY,
+    baseURL: env.AI_GATEWAY_URL || 'https://gateway.ai.cloudflare.com/v1/4507662551613440/pte-academic/openai', // Fallback to provided structure if URL is empty but key exists
+});
+
+export const proModel = gateway('gpt-4o');
+export const fastModel = gateway('gpt-4o-mini');
 export const geminiModel = google('gemini-1.5-pro');

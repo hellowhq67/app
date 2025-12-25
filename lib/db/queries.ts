@@ -4,7 +4,6 @@
  */
 
 export * from './queries/users'
-export * from './queries/pte'
 export * from './queries/activity'
 export * from './queries/dashboard'
 export * from './queries/attempts'

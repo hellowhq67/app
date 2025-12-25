@@ -27,7 +27,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { User as UserType } from '@/lib/db/schema'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 
 type UIUser = UserType & {
   targetScore?: number | null

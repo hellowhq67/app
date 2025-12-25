@@ -51,6 +51,8 @@ export enum QuestionType {
   DESCRIBE_IMAGE = 'Describe Image',
   RE_TELL_LECTURE = 'Re-tell Lecture',
   ANSWER_SHORT_QUESTION = 'Answer Short Question',
+  RESPOND_TO_A_SITUATION = 'Respond to a Situation',
+  SUMMARIZE_GROUP_DISCUSSION = 'Summarize Group Discussion',
 
   // Writing
   SUMMARIZE_WRITTEN_TEXT = 'Summarize Written Text',

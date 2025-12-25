@@ -12,11 +12,13 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 import { users } from './users';
-import { speakingAttempts } from './speaking';
-import { writingAttempts } from './writing';
-import { readingAttempts } from './reading';
-import { listeningAttempts } from './listening';
+// TODO: Uncomment when these schema files are created
+// import { speakingAttempts } from './speaking';
+// import { writingAttempts } from './writing';
+// import { readingAttempts } from './reading';
+// import { listeningAttempts } from './listening';
 import { conversationSessions } from './conversation';
+import { pteAttempts } from './pte-attempts';
 
 // Enums for AI usage
 export const aiUsageTypeEnum = pgEnum('ai_usage_type', [
@@ -48,7 +50,8 @@ export const aiCreditUsage = pgTable(
     cost: decimal('cost', { precision: 10, scale: 6 }), // Estimated cost in USD
     sessionId: uuid('session_id'), // Optional: link to conversation session
     attemptId: uuid('attempt_id'), // Optional: link to attempt (speaking/writing/etc.)
-    attemptType: text('attempt_type'), // 'speaking' | 'writing' | 'reading' | 'listening'
+    attemptType: text('attempt_type'), // 'speaking' | 'writing' | 'reading' | 'listening' | 'pte'
+    pteAttemptId: uuid('pte_attempt_id'), // Optional: link to PTE attempt
     metadata: jsonb('metadata'), // Additional tracking data
     createdAt: timestamp('created_at').defaultNow().notNull(),
   },
@@ -59,6 +62,7 @@ export const aiCreditUsage = pgTable(
     createdAtIdx: index('idx_ai_usage_created_at').on(table.createdAt),
     sessionIdIdx: index('idx_ai_usage_session_id').on(table.sessionId),
     attemptIdIdx: index('idx_ai_usage_attempt_id').on(table.attemptId),
+    pteAttemptIdIdx: index('idx_ai_usage_pte_attempt_id').on(table.pteAttemptId),
     // NEW: Composite index for cost tracking by user and date
     idxUserCreated: index('idx_ai_usage_user_created').on(
       table.userId,

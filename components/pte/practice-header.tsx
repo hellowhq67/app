@@ -45,7 +45,7 @@ export function AcademicPracticeHeader({
         {/* Breadcrumb Navigation */}
         <nav className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
           <Link
-            href="/pte/academic/practice"
+            href="/pte/practice"
             className="flex items-center gap-1 hover:text-blue-600"
           >
             <Home className="h-4 w-4" />
@@ -55,7 +55,7 @@ export function AcademicPracticeHeader({
             <>
               <ChevronRight className="h-4 w-4" />
               <Link
-                href={`/pte/academic/practice/${section}`}
+                href={`/pte/practice/${section}`}
                 className="hover:text-blue-600"
               >
                 {formatSectionName(section)}
