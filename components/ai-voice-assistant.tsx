@@ -1,7 +1,5 @@
-'use client'
-
 import React from 'react'
-import { RealtimeVoiceAgent } from '@/components/ui/realtime-voice-agent'
+import { GeminiRealtimeAgent } from '@/components/ui/gemini-voice-agent'
 import { cn } from '@/lib/utils'
 
 interface AIVoiceAssistantProps {
@@ -10,10 +8,9 @@ interface AIVoiceAssistantProps {
 
 export function AIVoiceAssistant({ className }: AIVoiceAssistantProps) {
   return (
-    <div className={cn('flex flex-col h-full', className)}>
-      <RealtimeVoiceAgent
-        sessionType="speaking_practice"
-        className="flex-1 flex flex-col justify-start items-stretch gap-4 p-0"
+    <div className={cn('flex flex-col h-full bg-background', className)}>
+      <GeminiRealtimeAgent
+        className="flex-1 flex flex-col justify-center items-center gap-8"
       />
     </div>
   )
