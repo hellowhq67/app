@@ -1,11 +1,12 @@
-'use client'
+import type { Metadata } from 'next'
+import { PTELayoutClient } from '@/components/pte/pte-layout-client'
 
-import { ReactNode } from 'react'
+export const metadata: Metadata = {
+    title: "PTE Practice Lab | Pedagogist's",
+    description: 'AI-Powered PTE Academic practice and scoring.',
+}
 
-export default function PracticeLayout({
-  children,
-}: {
-  children: ReactNode
-}): ReactNode {
-  return children
+export default function PracticeLayout({ children }: { children: React.ReactNode }) {
+    // Reuse the existing PTELayoutClient for consistent nav/sidebar
+    return <PTELayoutClient>{children}</PTELayoutClient>
 }
