@@ -84,25 +84,25 @@ export default async function PteAcademicDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4">
-              <Link href="/pte/academic/practice?tab=speaking" className="block">
+              <Link href="/pte/practice/speaking" className="block">
                 <div className="flex flex-col items-center justify-center p-6 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
                   <Mic className="h-8 w-8 mb-2 text-primary" />
                   <span className="font-medium">Speaking</span>
                 </div>
               </Link>
-              <Link href="/pte/academic/practice?tab=writing" className="block">
+              <Link href="/pte/practice/writing" className="block">
                 <div className="flex flex-col items-center justify-center p-6 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
                   <PenTool className="h-8 w-8 mb-2 text-primary" />
                   <span className="font-medium">Writing</span>
                 </div>
               </Link>
-              <Link href="/pte/academic/practice?tab=reading" className="block">
+              <Link href="/pte/practice/reading" className="block">
                 <div className="flex flex-col items-center justify-center p-6 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
                   <BookOpen className="h-8 w-8 mb-2 text-primary" />
                   <span className="font-medium">Reading</span>
                 </div>
               </Link>
-              <Link href="/pte/academic/practice?tab=listening" className="block">
+              <Link href="/pte/practice/listening" className="block">
                 <div className="flex flex-col items-center justify-center p-6 border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer">
                   <Headphones className="h-8 w-8 mb-2 text-primary" />
                   <span className="font-medium">Listening</span>

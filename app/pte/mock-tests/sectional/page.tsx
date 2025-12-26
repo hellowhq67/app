@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
   BookOpen,
   CheckCircle2,
@@ -17,7 +18,15 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 export default function SectionalMockTestsPage() {
-  const [activeTab, setActiveTab] = useState('all')
+  const searchParams = useSearchParams()
+  const tabParam = searchParams.get('tab')
+  const [activeTab, setActiveTab] = useState(tabParam || 'all')
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam])
 
   // Mock data - replace with actual database queries
   const sectionTests = {

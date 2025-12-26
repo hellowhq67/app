@@ -273,7 +273,7 @@ export function PTEDashboard() {
       {/* Quick Access Grid - Floating Glass Cards */}
       <motion.div variants={item} className="grid gap-6 md:grid-cols-3">
         {[
-          { href: '/pte/academic/practice', title: 'PTE Practice', count: '5000+ Questions', desc: 'Sharpen your skills with real-world scenarios.', icon: BookOpen, color: 'from-blue-500/10 to-transparent' },
+          { href: '/pte/practice', title: 'PTE Practice', count: '5000+ Questions', desc: 'Sharpen your skills with real-world scenarios.', icon: BookOpen, color: 'from-blue-500/10 to-transparent' },
           { href: '/pte/mock-tests', title: 'Mock Tests', count: '200+ Exams', desc: 'Simulate the pressure of the actual PTE hall.', icon: FileText, color: 'from-indigo-500/10 to-transparent' },
           { href: '/pte/templates', title: 'Smart Templates', count: '20+ Blueprints', desc: 'The proven structures for 79+ scores.', icon: Layout, color: 'from-accent-500/10 to-transparent' },
         ].map((card) => (

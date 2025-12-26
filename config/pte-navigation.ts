@@ -37,54 +37,54 @@ export const pteNavigation: NavSection[] = [
             },
             {
                 title: 'Practice',
-                href: '/pte/academic/practice',
+                href: '/pte/practice',
                 icon: BookOpen,
                 children: [
                     {
                         title: 'Speaking',
-                        href: '/pte/academic/practice/speaking',
+                        href: '/pte/practice/speaking',
                         icon: Mic,
                     },
                     {
                         title: 'Writing',
-                        href: '/pte/academic/practice/writing',
+                        href: '/pte/practice/writing',
                         icon: PenSquare,
                     },
                     {
                         title: 'Reading',
-                        href: '/pte/academic/practice/reading',
+                        href: '/pte/practice/reading',
                         icon: BookOpen,
                     },
                     {
                         title: 'Listening',
-                        href: '/pte/academic/practice/listening',
+                        href: '/pte/practice/listening',
                         icon: Headphones,
                     },
                 ],
             },
             {
                 title: 'Section Tests',
-                href: '/pte/academic/practice/section-tests',
+                href: '/pte/mock-tests/sectional',
                 icon: FileCheck,
                 children: [
                     {
                         title: 'Speaking Tests',
-                        href: '/pte/academic/practice/section-tests/speaking',
+                        href: '/pte/mock-tests/sectional?tab=speaking',
                         icon: Mic,
                     },
                     {
                         title: 'Writing Tests',
-                        href: '/pte/academic/practice/section-tests/writing',
+                        href: '/pte/mock-tests/sectional?tab=writing',
                         icon: PenSquare,
                     },
                     {
                         title: 'Reading Tests',
-                        href: '/pte/academic/practice/section-tests/reading',
+                        href: '/pte/mock-tests/sectional?tab=reading',
                         icon: BookOpen,
                     },
                     {
                         title: 'Listening Tests',
-                        href: '/pte/academic/practice/section-tests/listening',
+                        href: '/pte/mock-tests/sectional?tab=listening',
                         icon: Headphones,
                     },
                 ],

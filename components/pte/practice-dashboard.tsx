@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { pteScoreBreakdown } from '@/lib/pte/score-breakdown'
+
 import {
-  Award,
-  BarChart3,
-  BookOpen,
-  FileText,
-  Headphones,
-  Mic,
+    Award,
+    BarChart3,
+    BookOpen,
+    FileText,
+    Headphones,
+    Mic,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -73,61 +73,6 @@ export function PracticeDashboard({ categories }: { categories: any[] }) {
         )
     }, [activeSection, allCategories, deferredSearchTerm])
 
-    // Get score breakdown for current section
-    const getScoreInfo = (code: string, shortName?: string) => {
-        // Map category codes and short names to score breakdown abbreviations
-        // Priority: short name (if matches) > code mapping
-        if (shortName) {
-            const shortNameMatch = pteScoreBreakdown.find(
-                (q) => q.abbreviation === shortName
-            )
-            if (shortNameMatch) return shortNameMatch
-        }
-
-        const codeMap: Record<string, string> = {
-            s_read_aloud: 'RA',
-            s_repeat_sentence: 'RS',
-            s_describe_image: 'DI',
-            s_retell_lecture: 'RL',
-            s_short_question: 'ASQ',
-            s_respond_situation_academic: 'RTS-A',
-            s_summarize_group_discussion: 'SGD',
-            w_summarize_text: 'SWT', // This might be SWT (Reading & Writing Fill in Blanks)
-            w_essay: 'WE',
-            rw_fib: 'SWT', // Reading & Writing Fill in the Blanks
-            r_fib: 'FIB_Drop Down', // Fill in the Blanks - Drop Down
-            r_mcq_multiple: 'MCM_R',
-            r_reorder_paragraphs: 'RO',
-            r_fib_drag_drop: 'FIB_Drag',
-            r_mcq_single: 'MCS_R',
-            l_summarize_text: 'SST',
-            l_mcq_multiple: 'MCM_L',
-            l_fib: 'FIB_L',
-            l_highlight_correct_summary: 'HCS',
-            l_mcq_single: 'MCS_L',
-            l_select_missing_word: 'SMW',
-            l_highlight_incorrect_words: 'HIW',
-            l_write_from_dictation: 'WFD',
-        }
-
-        const abbreviation = codeMap[code]
-        if (!abbreviation) return null
-
-        // Handle special cases where abbreviation might have variations
-        // Normalize abbreviations for comparison (remove underscores, spaces, etc.)
-        const normalizeAbbr = (abbr: string) =>
-            abbr.replace(/[_\s-]/g, '').toUpperCase()
-        const normalizedTarget = normalizeAbbr(abbreviation)
-
-        return pteScoreBreakdown.find((q) => {
-            const normalizedQ = normalizeAbbr(q.abbreviation)
-            return (
-                normalizedQ === normalizedTarget ||
-                normalizedQ.includes(normalizedTarget) ||
-                normalizedTarget.includes(normalizedQ)
-            )
-        })
-    }
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         startTransition(() => {

@@ -30,6 +30,7 @@ import { ScoreDetailsModal } from './score-details-modal'
 interface UniversalPracticeWrapperProps {
     category: string
     type: string
+    questionId?: string
     children: (props: {
         question: any
         isSubmitting: boolean
@@ -42,6 +43,7 @@ interface UniversalPracticeWrapperProps {
 export function UniversalPracticeWrapper({
     category,
     type,
+    questionId,
     children
 }: UniversalPracticeWrapperProps) {
     const router = useRouter()
@@ -60,7 +62,11 @@ export function UniversalPracticeWrapper({
     useEffect(() => {
         async function fetchQuestions() {
             try {
-                const response = await fetch(`/api/pte/questions?type=${encodeURIComponent(type)}`)
+                let url = `/api/pte/questions?type=${encodeURIComponent(type)}`
+                if (questionId) {
+                    url = `/api/pte/questions?id=${encodeURIComponent(questionId)}`
+                }
+                const response = await fetch(url)
                 const data = await response.json()
                 if (data.success) {
                     setQuestions(data.data)
@@ -72,7 +78,7 @@ export function UniversalPracticeWrapper({
             }
         }
         fetchQuestions()
-    }, [type])
+    }, [type, questionId])
 
     // Timer Logic
     useEffect(() => {
@@ -281,27 +287,31 @@ export function UniversalPracticeWrapper({
                                         onClick={handleNext}
                                         className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold transition-all shadow-xl shadow-blue-600/20 flex items-center gap-2"
                                     >
-                                        {/* Community/Discussion Area - Below Practice Card */}
-                                        <div className="mt-12 w-full space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
-                                            <div className="flex items-center justify-between px-4">
-                                                <h3 className="text-lg font-bold flex items-center gap-2">
-                                                    <MessageSquare className="size-5 text-blue-500" />
-                                                    Community Discussion
-                                                </h3>
-                                                <span className="text-xs font-medium text-gray-400">24 Comments</span>
-                                            </div>
-
-                                            <div className="bg-white dark:bg-[#121214] border border-gray-200 dark:border-white/10 rounded-[28px] p-8 shadow-sm">
-                                                <div className="text-center py-12">
-                                                    <div className="size-16 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-4 border border-dashed border-gray-300 dark:border-white/10">
-                                                        <MessageSquare className="size-8 text-gray-400" />
-                                                    </div>
-                                                    <p className="text-gray-500 dark:text-gray-400 font-medium">Be the first to share your thoughts on this question!</p>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        <span>{currentIndex < questions.length - 1 ? 'Next Question' : 'Finish Practice'}</span>
+                                        <ChevronRight className="size-4" />
+                                    </button>
                                 </div>
-                            </main>
+                            </div>
+                        </div>
+
+                        {/* Community/Discussion Area - Below Practice Card */}
+                        <div className="w-full space-y-6 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+                            <div className="flex items-center justify-between px-4">
+                                <h3 className="text-lg font-bold flex items-center gap-2">
+                                    <MessageSquare className="size-5 text-blue-500" />
+                                    Community Discussion
+                                </h3>
+                                <span className="text-xs font-medium text-gray-400">24 Comments</span>
+                            </div>
+
+                            <div className="bg-white dark:bg-[#121214] border border-gray-200 dark:border-white/10 rounded-[28px] p-8 shadow-sm">
+                                <div className="text-center py-12">
+                                    <div className="size-16 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-4 border border-dashed border-gray-300 dark:border-white/10">
+                                        <MessageSquare className="size-8 text-gray-400" />
+                                    </div>
+                                    <p className="text-gray-500 dark:text-gray-400 font-medium">Be the first to share your thoughts on this question!</p>
+                                </div>
+                            </div>
                         </div>
 
                         <ScoreDetailsModal
@@ -311,7 +321,10 @@ export function UniversalPracticeWrapper({
                             question={currentQuestion}
                         />
                     </div>
-                    )
+                </main>
+            </div>
+        </div>
+    )
 }
 
                     function SidebarItem({icon, label, active = false, href}: {icon: React.ReactNode, label: string, active?: boolean, href?: string }) {

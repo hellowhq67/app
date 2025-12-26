@@ -9,11 +9,14 @@ export async function GET(request: NextRequest) {
     try {
         const searchParams = request.nextUrl.searchParams;
         const typeCode = searchParams.get('type');
+        const id = searchParams.get('id');
         const difficulty = searchParams.get('difficulty');
 
         let whereClause = undefined;
 
-        if (typeCode) {
+        if (id) {
+            whereClause = eq(pteQuestions.id, id);
+        } else if (typeCode) {
             const type = await db.query.pteQuestionTypes.findFirst({
                 where: eq(pteQuestionTypes.code, typeCode as any),
             });
