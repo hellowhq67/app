@@ -1,0 +1,100 @@
+" .vwo-content-loader{ border: 16px solid #f3f3f3; border-top: 16px solid #3498db; border-radius: 50%; width: 90px; height: 90px; position: fixed; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); transform: translate(-50%, -50%); animation: vwo-spin 2s linear infinite; z-index:" +
+                (popupZIndex - 1) +
+                "; }" +
+                "@keyframes vwo-spin { 0% { -webkit-transform: translate(-50%, -50%) rotate(0deg); transform: translate(-50%, -50%) rotate(0deg); } 100% { -webkit-transform: translate(-50%, -50%) rotate(360deg); transform: translate(-50%, -50%) rotate(360deg); } }";
+            /**
+             * This below written code should not be tweaked
+             * */
+            var overlayStyleTag = d.getElementById("_vis_opt_overlay"),
+              overlayCSS = ".vwo-overlay{" + vwoFilter + "}" + vwoLoaderCss;
+            if (overlayStyleTag) {
+              if (overlayStyleTag.styleSheet) {
+                overlayStyleTag.styleSheet.cssText = overlayCSS;
+              } else {
+                var _vwo_textNode = d.createTextNode(overlayCSS);
+                overlayStyleTag.appendChild(_vwo_textNode);
+                overlayStyleTag.removeChild(overlayStyleTag.childNodes[0]);
+              }
+            } else {
+              var a = d.createElement("style"),
+                h = d.getElementsByTagName("head")[0],
+                body = d.getElementsByTagName("body")[0];
+              var vwoOverlay = d.createElement("div");
+              vwoOverlay.classList.add("vwo-overlay");
+              body.prepend(vwoOverlay);
+              // CAUTION Do not remove this id from your style tag. It is required by VWO
+              a.setAttribute("id", "_vis_opt_overlay");
+              a.setAttribute("type", "text/css");
+              if (a.styleSheet) a.styleSheet.cssText = overlayCSS;
+              else a.appendChild(d.createTextNode(overlayCSS));
+              h.appendChild(a);
+            }
+            return !!popup;
+          },
+          removeLoaderAndOverlay: function () {
+            var overlay = d.getElementsByClassName("vwo-overlay");
+            var loader = d.getElementsByClassName("vwo-content-loader");
+            var overlayStyleTag = d.getElementById("_vis_opt_overlay");
+            overlay &&
+              (overlay = overlay[0]) &&
+              overlay.parentElement.removeChild(overlay);
+            loader &&
+              (loader = loader[0]) &&
+              loader.parentElement.removeChild(loader);
+            overlayStyleTag &&
+              overlayStyleTag.parentElement.removeChild(overlayStyleTag);
+          },
+          isNonLiveMode: function (accountId) {
+            var wName = w.name;
+            if (!wName) {
+              return;
+            }
+            return (
+              (wName.indexOf("_vis_editor") > -1 ||
+                wName.indexOf("_vis_preview_" + accountId) > -1 ||
+                wName.indexOf("_vis_heatmap_" + accountId) > -1) &&
+              "1"
+            );
+          },
+        };
+        w._vwo_code = code;
+      })();
+    _vwo_code.setFilterConfigAndApplyFilter({
+      popupSelector: "SELECTOR_PATH_OF_POPUP",
+      filterTime: "FILTER_TIME_AS_PER_YOUR_PREFERENCE",
+      isConsentGiven: function () {
+        var consented = document.cookie.indexOf("C0004%3A1");
+        if (consented > -1) {
+          return "1";
+        } else if (consented === -1) {
+          return "2";
+        } else {
+          return "3";
+        }
+      },
+      filterTolerance: "HARD_TIMER_FOR_REMOVING_OVERLAY_AND_POPUP",
+    });
+  </script>
+  <!-- End VWO Async SmartCode -->
+  <meta name="csp-nonce" content="dev-nonce">
+  <link rel="stylesheet" href="/assets/pte-assistant/build/pte-assistant.css">
+  <link rel="stylesheet" href="/assets/nemo/nemo.css">
+  <script type="module">
+    import { defineCustomElements as defineNemo } from '/assets/nemo-core/esm/loader.js';
+    defineNemo();
+
+    (function () {
+      const iconBase = '/assets/nemo/icon-assets/standardIcons/';
+      const origFetch = window.fetch.bind(window);
+      window.fetch = (u, o) => {
+        try {
+          if (typeof u === 'string' && u.endsWith('.json')) {
+            const m = u.match(/([a-z-]+-(?:sm|md))\.json$/);
+            if (m && m[1]) {
+              u = iconBase + m[1] + '.json';
+            }
+          }
+        } catch { }
+        return origFetch(u, o);
+      };
+    })();

@@ -2,9 +2,15 @@
   "mcpServers": {
     "sequentialthinking": {
       "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "context7": {
+      "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-sequential-thinking"
+        "@upstash/context7-mcp",
+        "--api-key",
+        "ctx7sk-d7ee7e2a-f74c-4463-bf19-c816f27d6654"
       ]
     },
     "supabase": {
@@ -18,9 +24,7 @@
     },
     "qdrant": {
       "command": "uvx",
-      "args": [
-        "mcp-server-qdrant"
-      ],
+      "args": ["mcp-server-qdrant"],
       "env": {
         "QDRANT_URL": "https://0dd4f2e6-daf6-4020-9121-d1b9107c4f3f.europe-west3-0.gcp.cloud.qdrant.io",
         "QDRANT_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.mjMhec5RXJBzZ1hWQV_GH7DVwjG9e3G6D6fmeg1i_GI",

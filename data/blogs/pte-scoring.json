@@ -1,0 +1,17 @@
+{
+  "slug": "understanding-pte-scoring",
+  "title": "Demystifying the PTE Scoring Algorithm",
+  "description": "Learn how the PTE AI scoring engine works. Understand enabling skills vs communicative skills and how to optimize your performance.",
+  "author": "Tech Team",
+  "date": "2024-02-01",
+  "tags": ["PTE User", "AI Scoring", "Technology"],
+  "image": "/images/blog/scoring-algo.jpg",
+  "seoKeywords": [
+    "PTE Scoring",
+    "AI Scoring",
+    "PTE Algorithm",
+    "Communicative Skills",
+    "Enabling Skills"
+  ],
+  "content": "<h2>The Automated Scoring System</h2><p>PTE Academic is scored entirely by a computer automated scoring system. There are no human examiners. This ensures impartiality and consistency.</p><h2>Communicative Skills</h2><p>These are the scores reported to institutions:</p><ul><li>Listening</li><li>Reading</li><li>Speaking</li><li>Writing</li></ul><h2>Enabling Skills</h2><p>These skills support your communicative scores but are no longer explicitly shown on newer score reports (though they still matter internally):</p><ul><li><strong>Fluency:</strong> Smoothness of speech.</li><li><strong>Pronunciation:</strong> Intelligibility to native speakers.</li><li><strong>Grammar:</strong> Correct usage of language rules.</li><li><strong>Vocabulary:</strong> Range and appropriateness of words.</li><li><strong>Spelling:</strong> Adherence to standard spelling conventions.</li><li><strong>Written Discourse:</strong> Structure and flow of written text.</li></ul><h2>How to Use This to Your Advantage</h2><p>Since an AI judges you, you can 'game' the system slightly by focusing on what the AI prioritizes: clarity, structure, and keyword relevance. Fluency often outweighs complex content in Speaking tasks.</p>"
+}

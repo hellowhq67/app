@@ -1,9 +1,0 @@
-npm warn Unknown project config "store-dir". This will stop working in the next major version of npm.
-npm warn Unknown project config "child-concurrency". This will stop working in the next major version of npm.
-npm warn Unknown project config "package-import-method". This will stop working in the next major version of npm.
-npm warn Unknown project config "network-timeout". This will stop working in the next major version of npm.
-[dotenv@17.2.3] injecting env (50) from .env.local -- tip: ≡ƒöÉ prevent committing .env to code: https://dotenvx.com/precommit
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ≡ƒöæ add access controls to secrets: https://dotenvx.com/ops
-[Prepare] Fetching audio from: https://sgp1.digitaloceanspaces.com/liilab/quizbit/media/audio_6324d7ee-d114-44ba-ad10-c7102dde36c5.m4a
-[Prepare] Uploading to Vercel Blob...
-[Success] Audio uploaded to: https://0bnqt3onuegvdmxo.public.blob.vercel-storage.com/test/speaking-audit-bNJ9fZ0a6BgiqHCchFztmN0i8Q4r2i.m4a

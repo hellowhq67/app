@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "figma-remote-mcp-server": {
+      "disabled": false,
+      "headers": {},
+      "serverUrl": "https://mcp.figma.com/mcp"
+    },
+    "supabase-mcp-server": {
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_bb816bfaedb0de1d8e82d3250188c42b00d0cf34"
+      ],
+      "command": "npx",
+      "disabled": false,
+      "env": {}
+    },
+    "time": {
+      "args": [
+        "-m",
+        "mcp_server_time"
+      ],
+      "command": "python",
+      "env": {}
+    },
+    "vercel": {
+      "disabled": false,
+      "headers": {},
+      "serverUrl": "https://mcp.vercel.com"
+    }
+  }
+}
