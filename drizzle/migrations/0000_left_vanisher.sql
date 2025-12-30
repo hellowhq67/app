@@ -1,4 +1,156 @@
-CREATE TYPE "public"."difficulty_level" AS ENUM('Easy', 'Medium', 'Hard');--> statement-breakpoint
+CREATE TYPE "public"."difficulty_level" AS ENUM('Easy', 'Medium', 'Hard');
+CREATE TYPE "public"."user_role" AS ENUM('admin', 'teacher', 'user', 'student');
+CREATE TYPE "public"."subscription_plan" AS ENUM('free', 'pro', 'premium');
+CREATE TYPE "public"."question_type" AS ENUM(
+    'read_aloud', 'repeat_sentence', 'describe_image', 'retell_lecture', 'answer_short_question',
+    'summarize_written_text', 'write_essay',
+    'multiple_choice_single', 'multiple_choice_multiple', 'reorder_paragraphs', 'fill_in_blanks', 'reading_writing_fill_blanks',
+    'summarize_spoken_text', 'select_missing_word', 'highlight_correct_summary', 'highlight_incorrect_words', 'write_from_dictation'
+);
+CREATE TYPE "public"."conversation_role" AS ENUM('user', 'assistant', 'system');
+CREATE TYPE "public"."ai_usage_type" AS ENUM('transcription', 'scoring', 'feedback', 'realtime_voice', 'text_generation', 'other');
+
+CREATE TABLE "users" (
+	"id" text PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"email" text NOT NULL,
+	"email_verified" boolean DEFAULT false NOT NULL,
+	"image" text,
+	"role" "user_role" DEFAULT 'user' NOT NULL,
+    "plan" "subscription_plan" DEFAULT 'free' NOT NULL,
+    "daily_ai_credits" integer DEFAULT 10 NOT NULL,
+    "ai_credits_used" integer DEFAULT 0 NOT NULL,
+    "last_credit_reset" timestamp DEFAULT now(),
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "users_email_unique" UNIQUE("email")
+);
+
+CREATE TABLE "accounts" (
+	"id" text PRIMARY KEY NOT NULL,
+	"account_id" text NOT NULL,
+	"provider_id" text NOT NULL,
+	"user_id" text NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+	"access_token" text,
+	"refresh_token" text,
+	"id_token" text,
+	"access_token_expires_at" timestamp,
+	"refresh_token_expires_at" timestamp,
+	"scope" text,
+	"password" text,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp NOT NULL
+);
+
+CREATE TABLE "sessions" (
+	"id" text PRIMARY KEY NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"token" text NOT NULL,
+    "user_id" text NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp NOT NULL,
+	"ip_address" text,
+	"user_agent" text,
+	CONSTRAINT "sessions_token_unique" UNIQUE("token")
+);
+
+CREATE TABLE "verifications" (
+	"id" text PRIMARY KEY NOT NULL,
+	"identifier" text NOT NULL,
+	"value" text NOT NULL,
+	"expires_at" timestamp NOT NULL,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "user_profiles" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+	"target_score" integer,
+	"exam_date" timestamp,
+	"study_goal" text,
+	"preferences" jsonb,
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "user_profiles_user_id_unique" UNIQUE("user_id")
+);
+
+CREATE TABLE "questions" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"type" "question_type" NOT NULL,
+	"title" text NOT NULL,
+	"content" text NOT NULL, -- Main prompt text
+    "content_data" jsonb, -- Structured content (options, etc.)
+    "media_url" text, -- Audio/Image URL
+    "transcript" text,
+    "correct_answer" jsonb,
+	"difficulty" "difficulty_level" DEFAULT 'Medium',
+	"tags" jsonb DEFAULT '[]'::jsonb,
+	"is_active" boolean DEFAULT true NOT NULL,
+    "metadata" jsonb, -- Timers, specific params
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "attempts" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+	"question_id" uuid NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
+	"response" jsonb, -- User answer
+    "is_correct" boolean,
+	"score" integer DEFAULT 0,
+    "ai_feedback" jsonb, -- Detailed feedback
+    "metadata" jsonb, -- Duration, pronunciation scores, etc.
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "tests" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"title" text NOT NULL,
+	"description" text,
+    "type" text DEFAULT 'mock', -- mock, diagnostic
+	"is_premium" boolean DEFAULT false,
+    "structure" jsonb, -- Section order, question counts
+	"created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "test_attempts" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+	"test_id" uuid NOT NULL REFERENCES "tests"("id") ON DELETE CASCADE,
+	"status" text DEFAULT 'in_progress', -- in_progress, completed
+	"started_at" timestamp DEFAULT now() NOT NULL,
+	"completed_at" timestamp,
+	"scores" jsonb, -- Overall and section scores
+    "created_at" timestamp DEFAULT now() NOT NULL,
+	"updated_at" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "test_answers" (
+    "id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+    "test_attempt_id" uuid NOT NULL REFERENCES "test_attempts"("id") ON DELETE CASCADE,
+    "question_id" uuid NOT NULL REFERENCES "questions"("id") ON DELETE CASCADE,
+    "answer" jsonb,
+    "score" integer,
+    "feedback" jsonb,
+    "created_at" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE TABLE "ai_credit_usage" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"user_id" text NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+	"usage_type" "ai_usage_type" NOT NULL,
+	"amount" integer DEFAULT 1,
+    "metadata" jsonb,
+	"created_at" timestamp DEFAULT now() NOT NULL
+);
+
+CREATE INDEX "idx_questions_type" ON "questions" USING btree ("type");
+CREATE INDEX "idx_questions_difficulty" ON "questions" USING btree ("difficulty");
+CREATE INDEX "idx_attempts_user" ON "attempts" USING btree ("user_id");
+CREATE INDEX "idx_attempts_question" ON "attempts" USING btree ("question_id");
+--> statement-breakpoint
 CREATE TYPE "public"."user_role" AS ENUM('admin', 'teacher', 'user', 'student');--> statement-breakpoint
 CREATE TYPE "public"."listening_question_type" AS ENUM('summarize_spoken_text', 'multiple_choice_single', 'multiple_choice_multiple', 'fill_in_blanks', 'highlight_correct_summary', 'select_missing_word', 'highlight_incorrect_words', 'write_from_dictation');--> statement-breakpoint
 CREATE TYPE "public"."reading_question_type" AS ENUM('multiple_choice_single', 'multiple_choice_multiple', 'reorder_paragraphs', 'fill_in_blanks', 'reading_writing_fill_blanks');--> statement-breakpoint

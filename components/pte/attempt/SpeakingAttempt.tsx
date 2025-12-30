@@ -5,16 +5,12 @@ import QuestionPrompt from '@/components/pte/speaking/QuestionPrompt'
 import SpeakingRecorder from '@/components/pte/speaking/SpeakingRecorder'
 import { ScoreDetailsModal } from '@/components/pte/attempt/ScoreDetailsModal'
 import { Button } from '@/components/ui/button'
-import {
-  enqueueSubmission,
-  getDefaultTimings,
-  initQueueAutoRetry,
-  type StartSessionResponse,
-} from '@/lib/pte/attempts'
-import { submitSpeakingAttempt } from '@/app/actions/speaking'
+import { scoreSpeakingAttempt, scoreReadAloudAttempt } from '@/app/actions/pte'
 import { uploadAudioWithFallback } from '@/lib/pte/blob-upload'
 import type { SpeakingTimings, SpeakingType } from '@/lib/pte/types'
 import SpeakingBoards from '@/components/pte/speaking/SpeakingBoards'
+import { QuestionType } from '@/lib/types'
+
 type PromptLike = {
   title?: string | null
   promptText?: string | null
@@ -83,8 +79,6 @@ export default function SpeakingAttempt({
         return
       }
       try {
-        // Create FormData for server action
-        const formData = new FormData()
         // Wrap blob into File for upload
         const file = new File(
           [recorded.blob],
@@ -94,28 +88,42 @@ export default function SpeakingAttempt({
           }
         )
 
-        formData.append('questionId', questionId)
-        formData.append('type', questionType)
-        formData.append('audio', file)
-        if (recorded.timings) {
-          formData.append('timings', JSON.stringify(recorded.timings))
+        let result;
+        const promptContent = prompt?.promptText || prompt?.title || '';
+
+        // Call server action based on type
+        if (questionType === 'read_aloud') {
+             result = await scoreReadAloudAttempt(file, promptContent, questionId);
+        } else {
+             // Map string type to enum if necessary, or pass as is if compatible
+             // Assuming QuestionType enum values match strings like 'describe_image' etc.
+             // Need to ensure QuestionType enum is imported or compatible.
+             // Using 'as any' for safety if enum mapping is tricky here without full type context.
+             result = await scoreSpeakingAttempt(questionType as any, file, promptContent, questionId);
         }
 
-        // Call server action
-        const attempt = await submitSpeakingAttempt(formData)
+        if (!result.success) {
+            throw new Error(result.error || 'Submission failed');
+        }
+
         // Success path
-        setAudioUrl(attempt.audioUrl)
-        setLastAttemptId(attempt.id)
-        if (attempt.score !== undefined && attempt.score !== null) {
+        setAudioUrl(result.audioUrl)
+        setLastAttemptId(result.attemptId)
+        
+        if (result.feedback) {
           setScoreData({
-            total: attempt.score,
-            breakdown: attempt.subscores,
-            feedback: attempt.feedback,
+            total: result.feedback.overallScore,
+            content: result.feedback.content?.score,
+            pronunciation: result.feedback.pronunciation?.score,
+            fluency: result.feedback.fluency?.score,
+            feedback: {
+                rationale: result.feedback.suggestions?.join('\n')
+            }
           })
           setShowScoreModal(true)
         }
 
-        onSubmitted?.(attempt.id)
+        onSubmitted?.(result.attemptId)
         return
       } catch (e: any) {
         // Server action error -> surface error
@@ -124,7 +132,7 @@ export default function SpeakingAttempt({
         )
       }
     },
-    [onSubmitted, questionId, questionType, recorded]
+    [onSubmitted, questionId, questionType, recorded, prompt]
   )
 
   return (

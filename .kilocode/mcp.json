@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "sequentialthinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@0.5.5",
+        "--access-token",
+        "sbp_262b8b8f4943ee94fee6a8d7eb37e7646a5c95cf"
+      ]
+    },
+    "qdrant": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-qdrant"
+      ],
+      "env": {
+        "QDRANT_URL": "https://0dd4f2e6-daf6-4020-9121-d1b9107c4f3f.europe-west3-0.gcp.cloud.qdrant.io",
+        "QDRANT_API_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.mjMhec5RXJBzZ1hWQV_GH7DVwjG9e3G6D6fmeg1i_GI",
+        "COLLECTION_NAME": " pte-vector",
+        "EMBEDDING_MODEL": ""
+      }
+    }
+  }
+}

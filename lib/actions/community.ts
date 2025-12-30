@@ -1,10 +1,10 @@
 'use server'
 
-import { db } from '@/lib/db'
-import { speakingAttempts, speakingQuestions, users } from '@/lib/db/schema'
-import { auth } from '@/lib/auth'
+import { db } from '@/lib/db/drizzle'
+import { pteAttempts, pteQuestions, users } from '@/lib/db/schema'
+import { auth } from '@/lib/auth/auth'
 import { headers } from 'next/headers'
-import { desc, eq, sql, and } from 'drizzle-orm'
+import { desc, eq, sql } from 'drizzle-orm'
 
 export type SpeakingType = 'read_aloud' | 'repeat_sentence' | 'describe_image' | 'retell_lecture' | 'answer_short_question'
 
@@ -22,47 +22,37 @@ export async function getAllAttempts(options: {
         throw new Error('Unauthorized')
     }
 
-    const { page = 1, limit = 20, type, sortBy = 'recent' } = options
+    const { page = 1, limit = 20, sortBy = 'recent' } = options
     const offset = (page - 1) * limit
 
-    // Build where clause
-    const whereClauses = type ? eq(speakingAttempts.type, type) : undefined
-
-    // Get total count
     const [{ count }] = await db
         .select({ count: sql<number>`COUNT(*)` })
-        .from(speakingAttempts)
-        .where(whereClauses)
+        .from(pteAttempts)
 
-    // Get attempts with user and question data
     const attempts = await db
         .select({
-            id: speakingAttempts.id,
-            userId: speakingAttempts.userId,
-            questionId: speakingAttempts.questionId,
-            type: speakingAttempts.type,
-            audioUrl: speakingAttempts.audioUrl,
-            transcript: speakingAttempts.transcript,
-            scores: speakingAttempts.scores,
-            durationMs: speakingAttempts.durationMs,
-            createdAt: speakingAttempts.createdAt,
+            id: pteAttempts.id,
+            userId: pteAttempts.userId,
+            questionId: pteAttempts.questionId,
+            audioUrl: pteAttempts.responseAudioUrl, // Mapped from responseAudioUrl
+            transcript: pteAttempts.responseText, // Using responseText as transcript
+            scores: pteAttempts.aiScores, // Mapped from aiScores
+            createdAt: pteAttempts.createdAt,
             // User data
             userName: users.name,
             userEmail: users.email,
             userImage: users.image,
             // Question data
-            questionTitle: speakingQuestions.title,
-            questionType: speakingQuestions.type,
-            questionDifficulty: speakingQuestions.difficulty,
+            questionTitle: pteQuestions.title,
+            questionDifficulty: pteQuestions.difficulty,
         })
-        .from(speakingAttempts)
-        .leftJoin(users, eq(speakingAttempts.userId, users.id))
-        .leftJoin(speakingQuestions, eq(speakingAttempts.questionId, speakingQuestions.id))
-        .where(whereClauses)
+        .from(pteAttempts)
+        .leftJoin(users, eq(pteAttempts.userId, users.id))
+        .leftJoin(pteQuestions, eq(pteAttempts.questionId, pteQuestions.id))
         .orderBy(
             sortBy === 'top_score'
-                ? desc(sql`(${speakingAttempts.scores}->>'overall_score')::int`)
-                : desc(speakingAttempts.createdAt)
+                ? desc(sql`(${pteAttempts.aiScores}->>'total')::int`)
+                : desc(pteAttempts.createdAt)
         )
         .limit(limit)
         .offset(offset)
@@ -87,18 +77,17 @@ export async function getUserPublicAttempts(userId: string, limit: number = 10) 
 
     const attempts = await db
         .select({
-            id: speakingAttempts.id,
-            type: speakingAttempts.type,
-            audioUrl: speakingAttempts.audioUrl,
-            scores: speakingAttempts.scores,
-            createdAt: speakingAttempts.createdAt,
-            questionTitle: speakingQuestions.title,
-            questionDifficulty: speakingQuestions.difficulty,
+            id: pteAttempts.id,
+            audioUrl: pteAttempts.responseAudioUrl,
+            scores: pteAttempts.aiScores,
+            createdAt: pteAttempts.createdAt,
+            questionTitle: pteQuestions.title,
+            questionDifficulty: pteQuestions.difficulty,
         })
-        .from(speakingAttempts)
-        .leftJoin(speakingQuestions, eq(speakingAttempts.questionId, speakingQuestions.id))
-        .where(eq(speakingAttempts.userId, userId))
-        .orderBy(desc(speakingAttempts.createdAt))
+        .from(pteAttempts)
+        .leftJoin(pteQuestions, eq(pteAttempts.questionId, pteQuestions.id))
+        .where(eq(pteAttempts.userId, userId))
+        .orderBy(desc(pteAttempts.createdAt))
         .limit(limit)
 
     return attempts
@@ -115,22 +104,21 @@ export async function getTopAttempts(limit: number = 10) {
 
     const attempts = await db
         .select({
-            id: speakingAttempts.id,
-            userId: speakingAttempts.userId,
-            type: speakingAttempts.type,
-            audioUrl: speakingAttempts.audioUrl,
-            scores: speakingAttempts.scores,
-            createdAt: speakingAttempts.createdAt,
+            id: pteAttempts.id,
+            userId: pteAttempts.userId,
+            audioUrl: pteAttempts.responseAudioUrl,
+            scores: pteAttempts.aiScores,
+            createdAt: pteAttempts.createdAt,
             userName: users.name,
             userEmail: users.email,
             userImage: users.image,
-            questionTitle: speakingQuestions.title,
-            questionDifficulty: speakingQuestions.difficulty,
+            questionTitle: pteQuestions.title,
+            questionDifficulty: pteQuestions.difficulty,
         })
-        .from(speakingAttempts)
-        .leftJoin(users, eq(speakingAttempts.userId, users.id))
-        .leftJoin(speakingQuestions, eq(speakingAttempts.questionId, speakingQuestions.id))
-        .orderBy(desc(sql`(${speakingAttempts.scores}->>'overall_score')::int`))
+        .from(pteAttempts)
+        .leftJoin(users, eq(pteAttempts.userId, users.id))
+        .leftJoin(pteQuestions, eq(pteAttempts.questionId, pteQuestions.id))
+        .orderBy(desc(sql`(${pteAttempts.aiScores}->>'total')::int`))
         .limit(limit)
 
     return attempts
@@ -148,10 +136,10 @@ export async function getCommunityStats() {
     const [stats] = await db
         .select({
             totalAttempts: sql<number>`COUNT(*)`,
-            totalUsers: sql<number>`COUNT(DISTINCT ${speakingAttempts.userId})`,
-            avgScore: sql<number>`AVG((${speakingAttempts.scores}->>'overall_score')::int)`,
+            totalUsers: sql<number>`COUNT(DISTINCT ${pteAttempts.userId})`,
+            avgScore: sql<number>`AVG((${pteAttempts.aiScores}->>'total')::int)`,
         })
-        .from(speakingAttempts)
+        .from(pteAttempts)
 
     return stats
 }

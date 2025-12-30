@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Mic, Square, Volume2, AlertCircle, ArrowLeft, Play, Loader2, RotateCcw, CheckCircle, Headphones, Sparkles, Clock } from 'lucide-react'
-import { submitAttempt } from '@/lib/actions/pte'
+import { scoreSpeakingAttempt } from '@/app/actions/pte'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
 import { useRouter } from 'next/navigation'
@@ -118,18 +118,29 @@ export function RetellLecture({ question }: RetellLectureProps) {
     }, [stopRecording, playBeep])
 
     const handleSubmit = async () => {
-        if (!audioUrl || !transcript) return
+        if (!audioUrl) return
         setIsSubmitting(true)
         try {
-            const result = await submitAttempt({
-                questionId: question.id,
-                questionType: 'retell_lecture',
-                audioUrl: audioUrl,
-                transcript: transcript,
-                durationMs: recordingTime,
-            })
-            setScore(result.score)
-            toast.success('Response scored successfully!')
+            const response = await fetch(audioUrl)
+            const blob = await response.blob()
+            const file = new File([blob], 'recording.webm', { type: 'audio/webm' })
+
+            const result = await scoreSpeakingAttempt(
+                'retell_lecture' as any,
+                file,
+                question.promptText || question.title || '',
+                question.id
+            )
+
+            if (result.success && result.feedback) {
+                setScore({
+                    overall: result.feedback.overallScore,
+                    ...result.feedback
+                })
+                toast.success('Response scored successfully!')
+            } else {
+                throw new Error(result.error || 'Submission failed')
+            }
         } catch (err: any) {
             setError(err.message || 'Failed to submit attempt')
             toast.error('Submission failed.')

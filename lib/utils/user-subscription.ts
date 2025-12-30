@@ -1,9 +1,9 @@
 'use server'
 
-import { db } from '@/lib/db'
-import { userSubscriptions } from '@/lib/db/schema'
+import { db } from '@/lib/db/drizzle'
+import { subscriptions } from '@/lib/db/schema'
 import { eq, and, gte, sql } from 'drizzle-orm'
-import { auth } from '@/lib/auth'
+import { auth } from '@/lib/auth/auth'
 import { headers } from 'next/headers'
 
 /**
@@ -14,19 +14,19 @@ export async function isProMember(userId?: string): Promise<boolean> {
     const targetUserId = userId || (await getCurrentUserId())
     if (!targetUserId) return false
 
-    const subscription = await db.query.userSubscriptions.findFirst({
+    const subscription = await db.query.subscriptions.findFirst({
       where: and(
-        eq(userSubscriptions.userId, targetUserId),
-        eq(userSubscriptions.status, 'active'),
-        gte(userSubscriptions.endDate, sql`NOW()`)
+        eq(subscriptions.userId, targetUserId),
+        eq(subscriptions.status, 'active'),
+        gte(subscriptions.currentPeriodEnd, new Date())
       ),
       orderBy: (subscriptions, { desc }) => [desc(subscriptions.createdAt)],
     })
 
     return (
-      subscription?.planType === 'pro' ||
-      subscription?.planType === 'premium' ||
-      subscription?.planType === 'enterprise'
+      subscription?.tier === 'pro' ||
+      subscription?.tier === 'premium' ||
+      subscription?.tier === 'unlimited'
     )
   } catch (error) {
     console.error('Error checking pro membership:', error)
@@ -51,25 +51,25 @@ async function getCurrentUserId(): Promise<string | null> {
 /**
  * Get user subscription tier
  */
-export async function getUserSubscriptionTier(userId?: string): Promise<'free' | 'pro' | 'premium'> {
+export async function getUserSubscriptionTier(userId?: string): Promise<'free' | 'pro' | 'premium' | 'unlimited'> {
   try {
     const targetUserId = userId || (await getCurrentUserId())
     if (!targetUserId) return 'free'
 
-    const subscription = await db.query.userSubscriptions.findFirst({
+    const subscription = await db.query.subscriptions.findFirst({
       where: and(
-        eq(userSubscriptions.userId, targetUserId),
-        eq(userSubscriptions.status, 'active'),
-        gte(userSubscriptions.endDate, sql`NOW()`)
+        eq(subscriptions.userId, targetUserId),
+        eq(subscriptions.status, 'active'),
+        gte(subscriptions.currentPeriodEnd, new Date())
       ),
       orderBy: (subscriptions, { desc }) => [desc(subscriptions.createdAt)],
     })
 
     if (!subscription) return 'free'
 
-    const planType = subscription.planType?.toLowerCase()
-    if (planType === 'pro' || planType === 'premium' || planType === 'enterprise') {
-      return planType === 'premium' || planType === 'enterprise' ? 'premium' : 'pro'
+    const tier = subscription.tier?.toLowerCase()
+    if (['pro', 'premium', 'unlimited'].includes(tier)) {
+      return tier as 'pro' | 'premium' | 'unlimited'
     }
 
     return 'free'
@@ -78,4 +78,3 @@ export async function getUserSubscriptionTier(userId?: string): Promise<'free' |
     return 'free'
   }
 }
-

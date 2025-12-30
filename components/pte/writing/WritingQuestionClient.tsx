@@ -8,8 +8,9 @@ import { AIScoringModal } from '@/components/pte/scoring/AIScoringModal'
 import { AIFeedbackData, QuestionType } from '@/lib/types'
 import { scoreWritingAttempt } from '@/app/actions/pte'
 import { Card, CardContent } from '@/components/ui/card'
-import { Clock, BookText, Sparkles, RotateCcw, SendHorizontal, Loader2 } from 'lucide-react'
+import { Clock, BookText, Sparkles, RotateCcw, SendHorizontal, Loader2, AlertCircle, LayoutPanelLeft } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { cn } from '@/lib/utils'
 import WritingResults from '@/app/practice/_componets/WritingResults'
 
@@ -213,5 +214,3 @@ export default function WritingQuestionClient({
     </div>
   )
 }
-
-import { AlertCircle, LayoutPanelLeft } from 'lucide-react'

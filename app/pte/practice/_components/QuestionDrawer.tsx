@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { CheckCircle, Circle, PlayCircle, Search, Filter } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 interface Question {

@@ -1,15 +1,12 @@
-import { db } from '../drizzle'
+import { db } from '@/lib/db/drizzle'
 import {
     users,
     userProfiles,
     userProgress,
     userScheduledExamDates,
-    speakingAttempts,
-    writingAttempts,
-    readingAttempts,
-    listeningAttempts,
-    userSubscriptions
-} from '../schema'
+    pteAttempts,
+    subscriptions
+} from '@/lib/db/schema'
 import { eq, sql, and } from 'drizzle-orm'
 
 /**
@@ -96,6 +93,15 @@ export async function getUserProgress(userId: string) {
 export async function upsertUserProfile(userId: string, data: { examDate?: string | Date | null, targetScore?: string | null }) {
     const { examDate, targetScore } = data
     const formattedDate = examDate ? new Date(examDate) : null
+    
+    // Handle targetScore being "null" string or actual null/number
+    // If input is string, convert to number if valid, else null
+    let numericScore: number | null = null;
+    if (typeof targetScore === 'number') numericScore = targetScore;
+    else if (typeof targetScore === 'string' && targetScore.trim() !== '') {
+        const parsed = parseInt(targetScore, 10);
+        if (!isNaN(parsed)) numericScore = parsed;
+    }
 
     const existing = await db.query.userProfiles.findFirst({
         where: eq(userProfiles.userId, userId),
@@ -106,7 +112,7 @@ export async function upsertUserProfile(userId: string, data: { examDate?: strin
             .update(userProfiles)
             .set({
                 examDate: formattedDate,
-                targetScore: targetScore || null,
+                targetScore: numericScore,
                 updatedAt: new Date(),
             })
             .where(eq(userProfiles.userId, userId))
@@ -118,7 +124,7 @@ export async function upsertUserProfile(userId: string, data: { examDate?: strin
             .values({
                 userId,
                 examDate: formattedDate,
-                targetScore: targetScore || null,
+                targetScore: numericScore,
             })
             .returning()
         return created
@@ -154,23 +160,23 @@ export async function updateUserProgress(userId: string, data: any) {
 export async function upsertUserSubscription(userId: string, data: any) {
     const existing = await db
         .select()
-        .from(userSubscriptions)
-        .where(eq(userSubscriptions.userId, userId))
+        .from(subscriptions)
+        .where(eq(subscriptions.userId, userId))
         .limit(1)
 
     if (existing.length > 0) {
         const [updated] = await db
-            .update(userSubscriptions)
+            .update(subscriptions)
             .set({
                 ...data,
                 updatedAt: new Date(),
             })
-            .where(eq(userSubscriptions.userId, userId))
+            .where(eq(subscriptions.userId, userId))
             .returning()
         return updated
     } else {
         const [created] = await db
-            .insert(userSubscriptions)
+            .insert(subscriptions)
             .values({
                 userId,
                 ...data,
@@ -250,16 +256,12 @@ export async function deleteUserExamDate(userId: string, dateId: string) {
  */
 export async function calculateUserProgressFallback(userId: string) {
     try {
-        const [sCount] = await db.select({ count: sql<number>`count(*)` }).from(speakingAttempts).where(eq(speakingAttempts.userId, userId))
-        const [wCount] = await db.select({ count: sql<number>`count(*)` }).from(writingAttempts).where(eq(writingAttempts.userId, userId))
-        const [rCount] = await db.select({ count: sql<number>`count(*)` }).from(readingAttempts).where(eq(readingAttempts.userId, userId))
-        const [lCount] = await db.select({ count: sql<number>`count(*)` }).from(listeningAttempts).where(eq(listeningAttempts.userId, userId))
+        const [attemptResult] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(pteAttempts)
+            .where(eq(pteAttempts.userId, userId))
 
-        const questionsAnswered =
-            Number(sCount?.count || 0) +
-            Number(wCount?.count || 0) +
-            Number(rCount?.count || 0) +
-            Number(lCount?.count || 0)
+        const questionsAnswered = Number(attemptResult?.count || 0)
 
         const [studyTimeResult] = await db
             .select({

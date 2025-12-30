@@ -23,8 +23,9 @@ if (!connectionString) {
 // Create PostgreSQL pool for connections
 const pool = new Pool({
   connectionString,
-  connectionTimeoutMillis: 5000,
-  ssl: connectionString && connectionString.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
+  connectionTimeoutMillis: 10000, // Increased timeout
+  max: 1, // Limit connections to avoid exhausting pool
+  ssl: { rejectUnauthorized: false }, // Force SSL
 });
 
 // Test database connection

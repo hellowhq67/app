@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Mic, Square, Volume2, AlertCircle, ArrowLeft, Play, Clock, Sparkles, Loader2, RotateCcw, CheckCircle, Users } from 'lucide-react'
 import { useAudioRecorder } from '../hooks/use-audio-recorder'
-import { submitAttempt } from '@/lib/actions/pte'
+import { scoreSpeakingAttempt } from '@/app/actions/pte'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
 import { useRouter } from 'next/navigation'
@@ -102,18 +102,29 @@ export function SummarizeGroupDiscussion({ question }: SummarizeGroupDiscussionP
     }
 
     const handleSubmit = async () => {
-        if (!audioUrl || !transcript) return
+        if (!audioUrl) return
         setIsSubmitting(true)
         try {
-            const result = await submitAttempt({
-                questionId: question.id,
-                questionType: 'summarize_group_discussion',
-                audioUrl: audioUrl,
-                transcript: transcript,
-                durationMs: recordingTime,
-            })
-            setScore(result.score)
-            toast.success('Response scored!')
+            const response = await fetch(audioUrl)
+            const blob = await response.blob()
+            const file = new File([blob], 'recording.webm', { type: 'audio/webm' })
+
+            const result = await scoreSpeakingAttempt(
+                'summarize_group_discussion' as any,
+                file,
+                question.promptText || question.title || '',
+                question.id
+            )
+
+            if (result.success && result.feedback) {
+                setScore({
+                    overall: result.feedback.overallScore,
+                    ...result.feedback
+                })
+                toast.success('Response scored!')
+            } else {
+                throw new Error(result.error || 'Submission failed')
+            }
         } catch (err: any) {
             setError(err.message || 'Failed to submit')
             toast.error('Submission failed')
