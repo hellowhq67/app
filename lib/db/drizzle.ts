@@ -9,11 +9,6 @@ let connectionString = env.DATABASE_URL || env.DATABASE_URL_POOLED || process.en
 if (!connectionString) {
   console.warn('❌ DATABASE_URL is not set in environment variables. Many features (auth, migrations) will fail until you provide one.');
 } else {
-  if (connectionString.includes('railway.internal')) {
-    console.warn('⚠️  Warning: Using a Railway internal database URL. This will not work outside the Railway network.');
-    console.warn('👉 Use the Public TCP connection string from the Railway dashboard for local development.');
-  }
-
   // Prefer IPv4 resolution for localhost to avoid ::1 connection refusals on some setups
   if (connectionString.includes('localhost')) {
     connectionString = connectionString.replace('localhost', '127.0.0.1');
