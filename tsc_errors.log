@@ -1,0 +1,256 @@
+npm warn Unknown project config "store-dir". This will stop working in the next major version of npm.
+npm warn Unknown project config "child-concurrency". This will stop working in the next major version of npm.
+npm warn Unknown project config "package-import-method". This will stop working in the next major version of npm.
+npm warn Unknown project config "network-timeout". This will stop working in the next major version of npm.
+.next/dev/types/validator.ts(440,39): error TS2306: File 'C:/Users/lemon/Documents/GitHub/app/app/api/billing/cancel/route.ts' is not a module.
+.next/types/app/api/billing/cancel/route.ts(2,24): error TS2306: File 'C:/Users/lemon/Documents/GitHub/app/app/api/billing/cancel/route.ts' is not a module.
+.next/types/app/api/billing/cancel/route.ts(7,29): error TS2306: File 'C:/Users/lemon/Documents/GitHub/app/app/api/billing/cancel/route.ts' is not a module.
+.next/types/app/checkout/[tier]/page.ts(36,29): error TS2344: Type '{ params: { tier: string; }; }' does not satisfy the constraint 'PageProps'.
+  Types of property 'params' are incompatible.
+    Type '{ tier: string; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/app/pte/community/page.ts(36,29): error TS2344: Type '{ searchParams: { page?: string | undefined; type?: string | undefined; sort?: string | undefined; }; }' does not satisfy the constraint 'PageProps'.
+  Types of property 'searchParams' are incompatible.
+    Type '{ page?: string | undefined; type?: string | undefined; sort?: string | undefined; }' is missing the following properties from type 'Promise<any>': then, catch, finally, [Symbol.toStringTag]
+.next/types/validator.ts(440,39): error TS2306: File 'C:/Users/lemon/Documents/GitHub/app/app/api/billing/cancel/route.ts' is not a module.
+app/api/ai-assistant/route.ts(1,10): error TS2305: Module '"@ai-sdk/google"' has no exported member 'createGoogle'.
+app/api/billing/credits/purchase/route.ts(61,13): error TS2353: Object literal may only specify known properties, and 'currency' does not exist in type 'CheckoutCreate'.
+app/api/pte/categories/route.ts(7,39): error TS2339: Property 'pteCategories' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+app/api/pte/categories/route.ts(11,17): error TS7006: Parameter 'categories' implicitly has an 'any' type.
+app/api/pte/categories/route.ts(11,31): error TS7031: Binding element 'asc' implicitly has an 'any' type.
+app/api/pte/questions/route.ts(20,41): error TS2339: Property 'pteQuestionTypes' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+app/api/pte/questions/route.ts(29,42): error TS2551: Property 'pteQuestions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'. Did you mean 'questions'?
+app/api/pte/score/route.ts(6,10): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteQuestions'. Did you mean 'questions'?
+app/api/pte/score/route.ts(34,41): error TS2551: Property 'pteQuestions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'. Did you mean 'questions'?
+app/api/questions/bookmark/route.ts(7,10): error TS2305: Module '"@/lib/db/queries"' has no exported member 'toggleQuestionBookmark'.
+app/api/user/exam-dates/[dateId]/route.ts(21,27): error TS2554: Expected 2 arguments, but got 1.
+app/api/user/exam-dates/route.ts(9,29): error TS2554: Expected 1 arguments, but got 0.
+app/api/user/exam-dates/route.ts(26,31): error TS2554: Expected 2 arguments, but got 1.
+app/api/user/progress/route.ts(1,27): error TS2305: Module '"@/lib/db/queries"' has no exported member 'getUserAnalytics'.
+app/api/user/progress/route.ts(25,32): error TS2554: Expected 1 arguments, but got 0.
+app/api/user/target-score/route.ts(13,27): error TS2554: Expected 1 arguments, but got 0.
+app/api/user/target-score/route.ts(35,11): error TS2554: Expected 2 arguments, but got 1.
+app/pte-mock-test/page.tsx(37,12): error TS7053: Element implicitly has an 'any' type because expression of type 'string' can't be used to index type '{ speaking_writing: { questions: PTEQuestion[]; duration: number; }; reading: { questions: PTEQuestion[]; duration: number; }; listening: { questions: PTEQuestion[]; duration: number; }; }'.
+  No index signature with a parameter of type 'string' was found on type '{ speaking_writing: { questions: PTEQuestion[]; duration: number; }; reading: { questions: PTEQuestion[]; duration: number; }; listening: { questions: PTEQuestion[]; duration: number; }; }'.
+app/pte-mock-test/page.tsx(80,50): error TS2345: Argument of type 'string' is not assignable to parameter of type '"reading" | "listening" | "speaking_writing"'.
+app/pte/academic/mocktest/page.tsx(9,10): error TS2305: Module '"@/lib/db/schema"' has no exported member 'pteTests'.
+app/pte/academic/mocktest/page.tsx(55,27): error TS2339: Property 'totalScore' does not exist on type 'PgTableWithColumns<{ name: "test_attempts"; schema: undefined; columns: { id: PgColumn<{ name: "id"; tableName: "test_attempts"; dataType: "string"; columnType: "PgUUID"; data: string; driverParam: string; notNull: true; ... 7 more ...; generated: undefined; }, {}, {}>; ... 7 more ...; updatedAt: PgColumn<...>; }; d...'.
+app/pte/mock-tests/page.tsx(29,10): error TS2305: Module '"@/lib/db/queries"' has no exported member 'getTests'.
+app/pte/mock-tests/page.tsx(30,10): error TS2305: Module '"@/lib/db/schema"' has no exported member 'PteTest'.
+app/pte/practice/page.tsx(2,10): error TS2305: Module '"@/lib/db/schema"' has no exported member 'pteCategories'.
+app/pte/practice/page.tsx(18,37): error TS2339: Property 'pteCategories' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+app/pte/practice/page.tsx(19,15): error TS7006: Parameter 'c' implicitly has an 'any' type.
+app/pte/practice/page.tsx(19,20): error TS7031: Binding element 'asc' implicitly has an 'any' type.
+app/pte/practice/page.tsx(22,21): error TS7006: Parameter 'qt' implicitly has an 'any' type.
+app/pte/practice/page.tsx(22,27): error TS7031: Binding element 'eq' implicitly has an 'any' type.
+app/pte/practice/page.tsx(44,26): error TS7006: Parameter 'category' implicitly has an 'any' type.
+app/pte/profile/page.tsx(29,10): error TS2724: '"@/lib/db/schema"' has no exported member named 'User'. Did you mean 'users'?
+app/pte/profile/page.tsx(87,21): error TS7006: Parameter 'prev' implicitly has an 'any' type.
+app/pte/profile/page.tsx(128,57): error TS7006: Parameter 'n' implicitly has an 'any' type.
+components/ai-elements/message.tsx(83,3): error TS2322: Type '"icon-sm"' is not assignable to type '"default" | "sm" | "lg" | "icon" | null'.
+components/ai-elements/message.tsx(252,7): error TS2322: Type '"icon-sm"' is not assignable to type '"default" | "sm" | "lg" | "icon" | null | undefined'.
+components/ai-elements/message.tsx(276,7): error TS2322: Type '"icon-sm"' is not assignable to type '"default" | "sm" | "lg" | "icon" | null | undefined'.
+components/ai/chat.tsx(6,21): error TS2339: Property 'input' does not exist on type 'UseChatHelpers<UIMessage<unknown, UIDataTypes, UITools>>'.
+components/ai/chat.tsx(6,28): error TS2339: Property 'handleInputChange' does not exist on type 'UseChatHelpers<UIMessage<unknown, UIDataTypes, UITools>>'.
+components/ai/chat.tsx(6,47): error TS2339: Property 'handleSubmit' does not exist on type 'UseChatHelpers<UIMessage<unknown, UIDataTypes, UITools>>'.
+components/ai/chat.tsx(13,14): error TS2339: Property 'content' does not exist on type 'UIMessage<unknown, UIDataTypes, UITools>'.
+components/billingsdk/billing-screen.tsx(7,18): error TS2305: Module '"motion/react"' has no exported member 'useMotionValue'.
+components/billingsdk/billing-screen.tsx(7,34): error TS2305: Module '"motion/react"' has no exported member 'useSpring'.
+components/billingsdk/billing-screen.tsx(7,45): error TS2305: Module '"motion/react"' has no exported member 'useTransform'.
+components/floating-navbar.tsx(31,10): error TS2724: '"@/lib/db/schema"' has no exported member named 'User'. Did you mean 'users'?
+components/home/AIChatMessage.tsx(8,27): error TS2307: Cannot find module 'react-markdown' or its corresponding type declarations.
+components/home/AIChatMessage.tsx(59,12): error TS2552: Cannot find name 'messages'. Did you mean 'message'?
+components/home/AIChatMessage.tsx(59,28): error TS7031: Binding element 'role' implicitly has an 'any' type.
+components/home/AIChatMessage.tsx(59,34): error TS7031: Binding element 'parts' implicitly has an 'any' type.
+components/home/AIChatMessage.tsx(59,43): error TS7006: Parameter 'index' implicitly has an 'any' type.
+components/home/AIChatMessage.tsx(61,16): error TS2304: Cannot find name 'MessageContent'.
+components/home/AIChatMessage.tsx(62,29): error TS7006: Parameter 'part' implicitly has an 'any' type.
+components/home/AIChatMessage.tsx(62,35): error TS7006: Parameter 'i' implicitly has an 'any' type.
+components/home/AIChatMessage.tsx(65,31): error TS2304: Cannot find name 'MessageResponse'.
+components/home/AIChatMessage.tsx(65,81): error TS2304: Cannot find name 'MessageResponse'.
+components/home/AIChatMessage.tsx(68,17): error TS2304: Cannot find name 'MessageContent'.
+components/pte/attempt/AttemptController.tsx(4,28): error TS2307: Cannot find module '@/components/pte/timers/CountdownTimer' or its corresponding type declarations.
+components/pte/attempt/AttemptController.tsx(11,8): error TS2307: Cannot find module '@/lib/pte/attempts' or its corresponding type declarations.
+components/pte/attempt/AttemptController.tsx(12,29): error TS2307: Cannot find module '@/lib/pte/timing' or its corresponding type declarations.
+components/pte/attempt/ListeningAttempt.tsx(4,44): error TS2307: Cannot find module '@/app/api/listening/schemas' or its corresponding type declarations.
+components/pte/attempt/ListeningAttempt.tsx(14,8): error TS2307: Cannot find module '@/lib/pte/attempts' or its corresponding type declarations.
+components/pte/attempt/ListeningAttempt.tsx(281,14): error TS2741: Property 'disabled' is missing in type '{ questionType: ListeningQuestionType; question: any; value: any; onChange: (resp: any) => void; }' but required in type 'Props'.
+components/pte/attempt/ReadingAttempt.tsx(12,8): error TS2307: Cannot find module '@/lib/pte/attempts' or its corresponding type declarations.
+components/pte/attempt/SpeakingAttempt.tsx(4,28): error TS2307: Cannot find module '@/components/pte/speaking/QuestionPrompt' or its corresponding type declarations.
+components/pte/attempt/SpeakingAttempt.tsx(9,41): error TS2307: Cannot find module '@/lib/pte/blob-upload' or its corresponding type declarations.
+components/pte/attempt/SpeakingAttempt.tsx(10,52): error TS2307: Cannot find module '@/lib/pte/types' or its corresponding type declarations.
+components/pte/attempt/SpeakingAttempt.tsx(11,28): error TS2307: Cannot find module '@/components/pte/speaking/SpeakingBoards' or its corresponding type declarations.
+components/pte/attempt/SpeakingAttempt.tsx(36,15): error TS2304: Cannot find name 'getDefaultTimings'.
+components/pte/attempt/SpeakingAttempt.tsx(57,5): error TS2304: Cannot find name 'initQueueAutoRetry'.
+components/pte/attempt/SpeakingAttempt.tsx(69,16): error TS2304: Cannot find name 'StartSessionResponse'.
+components/pte/attempt/WritingAttempt.tsx(13,8): error TS2307: Cannot find module '@/lib/pte/attempts' or its corresponding type declarations.
+components/pte/highlight/PTEHighlight.tsx(4,29): error TS2865: Import 'PTEHighlight' conflicts with local value, so must be declared with a type-only import when 'isolatedModules' is enabled.
+components/pte/highlight/PTEHighlight.tsx(30,5): error TS2353: Object literal may only specify known properties, and 'isValid' does not exist in type 'PTEHighlightState | (() => PTEHighlightState)'.
+components/pte/highlight/PTEHighlight.tsx(70,13): error TS7034: Variable 'newHighlights' implicitly has type 'any[]' in some locations where its type cannot be determined.
+components/pte/highlight/PTEHighlight.tsx(71,57): error TS7005: Variable 'newHighlights' implicitly has an 'any[]' type.
+components/pte/highlight/PTEHighlight.tsx(72,18): error TS7005: Variable 'newHighlights' implicitly has an 'any[]' type.
+components/pte/highlight/PTEHighlight.tsx(171,43): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(type: "click", listener: (this: HTMLDivElement, ev: PointerEvent) => any, options?: boolean | AddEventListenerOptions | undefined): void', gave the following error.
+    Argument of type '(e: React.MouseEvent) => void' is not assignable to parameter of type '(this: HTMLDivElement, ev: PointerEvent) => any'.
+      Types of parameters 'e' and 'ev' are incompatible.
+        Type 'PointerEvent' is missing the following properties from type 'MouseEvent<Element, MouseEvent>': nativeEvent, isDefaultPrevented, isPropagationStopped, persist
+  Overload 2 of 2, '(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions | undefined): void', gave the following error.
+    Argument of type '(e: React.MouseEvent) => void' is not assignable to parameter of type 'EventListenerOrEventListenerObject'.
+      Type '(e: React.MouseEvent) => void' is not assignable to type 'EventListener'.
+        Types of parameters 'e' and 'evt' are incompatible.
+          Type 'Event' is missing the following properties from type 'MouseEvent<Element, MouseEvent>': altKey, button, buttons, clientX, and 18 more.
+components/pte/highlight/PTEHighlight.tsx(175,48): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(type: "click", listener: (this: HTMLDivElement, ev: PointerEvent) => any, options?: boolean | EventListenerOptions | undefined): void', gave the following error.
+    Argument of type '(e: React.MouseEvent) => void' is not assignable to parameter of type '(this: HTMLDivElement, ev: PointerEvent) => any'.
+      Types of parameters 'e' and 'ev' are incompatible.
+        Type 'PointerEvent' is missing the following properties from type 'MouseEvent<Element, MouseEvent>': nativeEvent, isDefaultPrevented, isPropagationStopped, persist
+  Overload 2 of 2, '(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions | undefined): void', gave the following error.
+    Argument of type '(e: React.MouseEvent) => void' is not assignable to parameter of type 'EventListenerOrEventListenerObject'.
+      Type '(e: React.MouseEvent) => void' is not assignable to type 'EventListener'.
+        Types of parameters 'e' and 'evt' are incompatible.
+          Type 'Event' is missing the following properties from type 'MouseEvent<Element, MouseEvent>': altKey, button, buttons, clientX, and 18 more.
+components/pte/listening/ListeningInput.tsx(4,44): error TS2307: Cannot find module '@/app/api/listening/schemas' or its corresponding type declarations.
+components/pte/question/PTEQuestion.tsx(4,10): error TS2865: Import 'PTEQuestion' conflicts with local value, so must be declared with a type-only import when 'isolatedModules' is enabled.
+components/pte/question/PTEQuestion.tsx(281,14): error TS2741: Property 'dropZones' is missing in type '{ items: { id: string; content: string; originalIndex: number; }[]; onReorder: (newOrder: PTEDragItem[]) => void; }' but required in type 'PTEDragDropProps'.
+components/pte/question/PTEQuestion.tsx(319,15): error TS2322: Type '{ id: string; accepts: string[]; items: never[]; }[]' is not assignable to type 'PTEDropZone[]'.
+  Property 'isValid' is missing in type '{ id: string; accepts: string[]; items: never[]; }' but required in type 'PTEDropZone'.
+components/pte/question/PTEQuestion.tsx(448,53): error TS2339: Property 'totalQuestions' does not exist on type 'PTEQuestion'.
+components/pte/reading/ReadingInput.tsx(4,42): error TS2307: Cannot find module '@/app/api/reading/schemas' or its corresponding type declarations.
+components/pte/reading/ReadingQuestionClient.tsx(6,32): error TS2307: Cannot find module '@/components/pte/scoring/AIScoringModal' or its corresponding type declarations.
+components/pte/reading/ReadingQuestionClient.tsx(13,28): error TS2307: Cannot find module '@/app/practice/_componets/ReadingResults' or its corresponding type declarations.
+components/pte/reading/ReadingQuestionClient.tsx(56,28): error TS2554: Expected 7 arguments, but got 6.
+components/pte/speaking/answer-short-question.tsx(17,29): error TS2307: Cannot find module '@/app/practice/_componets/SpeakingResults' or its corresponding type declarations.
+components/pte/speaking/describe-image.tsx(27,29): error TS2307: Cannot find module '@/app/practice/_componets/SpeakingResults' or its corresponding type declarations.
+components/pte/speaking/read-aloud.tsx(14,29): error TS2307: Cannot find module '@/app/practice/_componets/SpeakingResults' or its corresponding type declarations.
+components/pte/speaking/repeat-sentence.tsx(26,29): error TS2307: Cannot find module '@/app/practice/_componets/SpeakingResults' or its corresponding type declarations.
+components/pte/speaking/respond-to-situation.tsx(18,29): error TS2307: Cannot find module '@/app/practice/_componets/SpeakingResults' or its corresponding type declarations.
+components/pte/speaking/retell-lecture.tsx(17,29): error TS2307: Cannot find module '@/app/practice/_componets/SpeakingResults' or its corresponding type declarations.
+components/pte/speaking/summarize-group-discussion.tsx(17,29): error TS2307: Cannot find module '@/app/practice/_componets/SpeakingResults' or its corresponding type declarations.
+components/pte/writing/WritingQuestionClient.tsx(7,32): error TS2307: Cannot find module '@/components/pte/scoring/AIScoringModal' or its corresponding type declarations.
+components/pte/writing/WritingQuestionClient.tsx(15,28): error TS2307: Cannot find module '@/app/practice/_componets/WritingResults' or its corresponding type declarations.
+components/pte/writing/WritingQuestionClient.tsx(61,28): error TS2554: Expected 4 arguments, but got 3.
+components/ui/audio-player.tsx(144,5): error TS2322: Type 'RefObject<HTMLAudioElement | null>' is not assignable to type 'RefObject<HTMLAudioElement>'.
+  Type 'HTMLAudioElement | null' is not assignable to type 'HTMLAudioElement'.
+    Type 'null' is not assignable to type 'HTMLAudioElement'.
+components/ui/border-beam.tsx(3,18): error TS2305: Module '"motion/react"' has no exported member 'MotionStyle'.
+components/ui/border-beam.tsx(3,31): error TS2305: Module '"motion/react"' has no exported member 'Transition'.
+components/ui/command.tsx(4,15): error TS2305: Module '"@radix-ui/react-dialog"' has no exported member 'DialogProps'.
+components/ui/sticky-scroll-reveal.tsx(3,10): error TS2305: Module '"motion/react"' has no exported member 'useMotionValueEvent'.
+components/ui/sticky-scroll-reveal.tsx(3,31): error TS2305: Module '"motion/react"' has no exported member 'useScroll'.
+components/ui/sticky-scroll-reveal.tsx(28,51): error TS7006: Parameter 'latest' implicitly has an 'any' type.
+components/ui/timeline.tsx(3,3): error TS2305: Module '"motion/react"' has no exported member 'useMotionValueEvent'.
+components/ui/timeline.tsx(4,3): error TS2305: Module '"motion/react"' has no exported member 'useScroll'.
+components/ui/timeline.tsx(5,3): error TS2305: Module '"motion/react"' has no exported member 'useTransform'.
+components/ui/tooltip.tsx(18,21): error TS2339: Property 'Portal' does not exist on type 'typeof import("@radix-ui/react-tooltip")'.
+components/ui/tooltip.tsx(28,22): error TS2339: Property 'Portal' does not exist on type 'typeof import("@radix-ui/react-tooltip")'.
+components/ui/tracing-beam.tsx(5,3): error TS2305: Module '"motion/react"' has no exported member 'useTransform'.
+components/ui/tracing-beam.tsx(6,3): error TS2305: Module '"motion/react"' has no exported member 'useScroll'.
+components/ui/tracing-beam.tsx(7,3): error TS2305: Module '"motion/react"' has no exported member 'useVelocity'.
+components/ui/tracing-beam.tsx(8,3): error TS2305: Module '"motion/react"' has no exported member 'useSpring'.
+hooks/usePracticeSession.ts(4,33): error TS2307: Cannot find module '@/lib/supabase/realtime' or its corresponding type declarations.
+hooks/usePracticeSession.ts(5,48): error TS2307: Cannot find module '@/lib/supabase/scoring' or its corresponding type declarations.
+hooks/usePracticeSession.ts(6,26): error TS2307: Cannot find module '@/lib/supabaseClient' or its corresponding type declarations.
+hooks/usePracticeSession.ts(7,92): error TS2307: Cannot find module '@/lib/supabase/database' or its corresponding type declarations.
+hooks/usePracticeSession.ts(40,27): error TS7006: Parameter 'updatedSession' implicitly has an 'any' type.
+hooks/usePracticeSession.ts(41,30): error TS7006: Parameter 'newResponse' implicitly has an 'any' type.
+hooks/usePracticeSession.ts(82,27): error TS7006: Parameter 'updatedSession' implicitly has an 'any' type.
+hooks/usePracticeSession.ts(83,30): error TS7006: Parameter 'newResponse' implicitly has an 'any' type.
+lib/actions/community.ts(4,10): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteAttempts'. Did you mean 'testAttempts'?
+lib/actions/community.ts(4,23): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteQuestions'. Did you mean 'questions'?
+lib/ai/scoring-agent.ts(152,9): error TS2322: Type 'LanguageModelV2' is not assignable to type 'LanguageModel'.
+  Type 'LanguageModelV2' is not assignable to type '(string & {}) | LanguageModelV2'.
+    Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2'.
+      Types of property 'doGenerate' are incompatible.
+        Type '(options: import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2CallOptions) => PromiseLike<...>' is not assignable to type '(options: import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2CallOptions) => PromiseLike<...>'.
+          Types of parameters 'options' and 'options' are incompatible.
+            Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2CallOptions' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2CallOptions'.
+              Types of property 'prompt' are incompatible.
+                Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2Prompt' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2Prompt'.
+                  Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2Message' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2Message'.
+                    Type '{ role: "system"; content: string; } & { providerOptions?: SharedV2ProviderOptions | undefined; }' is not assignable to type 'LanguageModelV2Message'.
+                      Type '{ role: "system"; content: string; } & { providerOptions?: import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions | undefined; }' is not assignable to type '{ role: "system"; content: string; } & { providerOptions?: import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions | undefined; }'.
+                        Type '{ role: "system"; content: string; } & { providerOptions?: SharedV2ProviderOptions | undefined; }' is not assignable to type '{ providerOptions?: SharedV2ProviderOptions | undefined; }'.
+                          Types of property 'providerOptions' are incompatible.
+                            Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions | undefined' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions | undefined'.
+                              Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions'.
+                                'string' index signatures are incompatible.
+                                  Type 'Record<string, import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").JSONValue>' is not assignable to type 'Record<string, import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").JSONValue>'.
+                                    'string' index signatures are incompatible.
+                                      Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").JSONValue' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").JSONValue'.
+                                        Type 'JSONObject' is not assignable to type 'JSONValue'.
+                                          Type 'JSONObject' is missing the following properties from type 'JSONValue[]': length, pop, push, concat, and 35 more.
+lib/ai/scoring.ts(47,5): error TS2322: Type 'LanguageModelV2' is not assignable to type 'LanguageModel'.
+  Type 'LanguageModelV2' is not assignable to type '(string & {}) | LanguageModelV2'.
+    Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2'.
+      Types of property 'doGenerate' are incompatible.
+        Type '(options: import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2CallOptions) => PromiseLike<...>' is not assignable to type '(options: import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2CallOptions) => PromiseLike<...>'.
+          Types of parameters 'options' and 'options' are incompatible.
+            Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2CallOptions' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2CallOptions'.
+              Types of property 'prompt' are incompatible.
+                Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2Prompt' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2Prompt'.
+                  Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2Message' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").LanguageModelV2Message'.
+                    Type '{ role: "system"; content: string; } & { providerOptions?: SharedV2ProviderOptions | undefined; }' is not assignable to type 'LanguageModelV2Message'.
+                      Type '{ role: "system"; content: string; } & { providerOptions?: import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions | undefined; }' is not assignable to type '{ role: "system"; content: string; } & { providerOptions?: import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions | undefined; }'.
+                        Type '{ role: "system"; content: string; } & { providerOptions?: SharedV2ProviderOptions | undefined; }' is not assignable to type '{ providerOptions?: SharedV2ProviderOptions | undefined; }'.
+                          Types of property 'providerOptions' are incompatible.
+                            Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions | undefined' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions | undefined'.
+                              Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").SharedV2ProviderOptions'.
+                                'string' index signatures are incompatible.
+                                  Type 'Record<string, import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").JSONValue>' is not assignable to type 'Record<string, import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").JSONValue>'.
+                                    'string' index signatures are incompatible.
+                                      Type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@3.0.0/node_modules/@ai-sdk/provider/dist/index").JSONValue' is not assignable to type 'import("C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@ai-sdk+provider@2.0.0/node_modules/@ai-sdk/provider/dist/index").JSONValue'.
+                                        Type 'JSONObject' is not assignable to type 'JSONValue'.
+                                          Type 'JSONObject' is missing the following properties from type 'JSONValue[]': length, pop, push, concat, and 35 more.
+lib/billing/invoices.ts(112,31): error TS2339: Property 'eq' does not exist on type '{ as: { <TSelection extends ColumnsSelection>(qb: TypedQueryBuilder<TSelection, unknown, unknown> | ((qb: QueryBuilder) => TypedQueryBuilder<TSelection, unknown, unknown>)): WithSubqueryWithSelection<...>; (qb: TypedQueryBuilder<...> | ((qb: QueryBuilder) => TypedQueryBuilder<...>)): WithSubqueryWithoutSelection<......'.
+lib/billing/invoices.ts(131,31): error TS2339: Property 'eq' does not exist on type '{ as: { <TSelection extends ColumnsSelection>(qb: TypedQueryBuilder<TSelection, unknown, unknown> | ((qb: QueryBuilder) => TypedQueryBuilder<TSelection, unknown, unknown>)): WithSubqueryWithSelection<...>; (qb: TypedQueryBuilder<...> | ((qb: QueryBuilder) => TypedQueryBuilder<...>)): WithSubqueryWithoutSelection<......'.
+lib/billing/invoices.ts(206,31): error TS2339: Property 'eq' does not exist on type '{ as: { <TSelection extends ColumnsSelection>(qb: TypedQueryBuilder<TSelection, unknown, unknown> | ((qb: QueryBuilder) => TypedQueryBuilder<TSelection, unknown, unknown>)): WithSubqueryWithSelection<...>; (qb: TypedQueryBuilder<...> | ((qb: QueryBuilder) => TypedQueryBuilder<...>)): WithSubqueryWithoutSelection<......'.
+lib/billing/subscriptions.ts(107,17): error TS2322: Type '"active" | "cancelled" | "past_due" | "unpaid" | "trialing"' is not assignable to type 'SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | "active" | "expired" | "cancelled" | "trial" | undefined'.
+  Type '"past_due"' is not assignable to type 'SQL<unknown> | PgColumn<ColumnBaseConfig<ColumnDataType, string>, {}, {}> | "active" | "expired" | "cancelled" | "trial" | undefined'.
+lib/db/queries/activity.ts(4,10): error TS2305: Module '"../schema"' has no exported member 'activityLogs'.
+lib/db/queries/ai-assistant.ts(2,10): error TS2305: Module '"@/lib/db/schema"' has no exported member 'userProgress'.
+lib/db/queries/ai-assistant.ts(2,38): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteQuestions'. Did you mean 'questions'?
+lib/db/queries/ai-assistant.ts(2,52): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteAttempts'. Did you mean 'testAttempts'?
+lib/db/queries/ai-assistant.ts(9,37): error TS2339: Property 'userProgress' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/ai-assistant.ts(17,43): error TS2551: Property 'pteAttempts' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'. Did you mean 'testAttempts'?
+lib/db/queries/ai-assistant.ts(50,38): error TS2551: Property 'pteQuestions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'. Did you mean 'questions'?
+lib/db/queries/ai-assistant.ts(87,37): error TS2551: Property 'pteAttempts' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'. Did you mean 'testAttempts'?
+lib/db/queries/attempts.ts(3,5): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteAttempts'. Did you mean 'testAttempts'?
+lib/db/queries/attempts.ts(4,5): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteQuestions'. Did you mean 'questions'?
+lib/db/queries/billing.ts(28,35): error TS2339: Property 'subscriptions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(43,35): error TS2339: Property 'subscriptions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(54,35): error TS2339: Property 'subscriptions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(65,21): error TS2339: Property 'subscriptions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(79,21): error TS2339: Property 'paymentMethods' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(89,35): error TS2339: Property 'paymentMethods' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(103,35): error TS2339: Property 'paymentMethods' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(133,18): error TS2339: Property 'invoices' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(155,35): error TS2339: Property 'invoices' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(166,35): error TS2339: Property 'invoices' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(177,21): error TS2339: Property 'invoices' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(218,18): error TS2339: Property 'transactions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(240,35): error TS2339: Property 'transactions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(270,18): error TS2339: Property 'creditPurchases' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(292,35): error TS2339: Property 'creditPurchases' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/billing.ts(303,35): error TS2339: Property 'creditPurchases' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/dashboard.ts(2,17): error TS2305: Module '"../schema"' has no exported member 'pteMockTests'.
+lib/db/queries/dashboard.ts(2,31): error TS2724: '"../schema"' has no exported member named 'pteQuestions'. Did you mean 'questions'?
+lib/db/queries/dashboard.ts(2,45): error TS2724: '"../schema"' has no exported member named 'pteAttempts'. Did you mean 'testAttempts'?
+lib/db/queries/dashboard.ts(2,58): error TS2305: Module '"../schema"' has no exported member 'userProgress'.
+lib/db/queries/dashboard.ts(32,41): error TS2339: Property 'userProgress' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/db/queries/pte-scoring.ts(3,10): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteAttempts'. Did you mean 'testAttempts'?
+lib/db/queries/pte-scoring.ts(119,36): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(value: { userId: string | SQL<unknown> | Placeholder<string, any>; usageType: "feedback" | "other" | "transcription" | "scoring" | "realtime_voice" | "text_generation" | SQL<...> | Placeholder<...>; metadata?: unknown; id?: string | ... 2 more ... | undefined; createdAt?: Date | ... 2 more ... | undefined; amount?: number | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'provider' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; usageType: "feedback" | "other" | "transcription" | "scoring" | "realtime_voice" | "text_generation" | SQL<...> | Placeholder<...>; metadata?: unknown; id?: string | ... 2 more ... | undefined; createdAt?: Date | ... 2 more ... | undefined; amount?: number ...'.
+  Overload 2 of 2, '(values: { userId: string | SQL<unknown> | Placeholder<string, any>; usageType: "feedback" | "other" | "transcription" | "scoring" | "realtime_voice" | "text_generation" | SQL<...> | Placeholder<...>; metadata?: unknown; id?: string | ... 2 more ... | undefined; createdAt?: Date | ... 2 more ... | undefined; amount?: number | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'userId' does not exist in type '{ userId: string | SQL<unknown> | Placeholder<string, any>; usageType: "feedback" | "other" | "transcription" | "scoring" | "realtime_voice" | "text_generation" | SQL<...> | Placeholder<...>; metadata?: unknown; id?: string | ... 2 more ... | undefined; createdAt?: Date | ... 2 more ... | undefined; amount?: number ...'.
+lib/db/queries/users.ts(5,5): error TS2305: Module '"@/lib/db/schema"' has no exported member 'userProgress'.
+lib/db/queries/users.ts(6,5): error TS2305: Module '"@/lib/db/schema"' has no exported member 'userScheduledExamDates'.
+lib/db/queries/users.ts(7,5): error TS2724: '"@/lib/db/schema"' has no exported member named 'pteAttempts'. Did you mean 'testAttempts'?
+lib/db/queries/users.ts(8,5): error TS2305: Module '"@/lib/db/schema"' has no exported member 'subscriptions'.
+lib/db/queries/users.ts(81,31): error TS2339: Property 'userProgress' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/utils/user-subscription.ts(4,10): error TS2305: Module '"@/lib/db/schema"' has no exported member 'subscriptions'.
+lib/utils/user-subscription.ts(17,41): error TS2339: Property 'subscriptions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/utils/user-subscription.ts(23,17): error TS7006: Parameter 'subscriptions' implicitly has an 'any' type.
+lib/utils/user-subscription.ts(23,34): error TS7031: Binding element 'desc' implicitly has an 'any' type.
+lib/utils/user-subscription.ts(59,41): error TS2339: Property 'subscriptions' does not exist on type '{ readonly users: RelationalQueryBuilder<ExtractTablesWithRelations<typeof import("C:/Users/lemon/Documents/GitHub/app/lib/db/schema/index")>, { tsName: "users"; dbName: "users"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }>; ... 9 more ...; readonly aiCreditUsage: RelationalQueryBuilder<...>; }'.
+lib/utils/user-subscription.ts(65,17): error TS7006: Parameter 'subscriptions' implicitly has an 'any' type.
+lib/utils/user-subscription.ts(65,34): error TS7031: Binding element 'desc' implicitly has an 'any' type.

@@ -89,6 +89,14 @@ export async function savePteAttempt(params: {
         })
         .returning();
 
+    // NEW: Vector Embedding Logic for Weak Areas (Client-side trigger or Server Action trigger)
+    // If score is low (< 60) and we can identify a weakness, we should ideally store it in Supabase Vector Store.
+    // Since this function is running in Next.js Server Environment, we can use Supabase Admin Client if available,
+    // or rely on the Edge Function to have done it (which we implemented in the Edge Function code previously).
+
+    // However, if we are NOT using the Edge Function for scoring (fallback), we might want to do it here.
+    // For now, we'll keep the scoring pure and assume the Edge Function handles the "embedding" insertion if it was used.
+
     return attempt;
 }
 

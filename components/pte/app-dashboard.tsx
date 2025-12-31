@@ -1,9 +1,9 @@
-'use client'
+"use client";
 
-import { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
-import Image from 'next/image'
-import { motion } from 'motion/react'
+import { useEffect, useState, useCallback } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { motion } from "motion/react";
 import {
   BarChart,
   Bar,
@@ -13,7 +13,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-} from 'recharts'
+} from "recharts";
 import {
   BookOpen,
   FileText,
@@ -29,11 +29,11 @@ import {
   Calendar,
   ArrowRight,
   Sparkles,
-} from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Skeleton } from '@/components/ui/skeleton'
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -41,41 +41,41 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { ExamDateScheduler } from '@/components/pte/dashboard/exam-date-scheduler'
-import { cn } from '@/lib/utils'
-import { useVoiceAssistant } from '@/components/pte/voice-assistant-context'
+} from "@/components/ui/dialog";
+import { ExamDateScheduler } from "@/components/pte/dashboard/exam-date-scheduler";
+import { cn } from "@/lib/utils";
+import { useVoiceAssistant } from "@/components/pte/voice-assistant-context";
 
 const studyGuides = [
   {
     id: 1,
-    title: 'PTE Read Aloud: Tips & Tricks',
-    date: 'October 26, 2025',
-    image: 'https://img.youtube.com/vi/1N2KOt4mHwE/mqdefault.jpg',
-    url: 'https://www.youtube.com/watch?v=1N2KOt4mHwE',
+    title: "PTE Read Aloud: Tips & Tricks",
+    date: "October 26, 2025",
+    image: "https://img.youtube.com/vi/1N2KOt4mHwE/mqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=1N2KOt4mHwE",
   },
   {
     id: 2,
-    title: 'Master Repeat Sentence',
-    date: 'October 26, 2025',
-    image: 'https://img.youtube.com/vi/tL0sRPdpNN4/mqdefault.jpg',
-    url: 'https://www.youtube.com/watch?v=tL0sRPdpNN4',
+    title: "Master Repeat Sentence",
+    date: "October 26, 2025",
+    image: "https://img.youtube.com/vi/tL0sRPdpNN4/mqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=tL0sRPdpNN4",
   },
   {
     id: 3,
-    title: 'Describe Image Strategies',
-    date: 'October 26, 2025',
-    image: 'https://img.youtube.com/vi/_jNUTdyemgs/mqdefault.jpg',
-    url: 'https://www.youtube.com/watch?v=_jNUTdyemgs',
+    title: "Describe Image Strategies",
+    date: "October 26, 2025",
+    image: "https://img.youtube.com/vi/_jNUTdyemgs/mqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=_jNUTdyemgs",
   },
   {
     id: 4,
-    title: 'Retell Lecture Guide',
-    date: 'July 20, 2025',
-    image: 'https://img.youtube.com/vi/6jTPfOtfXNA/mqdefault.jpg',
-    url: 'https://www.youtube.com/watch?v=6jTPfOtfXNA',
+    title: "Retell Lecture Guide",
+    date: "July 20, 2025",
+    image: "https://img.youtube.com/vi/6jTPfOtfXNA/mqdefault.jpg",
+    url: "https://www.youtube.com/watch?v=6jTPfOtfXNA",
   },
-]
+];
 
 const container = {
   hidden: { opacity: 0 },
@@ -85,96 +85,96 @@ const container = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 const item = {
   hidden: { opacity: 0, y: 20 },
   show: { opacity: 1, y: 0 },
-}
+};
 
 export function PTEDashboard() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState<any>(null)
-  const [examDate, setExamDate] = useState<Date | null>(null)
-  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 })
-  const [isExamDialogOpen, setIsExamDialogOpen] = useState(false)
-  const [chartData, setChartData] = useState<any[]>([])
-  const { open: openVoiceAssistant } = useVoiceAssistant()
+  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<any>(null);
+  const [examDate, setExamDate] = useState<Date | null>(null);
+  const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
+  const [isExamDialogOpen, setIsExamDialogOpen] = useState(false);
+  const [chartData, setChartData] = useState<any[]>([]);
+  const { open: openVoiceAssistant } = useVoiceAssistant();
 
   const fetchData = useCallback(async () => {
     try {
       const [userRes, examRes, statsRes] = await Promise.all([
-        fetch('/api/user'),
-        fetch('/api/user/exam-dates'),
-        fetch('/api/dashboard/feature-stats'),
-      ])
+        fetch("/api/user"),
+        fetch("/api/user/exam-dates"),
+        fetch("/api/dashboard/feature-stats"),
+      ]);
 
-      const userData = await userRes.json()
+      const userData = await userRes.json();
       if (userData && !userData.error) {
-        setUser(userData)
+        setUser(userData);
       }
 
-      const examData = await examRes.json()
+      const examData = await examRes.json();
       if (examData.examDates && examData.examDates.length > 0) {
         const primary =
           examData.examDates.find((d: any) => d.isPrimary) ||
-          examData.examDates[0]
+          examData.examDates[0];
         if (primary) {
-          setExamDate(new Date(primary.examDate))
+          setExamDate(new Date(primary.examDate));
         }
       } else {
-        setExamDate(null)
+        setExamDate(null);
       }
 
-      const statsData = await statsRes.json()
+      const statsData = await statsRes.json();
       if (Array.isArray(statsData)) {
         const mappedChartData = statsData.map((item: any) => ({
           name: item.name,
           score: item.value,
-          color: item.name === 'Speaking' ? '#3b82f6' : '#10b981', // Blue for Speaking, Green for Writing
-        }))
-        setChartData(mappedChartData)
+          color: item.name === "Speaking" ? "#3b82f6" : "#10b981", // Blue for Speaking, Green for Writing
+        }));
+        setChartData(mappedChartData);
       }
     } catch (error) {
-      console.error('Failed to fetch data', error)
+      console.error("Failed to fetch data", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [])
+  }, []);
 
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-    fetchData()
-  }, [fetchData])
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (!examDate) return
+    setMounted(true);
+    fetchData();
+  }, [fetchData]);
+
+  useEffect(() => {
+    if (!examDate) return;
 
     const timer = setInterval(() => {
-      const now = new Date()
-      const diff = examDate.getTime() - now.getTime()
+      const now = new Date();
+      const diff = examDate.getTime() - now.getTime();
 
       if (diff <= 0) {
-        setCountdown({ days: 0, hours: 0, minutes: 0 })
-        return
+        setCountdown({ days: 0, hours: 0, minutes: 0 });
+        return;
       }
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
       const hours = Math.floor(
         (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-      )
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      );
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
 
-      setCountdown({ days, hours, minutes })
-    }, 1000)
+      setCountdown({ days, hours, minutes });
+    }, 1000);
 
-    return () => clearInterval(timer)
-  }, [examDate])
+    return () => clearInterval(timer);
+  }, [examDate]);
 
   if (isLoading) {
-    return <DashboardSkeleton />
+    return <DashboardSkeleton />;
   }
 
   return (
@@ -191,9 +191,9 @@ export function PTEDashboard() {
       >
         <div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Welcome back,{' '}
+            Welcome back,{" "}
             <span className="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
-              {user?.name || 'Student'}
+              {user?.name || "Student"}
             </span>
             !
           </h1>
@@ -240,18 +240,22 @@ export function PTEDashboard() {
                 PedagogistsPTE <span className="text-primary italic">VIP</span>
               </h2>
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Unlock the full power of Artificial Intelligence. Detailed scoring,
-                advanced vocal analysis, and unlimited mock tests tailored to your growth.
+                Unlock the full power of Artificial Intelligence. Detailed
+                scoring, advanced vocal analysis, and unlimited mock tests
+                tailored to your growth.
               </p>
             </div>
 
             <div className="flex flex-wrap gap-4">
               {[
-                { name: 'AI Vocal Lab', icon: Mic },
-                { name: 'Predictive Scoring', icon: Target },
-                { name: 'Priority Support', icon: Zap },
+                { name: "AI Vocal Lab", icon: Mic },
+                { name: "Predictive Scoring", icon: Target },
+                { name: "Priority Support", icon: Zap },
               ].map((f) => (
-                <div key={f.name} className="flex items-center gap-2 text-sm font-medium text-white/70">
+                <div
+                  key={f.name}
+                  className="flex items-center gap-2 text-sm font-medium text-white/70"
+                >
                   <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                   {f.name}
                 </div>
@@ -260,10 +264,17 @@ export function PTEDashboard() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-            <Button size="lg" className="h-14 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105">
+            <Button
+              size="lg"
+              className="h-14 px-10 rounded-2xl bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-xl shadow-primary/20 transition-all hover:scale-105"
+            >
               Upgrade Now
             </Button>
-            <Button size="lg" variant="outline" className="h-14 px-10 rounded-2xl bg-white/5 border-white/10 hover:bg-white/10 text-white font-bold text-lg backdrop-blur-md">
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-14 px-10 rounded-2xl bg-white/5 border-white/10 hover:bg-white/10 text-white font-bold text-lg backdrop-blur-md"
+            >
               Compare Plans
             </Button>
           </div>
@@ -273,21 +284,50 @@ export function PTEDashboard() {
       {/* Quick Access Grid - Floating Glass Cards */}
       <motion.div variants={item} className="grid gap-6 md:grid-cols-3">
         {[
-          { href: '/pte/practice', title: 'PTE Practice', count: '5000+ Questions', desc: 'Sharpen your skills with real-world scenarios.', icon: BookOpen, color: 'from-blue-500/10 to-transparent' },
-          { href: '/pte/mock-tests', title: 'Mock Tests', count: '200+ Exams', desc: 'Simulate the pressure of the actual PTE hall.', icon: FileText, color: 'from-indigo-500/10 to-transparent' },
-          { href: '/pte/templates', title: 'Smart Templates', count: '20+ Blueprints', desc: 'The proven structures for 79+ scores.', icon: Layout, color: 'from-accent-500/10 to-transparent' },
+          {
+            href: "/pte/practice",
+            title: "PTE Practice",
+            count: "5000+ Questions",
+            desc: "Sharpen your skills with real-world scenarios.",
+            icon: BookOpen,
+            color: "from-blue-500/10 to-transparent",
+          },
+          {
+            href: "/pte/mock-tests",
+            title: "Mock Tests",
+            count: "200+ Exams",
+            desc: "Simulate the pressure of the actual PTE hall.",
+            icon: FileText,
+            color: "from-indigo-500/10 to-transparent",
+          },
+          {
+            href: "/pte/templates",
+            title: "Smart Templates",
+            count: "20+ Blueprints",
+            desc: "The proven structures for 79+ scores.",
+            icon: Layout,
+            color: "from-accent-500/10 to-transparent",
+          },
         ].map((card) => (
           <Link href={card.href} key={card.title}>
             <Card className="group relative h-full overflow-hidden border-white/5 bg-secondary/10 backdrop-blur-md transition-all duration-500 hover:translate-y-[-8px] hover:bg-secondary/20 hover:shadow-2xl">
-              <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
+              />
               <CardContent className="flex flex-col gap-6 p-8 relative z-10">
                 <div className="w-16 h-16 rounded-2xl bg-background border border-white/5 flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform duration-500">
                   <card.icon className="h-8 w-8 text-primary group-hover:text-white transition-colors" />
                 </div>
                 <div>
-                  <div className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-1">{card.count}</div>
-                  <h3 className="text-2xl font-black tracking-tight mb-2 group-hover:text-primary transition-colors">{card.title}</h3>
-                  <p className="text-muted-foreground leading-relaxed">{card.desc}</p>
+                  <div className="text-xs font-black uppercase tracking-[0.2em] text-primary mb-1">
+                    {card.count}
+                  </div>
+                  <h3 className="text-2xl font-black tracking-tight mb-2 group-hover:text-primary transition-colors">
+                    {card.title}
+                  </h3>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {card.desc}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -347,25 +387,29 @@ export function PTEDashboard() {
                 {mounted && chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData} barSize={40}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        vertical={false}
+                        stroke="#e5e7eb"
+                      />
                       <XAxis
                         dataKey="name"
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fill: '#6b7280', fontSize: 12 }}
+                        tick={{ fill: "#6b7280", fontSize: 12 }}
                         dy={10}
                       />
                       <YAxis
                         axisLine={false}
                         tickLine={false}
-                        tick={{ fill: '#6b7280', fontSize: 12 }}
+                        tick={{ fill: "#6b7280", fontSize: 12 }}
                       />
                       <Tooltip
-                        cursor={{ fill: 'transparent' }}
+                        cursor={{ fill: "transparent" }}
                         contentStyle={{
-                          borderRadius: '8px',
-                          border: 'none',
-                          boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+                          borderRadius: "8px",
+                          border: "none",
+                          boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                         }}
                       />
                       <Bar dataKey="score" radius={[4, 4, 0, 0]}>
@@ -402,7 +446,10 @@ export function PTEDashboard() {
           <Card className="overflow-hidden border-0 shadow-lg">
             <CardHeader className="flex flex-row items-center justify-between pb-2">
               <CardTitle className="text-base font-medium">Exam In</CardTitle>
-              <Dialog open={isExamDialogOpen} onOpenChange={setIsExamDialogOpen}>
+              <Dialog
+                open={isExamDialogOpen}
+                onOpenChange={setIsExamDialogOpen}
+              >
                 <DialogTrigger asChild>
                   <Button variant="ghost" size="sm" className="h-8 text-xs">
                     Set New Date
@@ -417,8 +464,8 @@ export function PTEDashboard() {
                   </DialogHeader>
                   <ExamDateScheduler
                     onUpdate={() => {
-                      fetchData()
-                      setIsExamDialogOpen(false)
+                      fetchData();
+                      setIsExamDialogOpen(false);
                     }}
                   />
                 </DialogContent>
@@ -431,19 +478,25 @@ export function PTEDashboard() {
                     <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {countdown.days}
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">Days</span>
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Days
+                    </span>
                   </div>
                   <div className="flex flex-1 flex-col items-center gap-2 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/30">
                     <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {countdown.hours}
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">Hours</span>
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Hours
+                    </span>
                   </div>
                   <div className="flex flex-1 flex-col items-center gap-2 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/30">
                     <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {countdown.minutes}
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">Mins</span>
+                    <span className="text-xs font-medium text-muted-foreground">
+                      Mins
+                    </span>
                   </div>
                 </div>
               ) : (
@@ -454,7 +507,10 @@ export function PTEDashboard() {
                   <p className="mb-4 text-sm text-muted-foreground">
                     No exam scheduled yet
                   </p>
-                  <Dialog open={isExamDialogOpen} onOpenChange={setIsExamDialogOpen}>
+                  <Dialog
+                    open={isExamDialogOpen}
+                    onOpenChange={setIsExamDialogOpen}
+                  >
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="w-full">
                         Schedule Exam
@@ -469,8 +525,8 @@ export function PTEDashboard() {
                       </DialogHeader>
                       <ExamDateScheduler
                         onUpdate={() => {
-                          fetchData()
-                          setIsExamDialogOpen(false)
+                          fetchData();
+                          setIsExamDialogOpen(false);
                         }}
                       />
                     </DialogContent>
@@ -478,7 +534,9 @@ export function PTEDashboard() {
                 </div>
               )}
               <div className="mt-6 space-y-4">
-                <h4 className="font-medium text-foreground">Practice Summary</h4>
+                <h4 className="font-medium text-foreground">
+                  Practice Summary
+                </h4>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-xl border bg-card p-3 shadow-sm">
                     <div className="text-xl font-bold text-foreground">0</div>
@@ -547,7 +605,9 @@ export function PTEDashboard() {
                   <Headphones className="h-5 w-5" />
                 </div>
                 <div className="flex-1">
-                  <div className="font-medium text-foreground">Audio Resources</div>
+                  <div className="font-medium text-foreground">
+                    Audio Resources
+                  </div>
                   <div className="text-xs text-muted-foreground">
                     Practice listening with audio
                   </div>
@@ -564,7 +624,7 @@ export function PTEDashboard() {
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">Study Guide</h2>
           <div className="flex gap-2">
-            {['Pearson PTE', 'Speaking', 'Writing', 'Reading', 'Listening'].map(
+            {["Pearson PTE", "Speaking", "Writing", "Reading", "Listening"].map(
               (tab) => (
                 <Button
                   key={tab}
@@ -572,9 +632,9 @@ export function PTEDashboard() {
                   size="sm"
                   className={cn(
                     "rounded-full text-xs",
-                    tab === 'Pearson PTE'
-                      ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
-                      : 'text-muted-foreground hover:text-foreground'
+                    tab === "Pearson PTE"
+                      ? "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                      : "text-muted-foreground hover:text-foreground"
                   )}
                 >
                   {tab}
@@ -600,7 +660,10 @@ export function PTEDashboard() {
                   />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 transition-opacity group-hover:opacity-100">
                     <div className="rounded-full bg-white/20 p-3 backdrop-blur-sm">
-                      <Play className="h-8 w-8 text-white" fill="currentColor" />
+                      <Play
+                        className="h-8 w-8 text-white"
+                        fill="currentColor"
+                      />
                     </div>
                   </div>
                 </div>
@@ -636,9 +699,8 @@ export function PTEDashboard() {
       </motion.div>
 
       {/* Voice Assistant Sidebar */}
-
     </motion.div>
-  )
+  );
 }
 
 function DashboardSkeleton() {
@@ -668,5 +730,5 @@ function DashboardSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }

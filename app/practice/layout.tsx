@@ -6,7 +6,11 @@ export const metadata: Metadata = {
     description: 'AI-Powered PTE Academic practice and scoring.',
 }
 
-export default function PracticeLayout({ children }: { children: React.ReactNode }) {
-    // Reuse the existing PTELayoutClient for consistent nav/sidebar
-    return <PTELayoutClient>{children}</PTELayoutClient>
+export default function PracticeLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  // use the existing PTELayoutClient for consistent nav/sidebar
+  return <PTELayoutClient>{children}</PTELayoutClient>
 }

@@ -115,9 +115,69 @@ export async function scorePteAttemptV2(
             text?: string;
             audioUrl?: string;
         };
+        userId?: string; // Added for personalization/weak area tracking
+        questionId?: string;
     }
 ): Promise<AIFeedbackData> {
     console.log(`[Scoring Agent] Starting scoring for ${type}`);
+
+    let transcript: string | undefined;
+
+    // Handle Audio Transcription First (if applicable)
+    if (params.submission.audioUrl) {
+        console.log(`[Scoring Agent] Processing audio: ${params.submission.audioUrl}`);
+        const transcriptionResult = await transcribeAudio(params.submission.audioUrl);
+        if (transcriptionResult.transcript) {
+            transcript = transcriptionResult.transcript;
+        } else {
+            console.warn('[Scoring Agent] Transcription failed:', transcriptionResult.error);
+        }
+    }
+
+    // Check for Supabase Edge Function Configuration
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const useEdgeFunction = !!supabaseUrl && !!supabaseAnonKey;
+
+    if (useEdgeFunction) {
+        console.log('[Scoring Agent] Delegating strict scoring to Supabase Edge Function (ai-scoring)');
+        try {
+            // Call Edge Function
+            const response = await fetch(`${supabaseUrl}/functions/v1/ai-scoring`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${supabaseAnonKey}`,
+                },
+                body: JSON.stringify({
+                    questionType: type,
+                    questionContent: params.questionContent,
+                    submission: {
+                        text: params.submission.text,
+                        audioUrl: params.submission.audioUrl,
+                        transcript: transcript // Pass transcript to Edge Function
+                    },
+                    userId: params.userId,
+                    questionId: params.questionId
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Edge Function error: ${response.statusText}`);
+            }
+
+            const feedbackData = await response.json();
+            // Validate usage schema
+            const validatedData = AIFeedbackDataSchema.parse(feedbackData);
+            return validatedData;
+
+        } catch (error) {
+            console.error('[Scoring Agent] Edge Function call failed, falling back to local scoring:', error);
+            // Fall through to local logic below
+        }
+    }
+
+    // --- Local Fallback Logic (Existing Implementation) ---
 
     // Step 1: Retrieve scoring criteria
     const questionTypeKey = type.toLowerCase().replace(/\s+/g, '_');
@@ -128,17 +188,10 @@ export async function scorePteAttemptV2(
     userContent += `Scoring Criteria:\n${criteria}\n\n`;
 
     // Handle Audio or Text
-    if (params.submission.audioUrl) {
-        console.log(`[Scoring Agent] Processing audio: ${params.submission.audioUrl}`);
-
-        // Transcribe audio using AssemblyAI
-        const transcriptionResult = await transcribeAudio(params.submission.audioUrl);
-        if (transcriptionResult.transcript) {
-            userContent += `User's Audio Transcript: ${transcriptionResult.transcript}\n\n`;
-        } else if (transcriptionResult.error) {
-            console.warn('[Scoring Agent] Transcription failed:', transcriptionResult.error);
-            userContent += `User submitted an audio file, but transcription failed.\n\n`;
-        }
+    if (transcript) {
+        userContent += `User's Audio Transcript: ${transcript}\n\n`;
+    } else if (params.submission.audioUrl) {
+        userContent += `User submitted an audio file, but transcription failed.\n\n`;
     } else if (params.submission.text) {
         userContent += `User Text Response: ${params.submission.text}\n\n`;
     }
@@ -146,7 +199,6 @@ export async function scorePteAttemptV2(
     userContent += `Please evaluate this response according to the PTE Academic scoring criteria provided above. Return a detailed JSON report with scores and feedback.`;
 
     // Generate scoring using Gemini
-    // Using fastModel for cost-efficiency (Free Mode)
     const isFreeMode = process.env.NEXT_PUBLIC_FREE_MODE === 'true';
     const { text } = await generateText({
         model: isFreeMode ? fastModel : proModel,
@@ -177,7 +229,6 @@ export async function scorePteAttemptV2(
 
     // Parse the JSON response
     try {
-        // Extract JSON from the response (in case there's extra text)
         const jsonMatch = text.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
             throw new Error('No JSON found in response');
@@ -190,7 +241,6 @@ export async function scorePteAttemptV2(
         return validatedData;
     } catch (error) {
         console.error('[Scoring Agent] Failed to parse response:', error);
-        // Return a fallback response
         return {
             overallScore: 0,
             suggestions: ['Unable to generate feedback. Please try again.'],

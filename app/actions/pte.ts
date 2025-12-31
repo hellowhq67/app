@@ -71,6 +71,8 @@ export async function scoreWritingAttempt(
     const feedback = await scorePteAttemptV2(QuestionType.WRITE_ESSAY, {
       questionContent: promptTopic,
       submission: { text: essayText },
+      userId: session.user.id,
+      questionId,
     });
 
     // Save to database
@@ -136,6 +138,8 @@ export async function scoreReadAloudAttempt(
     const feedback = await scorePteAttemptV2(QuestionType.READ_ALOUD, {
       questionContent: originalText,
       submission: { audioUrl: blob.url },
+      userId: session.user.id,
+      questionId,
     });
 
     // 3. Save to database
@@ -201,6 +205,8 @@ export async function scoreSpeakingAttempt(
     const feedback = await scorePteAttemptV2(type, {
       questionContent,
       submission: { audioUrl: blob.url },
+      userId: session.user.id,
+      questionId,
     });
 
     // 3. Save to database
@@ -275,6 +281,8 @@ export async function scoreReadingAttempt(
     const feedback = await scorePteAttemptV2(type, {
       questionContent,
       submission: { text: JSON.stringify(userResponse) },
+      userId: session.user.id,
+      questionId,
     });
 
     // Save to database
@@ -361,6 +369,8 @@ export async function scoreListeningAttempt(
     const feedback = await scorePteAttemptV2(type, {
       questionContent,
       submission: { text: typeof userResponse === 'string' ? userResponse : JSON.stringify(userResponse) },
+      userId: session.user.id,
+      questionId,
     });
 
     // Save to database

@@ -74,10 +74,15 @@ export interface PTEWordCount {
 }
 
 export interface PTEResponse {
+  id?: string;
   questionId: string;
   answer: string | string[] | PTEBlankAnswer[];
   timeSpent: number;
   timestamp: number;
+  sessionId?: string;
+  questionType?: string;
+  aiScore?: number;
+  aiFeedback?: PTEAIFeedback;
 }
 
 export interface PTEBlankAnswer {

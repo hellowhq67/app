@@ -1,0 +1,24 @@
+npm warn Unknown project config "store-dir". This will stop working in the next major version of npm.
+npm warn Unknown project config "child-concurrency". This will stop working in the next major version of npm.
+npm warn Unknown project config "package-import-method". This will stop working in the next major version of npm.
+npm warn Unknown project config "network-timeout". This will stop working in the next major version of npm.
+components/ui/tracing-beam.tsx(2,8): error TS1259: Module '"C:/Users/lemon/Documents/GitHub/app/node_modules/.pnpm/@types+react@19.2.7/node_modules/@types/react/index"' can only be default-imported using the 'esModuleInterop' flag
+components/ui/tracing-beam.tsx(10,20): error TS2307: Cannot find module '@/lib/utils' or its corresponding type declarations.
+components/ui/tracing-beam.tsx(50,5): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(54,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(55,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(68,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(80,9): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(87,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(96,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(106,11): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(107,13): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(115,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(116,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(117,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(118,15): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+components/ui/tracing-beam.tsx(123,7): error TS17004: Cannot use JSX unless the '--jsx' flag is provided.
+node_modules/.pnpm/framer-motion@12.23.26_reac_b75e9981d053c7985282bd491e2a6f69/node_modules/framer-motion/dist/types.d-DagZKalS.d.ts(33,11): error TS2320: Interface 'MotionStyle' cannot simultaneously extend types 'MakeMotionHelper<Omit<CSSProperties, "perspective" | "rotate" | "scale">>' and 'MakeMotionHelper<TransformProperties>'.
+  Named property 'x' of types 'MakeMotionHelper<Omit<CSSProperties, "perspective" | "rotate" | "scale">>' and 'MakeMotionHelper<TransformProperties>' are not identical.
+node_modules/.pnpm/framer-motion@12.23.26_reac_b75e9981d053c7985282bd491e2a6f69/node_modules/framer-motion/dist/types/index.d.ts(515,226): error TS2503: Cannot find namespace 'JSX'.
+node_modules/.pnpm/framer-motion@12.23.26_reac_b75e9981d053c7985282bd491e2a6f69/node_modules/framer-motion/dist/types/index.d.ts(542,228): error TS2503: Cannot find namespace 'JSX'.

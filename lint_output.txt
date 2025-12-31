@@ -1,0 +1,6 @@
+
+> nextjs@0.1.0 lint C:\Users\lemon\Documents\GitHub\app
+> next lint
+
+Invalid project directory provided, no such directory: C:\Users\lemon\Documents\GitHub\app\lint
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.

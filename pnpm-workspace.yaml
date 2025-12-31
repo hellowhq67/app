@@ -8,6 +8,7 @@ onlyBuiltDependencies:
   - esbuild
   - protobufjs
   - sharp
+  - supabase
   - unrs-resolver
 
 overrides:

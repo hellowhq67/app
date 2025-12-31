@@ -1,5 +1,5 @@
-import { drizzle } from 'drizzle-orm/node-postgres';
-import { Pool } from 'pg';
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
 import * as schema from './schema';
 import { env } from '@/lib/env';
 
@@ -7,37 +7,22 @@ import { env } from '@/lib/env';
 let connectionString = env.DATABASE_URL || env.DATABASE_URL_POOLED || process.env.DATABASE_URL || process.env.DATABASE_URL_POOLED;
 
 if (!connectionString) {
-  console.warn('❌ DATABASE_URL is not set in environment variables. Many features (auth, migrations) will fail until you provide one.');
-} else {
-  // Prefer IPv4 resolution for localhost to avoid ::1 connection refusals on some setups
-  if (connectionString.includes('localhost')) {
-    connectionString = connectionString.replace('localhost', '127.0.0.1');
-  }
+  throw new Error('❌ DATABASE_URL is not set in environment variables');
 }
 
-// Create PostgreSQL pool for connections
-const pool = new Pool({
-  connectionString,
-  connectionTimeoutMillis: 10000, // Increased timeout
-  max: 1, // Limit connections to avoid exhausting pool
-  ssl: { rejectUnauthorized: false }, // Force SSL
-});
+// Create Neon HTTP client for serverless environments
+const sql = neon(connectionString);
 
 // Test database connection
 (async () => {
   try {
-    const client = await pool.connect();
-    try {
-      const result = await client.query('SELECT 1 as ok');
-      console.log('DB OK', result.rows);
-    } finally {
-      client.release();
-    }
+    const result = await sql`SELECT 1 as ok`;
+    console.log('✅ Database connection successful', result);
   } catch (error) {
-    console.error('DB ERR', error);
+    console.error('❌ Database connection failed:', error);
   }
 })();
 
 // Export the Drizzle ORM instance with schema for relational queries
-export const db = drizzle(pool, { schema });
-export const client = pool;
+export const db = drizzle(sql, { schema });
+export const client = sql;

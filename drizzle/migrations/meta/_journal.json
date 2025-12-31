@@ -29,6 +29,20 @@
       "when": 1766807690619,
       "tag": "0003_chilly_power_pack",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1767115791745,
+      "tag": "0004_medical_quasar",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1767157200857,
+      "tag": "0005_strong_inertia",
+      "breakpoints": true
     }
   ]
 }

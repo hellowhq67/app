@@ -1,0 +1,11 @@
+
+> nextjs@0.1.0 type-check C:\Users\lemon\Documents\GitHub\app
+> tsc --noEmit
+
+components/pte/dragdrop/PTEDragDrop.tsx(272,13): error TS1005: ')' expected.
+components/pte/dragdrop/PTEDragDrop.tsx(273,15): error TS1381: Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+components/pte/dragdrop/PTEDragDrop.tsx(275,9): error TS1005: ')' expected.
+components/pte/dragdrop/PTEDragDrop.tsx(293,5): error TS1128: Declaration or statement expected.
+components/pte/dragdrop/PTEDragDrop.tsx(294,3): error TS1109: Expression expected.
+components/pte/dragdrop/PTEDragDrop.tsx(295,1): error TS1128: Declaration or statement expected.
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.

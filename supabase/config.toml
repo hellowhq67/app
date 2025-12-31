@@ -1,0 +1,5 @@
+project_id = "yvbolijvpfsdpzmlxjru"
+
+[functions]
+  [functions.hello-world]
+    verify_jwt = true

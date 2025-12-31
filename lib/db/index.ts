@@ -1,4 +1,2 @@
-// Database instance
-export { db, client } from './drizzle'
-
-export * from './schema'
+export * from './drizzle';
+export * from './schema';

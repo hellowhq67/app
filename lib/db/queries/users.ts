@@ -5,7 +5,7 @@ import {
     userProgress,
     userScheduledExamDates,
     pteAttempts,
-    subscriptions
+
 } from '@/lib/db/schema'
 import { eq, sql, and } from 'drizzle-orm'
 
@@ -93,7 +93,7 @@ export async function getUserProgress(userId: string) {
 export async function upsertUserProfile(userId: string, data: { examDate?: string | Date | null, targetScore?: string | null }) {
     const { examDate, targetScore } = data
     const formattedDate = examDate ? new Date(examDate) : null
-    
+
     // Handle targetScore being "null" string or actual null/number
     // If input is string, convert to number if valid, else null
     let numericScore: number | null = null;
@@ -156,35 +156,6 @@ export async function updateUserProgress(userId: string, data: any) {
 
 /**
  * Upsert a user subscription.
- */
-export async function upsertUserSubscription(userId: string, data: any) {
-    const existing = await db
-        .select()
-        .from(subscriptions)
-        .where(eq(subscriptions.userId, userId))
-        .limit(1)
-
-    if (existing.length > 0) {
-        const [updated] = await db
-            .update(subscriptions)
-            .set({
-                ...data,
-                updatedAt: new Date(),
-            })
-            .where(eq(subscriptions.userId, userId))
-            .returning()
-        return updated
-    } else {
-        const [created] = await db
-            .insert(subscriptions)
-            .values({
-                userId,
-                ...data,
-            })
-            .returning()
-        return created
-    }
-}
 
 /**
  * Retrieve scheduled exam dates for a user.
