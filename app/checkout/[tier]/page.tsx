@@ -17,15 +17,13 @@ interface CheckoutPageProps {
 
 export default async function CheckoutPage({
   params,
-}: {
-  params: { tier: string };
-}) {
-  const { tier: tierParam } = params
+}: CheckoutPageProps) {
+  const { tier } = await params
   const [isLoading, setIsLoading] = useState(false)
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
-  const tier = tierParam as SubscriptionTier
+  const tierParam = tier as SubscriptionTier
 
-  if (!['pro', 'premium'].includes(tier)) {
+  if (!['pro', 'premium'].includes(tierParam)) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

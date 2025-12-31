@@ -6,4 +6,5 @@ export * from './dashboard';
 export * from './pte-questions';
 export * from './pte-scoring';
 export * from './pte-sessions';
+export * from './questions';
 export * from './users';

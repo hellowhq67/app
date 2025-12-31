@@ -19,7 +19,7 @@ const BookmarkSchema = z.object({
  */
 export async function POST(request: Request) {
   try {
-    await requireAuth();
+    const session = await requireAuth();
 
     const body = await request.json();
     const parsed = BookmarkSchema.safeParse(body);
@@ -28,13 +28,9 @@ export async function POST(request: Request) {
       return apiError(400, "Invalid request body: " + parsed.error.issues.map(i => i.message).join('; '), "BAD_REQUEST");
     }
 
-    const { questionId, questionType, bookmarked } = parsed.data;
+    const { questionId } = parsed.data;
 
-    const updated = await toggleQuestionBookmark({
-      category: questionType,
-      questionId,
-      bookmarked,
-    });
+    const updated = await toggleQuestionBookmark(session.userId, questionId);
 
     if (!updated) {
       return apiError(404, "Question not found", "NOT_FOUND");

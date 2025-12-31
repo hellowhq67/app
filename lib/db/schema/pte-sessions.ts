@@ -10,6 +10,7 @@ import {
     uuid,
 } from 'drizzle-orm/pg-core';
 import { users } from './users';
+import { pteAttempts } from './pte-attempts';
 
 export const pteSessions = pgTable('pte_sessions', {
     id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
@@ -87,6 +88,14 @@ export const pteScores = pgTable('pte_scores', {
 
     createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// Type exports
+export type PteSession = typeof pteSessions.$inferSelect
+export type NewPteSession = typeof pteSessions.$inferInsert
+
+// Legacy exports for compatibility
+export const pteTests = pteSessions
+export const testAttempts = pteAttempts
 
 // Relations
 export const pteSessionsRelations = relations(pteSessions, ({ one, many }) => ({

@@ -48,6 +48,58 @@ export async function getSubscriptionById(subscriptionId: string): Promise<Subsc
 }
 
 /**
+ * Create or update user subscription
+ */
+export async function upsertUserSubscription(userId: string, subscriptionData: {
+    polarProductId: string;
+    polarSubscriptionId: string;
+    status: 'active' | 'cancelled' | 'past_due' | 'unpaid' | 'trialing';
+    currentPeriodStart: Date;
+    currentPeriodEnd: Date;
+    cancelAtPeriodEnd?: boolean;
+    tier?: string;
+    amount?: number;
+}): Promise<Subscription> {
+    // Check if user has existing subscription
+    const existingSubscription = await getActiveSubscription(userId);
+
+    const subscriptionPayload = {
+        userId,
+        polarSubscriptionId: subscriptionData.polarSubscriptionId,
+        status: subscriptionData.status,
+        currentPeriodStart: subscriptionData.currentPeriodStart,
+        currentPeriodEnd: subscriptionData.currentPeriodEnd,
+        cancelAtPeriodEnd: subscriptionData.cancelAtPeriodEnd ?? false,
+        tier: subscriptionData.tier || 'pro',
+        amount: subscriptionData.amount ? subscriptionData.amount.toString() : '29.99',
+        currency: 'USD',
+        interval: 'month',
+    };
+
+    if (existingSubscription) {
+        // Update existing subscription
+        const [updated] = await db
+            .update(subscriptions)
+            .set({
+                ...subscriptionPayload,
+                updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.id, existingSubscription.id))
+            .returning();
+
+        return updated;
+    } else {
+        // Create new subscription
+        const [created] = await db
+            .insert(subscriptions)
+            .values(subscriptionPayload)
+            .returning();
+
+        return created;
+    }
+}
+
+/**
  * Get subscription by Polar ID
  */
 export async function getSubscriptionByPolarId(polarId: string): Promise<Subscription | null> {

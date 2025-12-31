@@ -58,7 +58,6 @@ export async function POST(request: NextRequest) {
         const checkout = await polar.checkouts.create({
             products: [], // Add your one-time product ID here
             amount: amount * 100, // Convert to cents
-            currency: 'USD',
             successUrl: `${process.env.NEXT_PUBLIC_BETTER_AUTH_URL}/billing?purchase=success&id=${purchase.id}`,
             customerEmail: session.user.email,
             customerName: session.user.name || undefined,

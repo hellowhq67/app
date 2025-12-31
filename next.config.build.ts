@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable React Compiler
-  reactCompiler: true,
+  // Disable React Compiler for build stability
+  reactCompiler: false,
 
   // Enable source maps for development and production error tracking
   productionBrowserSourceMaps: true,
@@ -10,26 +10,12 @@ const nextConfig: NextConfig = {
   // Optimize output for production
   output: 'standalone',
 
-  // Compress responses (improoves load times)
+  // Compress responses (improves load times)
   compress: true,
 
   // Power off x-powered-by header
   poweredByHeader: false,
   
-  // Add onDemandEntries configuration
-  onDemandEntries: {
-    // period (in ms) where the server will keep pages in the buffer
-    maxInactiveAge: 25 * 1000,
-    // number of pages that should be kept simultaneously without being disposed
-    pagesBufferLength: 2,
-  },
-  
-  // Add generateBuildId configuration
-  generateBuildId: async () => {
-    // This could be anything, using the latest git hash
-    return process.env.GIT_HASH || 'dev';
-  },
-
   // Allow remote icons/assets used by PTE data
   images: {
     remotePatterns: [
@@ -73,34 +59,6 @@ const nextConfig: NextConfig = {
 
   // Custom webpack config for optimizations
   webpack: (config, { isServer, webpack, dev }) => {
-    // Ignore problematic imports during build
-    config.ignoreWarnings = [
-      {
-        module: /app\/api\/ai-assistant\/route\.ts/,
-        message: /createGoogle.*is not exported/,
-      },
-      {
-        module: /app\/api\/questions\/bookmark\/route\.ts/,
-        message: /toggleQuestionBookmark.*is not exported/,
-      },
-      {
-        module: /app\/api\/user\/progress\/route\.ts/,
-        message: /getUserAnalytics.*is not exported/,
-      },
-      {
-        module: /app\/api\/webhooks\/polar\/route\.ts/,
-        message: /upsertUserSubscription.*is not exported/,
-      },
-      {
-        module: /app\/pte\/academic\/mocktest\/page\.tsx/,
-        message: /pteTests.*is not exported/,
-      },
-      {
-        module: /app\/pte\/academic\/mocktest\/page\.tsx/,
-        message: /testAttempts.*is not exported/,
-      },
-    ];
-
     // Fallbacks for browser
     if (!isServer) {
       config.resolve.fallback = {
@@ -131,18 +89,12 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Bundle analyzer (when ANALYZE=true)
-    if (process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('@next/bundle-analyzer')({
-        enabled: true,
+    // Ignore problematic modules for build
+    config.externals = config.externals || [];
+    if (isServer) {
+      config.externals.push({
+        '@ai-sdk/google': 'commonjs @ai-sdk/google',
       });
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          reportFilename: isServer ? '../analyze/server.html' : './analyze/client.html',
-          openAnalyzer: true,
-        })
-      );
     }
 
     return config;

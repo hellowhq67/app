@@ -12,7 +12,7 @@ export const metadata = {
 export default async function CommunityPage({
   searchParams,
 }: {
-  searchParams: { page?: string; type?: string; sort?: string }
+  searchParams: Promise<{ page?: string; type?: string; sort?: string }>
 }) {
   const params = await searchParams
   const page = parseInt(params.page || '1')

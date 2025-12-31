@@ -255,3 +255,28 @@ export async function calculateUserProgressFallback(userId: string) {
         }
     }
 }
+
+/**
+ * Get user analytics for dashboard
+ */
+export async function getUserAnalytics(userId: string) {
+    try {
+        const user = await getUser(userId)
+        const profile = await getUserProfile(userId)
+        const progress = await getUserProgress(userId)
+        const fallback = await calculateUserProgressFallback(userId)
+
+        return {
+            user,
+            profile,
+            progress,
+            fallback,
+            totalAttempts: fallback.questionsAnswered,
+            averageScore: 0, // Calculate from attempts if needed
+            studyTime: fallback.totalStudyTimeHours,
+        }
+    } catch (error) {
+        console.error('Error in getUserAnalytics query:', error)
+        return null
+    }
+}
