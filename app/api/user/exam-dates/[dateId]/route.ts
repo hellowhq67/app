@@ -15,10 +15,10 @@ export async function DELETE(
   { params }: { params: Promise<{ dateId: string }> }
 ) {
   try {
-    await requireAuth()
+    const session = await requireAuth()
     const { dateId } = await params
 
-    const deleted = await deleteUserExamDate(dateId)
+    const deleted = await deleteUserExamDate(session.userId, dateId)
 
     if (!deleted) {
       return apiError(404, 'Exam date not found or unauthorized', 'NOT_FOUND')
