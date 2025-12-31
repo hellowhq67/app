@@ -9,3 +9,4 @@ export * from './pte-categories';
 export * from './pte-questions';
 export * from './pte-attempts';
 export * from './pte-sessions';
+export * from './billing';

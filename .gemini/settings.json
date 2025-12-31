@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "livekit-docs": {
-      "url": "https://doc.livekit.mcp",
-      "type": "http"
-    }
-  }
-}
