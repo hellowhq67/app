@@ -1,7 +1,7 @@
 import { PTEAppSidebar } from "@/components/pte/pte-app-sidebar"
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
 
-export default function PracticeLayout({ children }: { children: React.ReactNode }) {
+export default function PTELayout({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <PTEAppSidebar />

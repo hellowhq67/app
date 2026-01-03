@@ -1,4 +1,5 @@
 // PTE Academic Mock Test Constants
+// Note: These codes must match the schema enum values in pte-categories.ts
 
 export const PTE_SECTIONS = {
   SPEAKING_WRITING: 'speaking_writing',
