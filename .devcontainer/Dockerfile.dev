@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm
+
+# Install common dev utilities
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git openssh-client ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Ensure pnpm is available via corepack
+RUN npm install -g corepack@latest || true \
+    && corepack enable \
+    && corepack prepare pnpm@latest --activate
+
+WORKDIR /workspace
+
+# Use non-root user from the base image
+USER vscode
+
+EXPOSE 3000
+
+CMD ["sleep", "infinity"]
