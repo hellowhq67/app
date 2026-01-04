@@ -134,48 +134,7 @@ export async function scorePteAttemptV2(
         }
     }
 
-    // Check for Supabase Edge Function Configuration
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    const useEdgeFunction = !!supabaseUrl && !!supabaseAnonKey;
-
-    if (useEdgeFunction) {
-        console.log('[Scoring Agent] Delegating strict scoring to Supabase Edge Function (ai-scoring)');
-        try {
-            // Call Edge Function
-            const response = await fetch(`${supabaseUrl}/functions/v1/ai-scoring`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${supabaseAnonKey}`,
-                },
-                body: JSON.stringify({
-                    questionType: type,
-                    questionContent: params.questionContent,
-                    submission: {
-                        text: params.submission.text,
-                        audioUrl: params.submission.audioUrl,
-                        transcript: transcript // Pass transcript to Edge Function
-                    },
-                    userId: params.userId,
-                    questionId: params.questionId
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Edge Function error: ${response.statusText}`);
-            }
-
-            const feedbackData = await response.json();
-            // Validate usage schema
-            const validatedData = AIFeedbackDataSchema.parse(feedbackData);
-            return validatedData;
-
-        } catch (error) {
-            console.error('[Scoring Agent] Edge Function call failed, falling back to local scoring:', error);
-            // Fall through to local logic below
-        }
-    }
+    // Note: Supabase Edge Function delegation removed — run local scoring only.
 
     // --- Local Fallback Logic (Existing Implementation) ---
 

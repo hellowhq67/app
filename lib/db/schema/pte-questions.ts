@@ -240,4 +240,5 @@ export type ReadingTestType =
   | 'reading-fill-blanks-drag'
   | 'reading-mc-single';
 
-export { pteQuestionTypeCodeEnum };
+
+  
