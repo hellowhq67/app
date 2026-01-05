@@ -1,15 +1,11 @@
-import { PTEAppSidebar } from "@/components/pte/pte-app-sidebar"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
+import type { Metadata } from 'next'
+import { PTELayoutClient } from '@/components/pte/pte-layout-client'
+
+export const metadata: Metadata = {
+  title: "Pedagogist's PTE Academic Practice",
+  description: 'Practice for PTE Academic exam with AI-powered scoring',
+}
 
 export default function PTELayout({ children }: { children: React.ReactNode }) {
-  return (
-    <SidebarProvider>
-      <PTEAppSidebar />
-      <SidebarInset className="flex flex-col min-h-screen">
-        <main className="flex-1">
-          {children}
-        </main>
-      </SidebarInset>
-    </SidebarProvider>
-  )
+  return <PTELayoutClient>{children}</PTELayoutClient>
 }
