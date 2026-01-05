@@ -9,6 +9,7 @@ import {
 } from '@/lib/db/schema/pte-attempts';
 import { pteQuestions } from '@/lib/db/schema/pte-questions';
 import { eq, desc, and } from 'drizzle-orm';
+import { getQuestionTypeByCode } from '@/lib/constants/pte-questions';
 
 type TestType = 'full_test' | 'speaking_section' | 'writing_section' | 'reading_section' | 'listening_section';
 
@@ -89,7 +90,7 @@ export async function startMockTest(input: StartMockTestInput): Promise<StartMoc
             mockTestId: mockTest.id,
             questionId: q.id,
             questionOrder: index + 1,
-            sectionName: q.categoryId || 'General',
+            sectionName: getQuestionTypeByCode(q.questionTypeId)?.category || 'General',
             maxScore: 10,
             isCompleted: false,
         }));

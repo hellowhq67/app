@@ -7,7 +7,7 @@ import {
     users
 } from '@/lib/db/schema';
 import { eq, and, desc } from 'drizzle-orm';
-import { Database } from '@/supabase/client'; // Keeping for type reference if needed, or better, define new types
+// import { Database } from '@/supabase/client'; // REMOVED: broken import
 
 // PTE Session Management
 export async function createPTESession(userId: string) {

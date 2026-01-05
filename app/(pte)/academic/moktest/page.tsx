@@ -1,6 +1,6 @@
-import { MockTestTable } from "@/components/pte/mock-test/moktest-table";
-
-export function MockTestPage() {
+import React from 'react'
+import { MockTestTable } from '@/components/pte/mock-test/moktest-table';
+export default function page() {
   return (
     <div className="min-h-screen bg-background text-foreground p-6 space-y-8">
       {/* Header */}
@@ -27,10 +27,16 @@ export function MockTestPage() {
         <MockTestTable />
       </div>
     </div>
-  );
+  )
 }
 
-function StatCard({ title, value }: { title: string; value: string }) {
+function StatCard({
+  title,
+  value,
+}: {
+  title: string;
+  value: string;
+}) {
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
       <p className="text-sm text-muted-foreground">{title}</p>

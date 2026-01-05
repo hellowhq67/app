@@ -1,26 +1,26 @@
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
-import { ArrowRight, Clock, PenTool } from 'lucide-react'
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { ArrowRight, Clock, PenTool } from "lucide-react";
 
 const writingTypes = [
   {
-    id: 'summarize_written_text',
-    name: 'Summarize Written Text',
-    description: 'Read a passage and write a one-sentence summary (5-75 words)',
-    time: '10 min',
+    id: "summarize_written_text",
+    name: "Summarize Written Text",
+    description: "Read a passage and write a one-sentence summary (5-75 words)",
+    time: "10 min",
     aiScored: true,
     questionCount: 30,
   },
   {
-    id: 'write_essay',
-    name: 'Write Essay',
-    description: 'Write an essay of 200-300 words on a given topic',
-    time: '20 min',
+    id: "write_essay",
+    name: "Write Essay",
+    description: "Write an essay of 200-300 words on a given topic",
+    time: "20 min",
     aiScored: true,
     questionCount: 40,
   },
-]
+];
 
 export default function WritingPracticePage() {
   return (
@@ -32,7 +32,9 @@ export default function WritingPracticePage() {
             <PenTool className="h-6 w-6 text-green-600" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Writing Practice</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Writing Practice
+            </h1>
             <p className="text-muted-foreground">
               Master both writing question types for PTE Academic
             </p>
@@ -42,7 +44,9 @@ export default function WritingPracticePage() {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/practice" className="hover:text-primary">Practice</Link>
+        <Link href="/practice" className="hover:text-primary">
+          Practice
+        </Link>
         <span>/</span>
         <span className="text-foreground font-medium">Writing</span>
       </nav>
@@ -58,7 +62,9 @@ export default function WritingPracticePage() {
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-semibold text-lg">{type.name}</h3>
                       {type.aiScored && (
-                        <Badge variant="secondary" className="text-xs">AI Scored</Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          AI Scored
+                        </Badge>
                       )}
                     </div>
                     <p className="text-muted-foreground text-sm mb-2">
@@ -80,5 +86,5 @@ export default function WritingPracticePage() {
         ))}
       </div>
     </div>
-  )
+  );
 }
