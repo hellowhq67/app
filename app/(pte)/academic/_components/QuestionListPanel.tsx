@@ -229,7 +229,7 @@ export function QuestionListPanel({
             return (
               <Link
                 key={question.id}
-                href={`/practice/${section}/${question.id}`}
+                href={`/academic/practice/${section}/${testType}/${question.id}`}
                 onClick={() => {
                   if (onClose) onClose();
                   if (onSelectQuestion) onSelectQuestion(originalIndex);

@@ -1,21 +1,18 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable React Compiler
+  output: "standalone",
   reactCompiler: true,
 
   // Enable source maps for development and production error tracking
   productionBrowserSourceMaps: true,
-
-  // Optimize output for production
-  output: 'standalone',
 
   // Compress responses (improoves load times)
   compress: true,
 
   // Power off x-powered-by header
   poweredByHeader: false,
-  
+
   // Add onDemandEntries configuration
   onDemandEntries: {
     // period (in ms) where the server will keep pages in the buffer
@@ -23,11 +20,11 @@ const nextConfig: NextConfig = {
     // number of pages that should be kept simultaneously without being disposed
     pagesBufferLength: 2,
   },
-  
+
   // Add generateBuildId configuration
   generateBuildId: async () => {
     // This could be anything, using the latest git hash
-    return process.env.GIT_HASH || 'dev';
+    return process.env.GIT_HASH || "dev";
   },
 
   // Allow remote icons/assets used by PTE data
@@ -48,17 +45,25 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "pedagogistspte.com" },
     ],
   },
+  serverExternalPackages: [
+    "@acme/ui",
+    "eslint",
+    "ts-node",
+    "postcss",
 
+    "@huggingface/transformers",
+    "typescript",
+  ],
   // 4. Turbopack (Native v16+ implementation)
   // This replaces almost all of your previous 'webpack' fallback logic
   experimental: {
     // Optimize package imports
     optimizePackageImports: [
-      '@radix-ui/react-icons',
-      '@tabler/icons-react',
-      'lucide-react',
-      'recharts',
-      'framer-motion'
+      "@radix-ui/react-icons",
+      "@tabler/icons-react",
+      "lucide-react",
+      "recharts",
+      "framer-motion",
     ],
   },
 
@@ -123,14 +128,16 @@ const nextConfig: NextConfig = {
     }
 
     // Bundle analyzer (when ANALYZE=true)
-    if (process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('@next/bundle-analyzer')({
+    if (process.env.ANALYZE === "true") {
+      const { BundleAnalyzerPlugin } = require("@next/bundle-analyzer")({
         enabled: true,
       });
       config.plugins.push(
         new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          reportFilename: isServer ? '../analyze/server.html' : './analyze/client.html',
+          analyzerMode: "static",
+          reportFilename: isServer
+            ? "../analyze/server.html"
+            : "./analyze/client.html",
           openAnalyzer: true,
         })
       );

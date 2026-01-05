@@ -190,10 +190,54 @@ export const pteListeningQuestions = pgTable('pte_listening_questions', {
 
 // Relations
 export const pteQuestionsRelations = relations(pteQuestions, ({ one }) => ({
-  questionType: one(pteQuestionTypes, {
-    fields: [pteQuestions.questionTypeId],
-    references: [pteQuestionTypes.id],
-  }),
+    questionType: one(pteQuestionTypes, {
+        fields: [pteQuestions.questionTypeId],
+        references: [pteQuestionTypes.id],
+    }),
+    listening: one(pteListeningQuestions, {
+        fields: [pteQuestions.id],
+        references: [pteListeningQuestions.questionId],
+    }),
+    speaking: one(pteSpeakingQuestions, {
+        fields: [pteQuestions.id],
+        references: [pteSpeakingQuestions.questionId],
+    }),
+    writing: one(pteWritingQuestions, {
+        fields: [pteQuestions.id],
+        references: [pteWritingQuestions.questionId],
+    }),
+    reading: one(pteReadingQuestions, {
+        fields: [pteQuestions.id],
+        references: [pteReadingQuestions.questionId],
+    }),
+}));
+
+export const pteListeningQuestionsRelations = relations(pteListeningQuestions, ({ one }) => ({
+    question: one(pteQuestions, {
+        fields: [pteListeningQuestions.questionId],
+        references: [pteQuestions.id],
+    }),
+}));
+
+export const pteSpeakingQuestionsRelations = relations(pteSpeakingQuestions, ({ one }) => ({
+    question: one(pteQuestions, {
+        fields: [pteSpeakingQuestions.questionId],
+        references: [pteQuestions.id],
+    }),
+}));
+
+export const pteWritingQuestionsRelations = relations(pteWritingQuestions, ({ one }) => ({
+    question: one(pteQuestions, {
+        fields: [pteWritingQuestions.questionId],
+        references: [pteQuestions.id],
+    }),
+}));
+
+export const pteReadingQuestionsRelations = relations(pteReadingQuestions, ({ one }) => ({
+    question: one(pteQuestions, {
+        fields: [pteReadingQuestions.questionId],
+        references: [pteQuestions.id],
+    }),
 }));
 
 // ============================================================
@@ -204,41 +248,40 @@ export type NewPteQuestion = typeof pteQuestions.$inferInsert;
 
 // Listening question types
 export type ListeningTestType =
-  | 'highlight-correct-summary'
-  | 'mc-single-listening'
-  | 'mc-multiple-listening'
-  | 'fill-blanks-listening'
-  | 'highlight-incorrect-words'
-  | 'write-from-dictation'
-  | 'select-missing-word'
-  | 'summarize-spoken-text';
+    | 'highlight-correct-summary'
+    | 'mc-single-listening'
+    | 'mc-multiple-listening'
+    | 'fill-blanks-listening'
+    | 'highlight-incorrect-words'
+    | 'write-from-dictation'
+    | 'select-missing-word'
+    | 'summarize-spoken-text';
 
 // Speaking question types
 export type SpeakingTestType =
-  | 'read-aloud'
-  | 'repeat-sentence'
-  | 'describe-image'
-  | 'retell-lecture'
-  | 'answer-short-question'
-  | 'summarize-spoken-text-speaking'
-  | 'read-and-retell'
-  | 'summarize-group-discussion'
-  | 'respond-to-situation';
+    | 'read-aloud'
+    | 'repeat-sentence'
+    | 'describe-image'
+    | 'retell-lecture'
+    | 'answer-short-question'
+    | 'summarize-spoken-text-speaking'
+    | 'read-and-retell'
+    | 'summarize-group-discussion'
+    | 'respond-to-situation';
 
 // Writing question types
 export type WritingTestType =
-  | 'summarize-written-text'
-  | 'write-essay'
-  | 'summarize-written-text-core'
-  | 'write-email';
+    | 'summarize-written-text'
+    | 'write-essay'
+    | 'summarize-written-text-core'
+    | 'write-email';
 
 // Reading question types
 export type ReadingTestType =
-  | 'reading-fill-blanks-dropdown'
-  | 'reading-mc-multiple'
-  | 'reorder-paragraphs'
-  | 'reading-fill-blanks-drag'
-  | 'reading-mc-single';
+    | 'reading-fill-blanks-dropdown'
+    | 'reading-mc-multiple'
+    | 'reorder-paragraphs'
+    | 'reading-fill-blanks-drag'
+    | 'reading-mc-single';
 
 
-  
