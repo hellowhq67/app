@@ -25,7 +25,7 @@ const categories = [
     icon: Mic,
     color: 'from-blue-600 to-blue-400',
     cardBg: 'bg-blue-50/50 dark:bg-blue-500/5',
-    href: '/practice/speaking',
+    href: '/academic/practice/speaking',
     count: 7,
   },
   {
@@ -35,7 +35,7 @@ const categories = [
     icon: PenTool,
     color: 'from-purple-600 to-purple-400',
     cardBg: 'bg-purple-50/50 dark:bg-purple-500/5',
-    href: '/practice/writing',
+    href: '/academic/practice/writing',
     count: 2,
   },
   {
@@ -45,7 +45,7 @@ const categories = [
     icon: BookOpen,
     color: 'from-emerald-600 to-emerald-400',
     cardBg: 'bg-emerald-50/50 dark:bg-emerald-500/5',
-    href: '/practice/reading',
+    href: '/academic/practice/reading',
     count: 5,
   },
   {
@@ -55,7 +55,7 @@ const categories = [
     icon: Headphones,
     color: 'from-orange-600 to-orange-400',
     cardBg: 'bg-orange-50/50 dark:bg-orange-500/5',
-    href: '/practice/listening',
+    href: '/academic/practice/listening',
     count: 8,
   },
 ]
@@ -141,7 +141,7 @@ export default function PtePracticePage() {
               <h2 className="text-3xl font-black tracking-tight leading-tight md:text-4xl">Full-length Mock Test Simulation</h2>
               <p className="text-gray-400 font-medium text-lg leading-relaxed">Simulate the real PTE exam environment and get a predictive score report with AI analysis.</p>
               <Link
-                href="/pte/mock-tests"
+                href="/academic/moktest"
                 className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-black py-4 px-10 rounded-[20px] transition-all shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 group"
               >
                 Start Simulation
@@ -163,7 +163,7 @@ export default function PtePracticePage() {
         <div className="bg-white dark:bg-[#121214] border border-gray-100 dark:border-white/10 rounded-[40px] p-8 space-y-8">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-black text-gray-900 dark:text-white">Recent Results</h3>
-            <Link href="/pte/academic/practice-attempts" className="text-xs font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest">View All</Link>
+            <Link href="/academic/practice-attempts" className="text-xs font-bold text-blue-600 hover:text-blue-700 uppercase tracking-widest">View All</Link>
           </div>
 
           <div className="space-y-4">

@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ArrowRight, Clock, BookOpen } from "lucide-react";
+import { getPteQuestionCounts } from "@/lib/db/queries/metrics";
 
 const readingTypes = [
   {
@@ -10,7 +11,6 @@ const readingTypes = [
     description: "Read a passage and select the correct answer from options",
     time: "2 min",
     aiScored: false,
-    questionCount: 35,
   },
   {
     id: "reading_mc_multiple",
@@ -18,7 +18,6 @@ const readingTypes = [
     description: "Read a passage and select all correct answers",
     time: "2 min",
     aiScored: false,
-    questionCount: 30,
   },
   {
     id: "reorder_paragraphs",
@@ -26,7 +25,6 @@ const readingTypes = [
     description: "Arrange paragraphs in the correct logical order",
     time: "2-3 min",
     aiScored: false,
-    questionCount: 25,
   },
   {
     id: "reading_fill_blanks_dropdown",
@@ -34,7 +32,6 @@ const readingTypes = [
     description: "Select the correct word from dropdown options",
     time: "2 min",
     aiScored: false,
-    questionCount: 40,
   },
   {
     id: "reading_fill_blanks_drag",
@@ -42,11 +39,12 @@ const readingTypes = [
     description: "Drag words from a word bank to fill the blanks",
     time: "2 min",
     aiScored: false,
-    questionCount: 35,
   },
 ];
 
-export default function ReadingPracticePage() {
+export default async function ReadingPracticePage() {
+  const counts = await getPteQuestionCounts();
+
   return (
     <div className="container mx-auto p-6 space-y-8">
       {/* Header */}
@@ -68,7 +66,7 @@ export default function ReadingPracticePage() {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/practice" className="hover:text-primary">
+        <Link href="/academic/practice" className="hover:text-primary">
           Practice
         </Link>
         <span>/</span>
@@ -80,7 +78,7 @@ export default function ReadingPracticePage() {
         {readingTypes.map((type) => (
           <Link
             key={type.id}
-            href={`/pte/academic/practice/reading/${type.id}`}
+            href={`/academic/practice/reading/${type.id}`}
           >
             <Card className="hover:shadow-md transition-all cursor-pointer hover:border-primary/50">
               <CardContent className="p-6">
@@ -106,7 +104,7 @@ export default function ReadingPracticePage() {
                         <Clock className="h-3 w-3" />
                         {type.time}
                       </span>
-                      <span>{type.questionCount} questions available</span>
+                      <span>{counts[type.id] || 0} questions available</span>
                     </div>
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground" />

@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { ArrowRight, Clock, PenTool } from "lucide-react";
+import { getPteQuestionCounts } from "@/lib/db/queries/metrics";
 
 const writingTypes = [
   {
@@ -10,7 +11,6 @@ const writingTypes = [
     description: "Read a passage and write a one-sentence summary (5-75 words)",
     time: "10 min",
     aiScored: true,
-    questionCount: 30,
   },
   {
     id: "write_essay",
@@ -18,11 +18,12 @@ const writingTypes = [
     description: "Write an essay of 200-300 words on a given topic",
     time: "20 min",
     aiScored: true,
-    questionCount: 40,
   },
 ];
 
-export default function WritingPracticePage() {
+export default async function WritingPracticePage() {
+  const counts = await getPteQuestionCounts();
+
   return (
     <div className="container mx-auto p-6 space-y-8">
       {/* Header */}
@@ -44,7 +45,7 @@ export default function WritingPracticePage() {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/practice" className="hover:text-primary">
+        <Link href="/academic/practice" className="hover:text-primary">
           Practice
         </Link>
         <span>/</span>
@@ -54,7 +55,7 @@ export default function WritingPracticePage() {
       {/* Question Types */}
       <div className="grid gap-4">
         {writingTypes.map((type) => (
-          <Link key={type.id} href={`/pte/academic/practice/writing/${type.id}`}>
+          <Link key={type.id} href={`/academic/practice/writing/${type.id}`}>
             <Card className="hover:shadow-md transition-all cursor-pointer hover:border-primary/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -75,7 +76,7 @@ export default function WritingPracticePage() {
                         <Clock className="h-3 w-3" />
                         {type.time}
                       </span>
-                      <span>{type.questionCount} questions available</span>
+                      <span>{counts[type.id] || 0} questions available</span>
                     </div>
                   </div>
                   <ArrowRight className="h-5 w-5 text-muted-foreground" />

@@ -91,7 +91,7 @@ export default function ListeningPracticePage() {
 
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Link href="/practice" className="hover:text-primary">Practice</Link>
+                <Link href="/academic/practice" className="hover:text-primary">Practice</Link>
                 <span>/</span>
                 <span className="text-foreground font-medium">Listening</span>
             </nav>
@@ -99,7 +99,7 @@ export default function ListeningPracticePage() {
             {/* Question Types */}
             <div className="grid gap-4">
                 {listeningTypes.map((type) => (
-                    <Link key={type.id} href={`/practice/listening/${type.id}`}>
+                    <Link key={type.id} href={`/academic/practice/listening/${type.id}`}>
                         <Card className={`hover:shadow-md transition-all cursor-pointer hover:border-primary/50 ${type.isHighValue ? 'border-orange-200 dark:border-orange-900 bg-orange-50/30 dark:bg-orange-950/20' : ''}`}>
                             <CardContent className="p-6">
                                 <div className="flex items-center justify-between">
@@ -123,7 +123,7 @@ export default function ListeningPracticePage() {
                                                 <Clock className="h-3 w-3" />
                                                 {type.time}
                                             </span>
-                                            <span>{type.questionCount} questions available</span>
+                                            <span>{counts[type.id] || 0} questions available</span>
                                         </div>
                                     </div>
                                     <ArrowRight className="h-5 w-5 text-muted-foreground" />

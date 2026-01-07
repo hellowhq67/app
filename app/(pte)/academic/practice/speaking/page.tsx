@@ -1,72 +1,68 @@
-import { Card, CardContent } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
-import { ArrowRight, Clock, Mic, Sparkles } from 'lucide-react'
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Link from "next/link";
+import { ArrowRight, Clock, Mic, Sparkles } from "lucide-react";
+import { getPteQuestionCounts } from "@/lib/db/queries/metrics";
 
 const speakingTypes = [
   {
-    id: 'read_aloud',
-    name: 'Read Aloud',
-    description: 'Read a text aloud with correct pronunciation and fluency',
-    time: '30-35 sec',
+    id: "read_aloud",
+    name: "Read Aloud",
+    description: "Read a text aloud with correct pronunciation and fluency",
+    time: "30-35 sec",
     aiScored: true,
-    questionCount: 50,
     isHighValue: true,
   },
   {
-    id: 'repeat_sentence',
-    name: 'Repeat Sentence',
-    description: 'Listen and repeat the sentence exactly as you hear it',
-    time: '15 sec',
+    id: "repeat_sentence",
+    name: "Repeat Sentence",
+    description: "Listen and repeat the sentence exactly as you hear it",
+    time: "15 sec",
     aiScored: true,
-    questionCount: 45,
     isHighValue: true,
   },
   {
-    id: 'describe_image',
-    name: 'Describe Image',
-    description: 'Describe what you see in the image in detail',
-    time: '40 sec',
+    id: "describe_image",
+    name: "Describe Image",
+    description: "Describe what you see in the image in detail",
+    time: "40 sec",
     aiScored: true,
-    questionCount: 35,
   },
   {
-    id: 'retell_lecture',
-    name: 'Re-tell Lecture',
-    description: 'Listen to a lecture and retell it in your own words',
-    time: '40 sec',
+    id: "retell_lecture",
+    name: "Re-tell Lecture",
+    description: "Listen to a lecture and retell it in your own words",
+    time: "40 sec",
     aiScored: true,
-    questionCount: 30,
   },
   {
-    id: 'answer_short_question',
-    name: 'Answer Short Question',
-    description: 'Answer a question with a single word or short phrase',
-    time: '10 sec',
+    id: "answer_short_question",
+    name: "Answer Short Question",
+    description: "Answer a question with a single word or short phrase",
+    time: "10 sec",
     aiScored: true,
-    questionCount: 40,
   },
   {
-    id: 'respond_to_situation',
-    name: 'Respond to a Situation',
-    description: 'Respond appropriately to a given situation (Core)',
-    time: '40 sec',
+    id: "respond_to_situation",
+    name: "Respond to a Situation",
+    description: "Respond appropriately to a given situation (Core)",
+    time: "40 sec",
     aiScored: true,
-    questionCount: 20,
     isCore: true,
   },
   {
-    id: 'summarize_group_discussion',
-    name: 'Summarize Group Discussion',
-    description: 'Listen to a discussion and summarize main points (Core)',
-    time: '40 sec',
+    id: "summarize_group_discussion",
+    name: "Summarize Group Discussion",
+    description: "Listen to a discussion and summarize main points (Core)",
+    time: "40 sec",
     aiScored: true,
-    questionCount: 15,
     isCore: true,
   },
-]
+];
 
-export default function SpeakingPracticePage() {
+export default async function SpeakingPracticePage() {
+  const counts = await getPteQuestionCounts();
+
   return (
     <div className="container mx-auto p-6 space-y-8">
       {/* Header */}
@@ -86,7 +82,7 @@ export default function SpeakingPracticePage() {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/practice" className="hover:text-primary">Practice</Link>
+        <Link href="/academic/practice" className="hover:text-primary">Practice</Link>
         <span>/</span>
         <span className="text-foreground font-medium">Speaking</span>
       </nav>
@@ -94,7 +90,7 @@ export default function SpeakingPracticePage() {
       {/* Question Types */}
       <div className="grid gap-4">
         {speakingTypes.map((type) => (
-          <Link key={type.id} href={`/practice/speaking/${type.id}`}>
+          <Link key={type.id} href={`/academic/practice/speaking/${type.id}`}>
             <Card className={`hover:shadow-md transition-all cursor-pointer hover:border-primary/50 group ${type.isHighValue ? 'border-blue-200 dark:border-blue-900 bg-blue-50/30 dark:bg-blue-950/20' : ''}`}>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
@@ -121,7 +117,7 @@ export default function SpeakingPracticePage() {
                         <Clock className="h-3 w-3" />
                         {type.time}
                       </span>
-                      <span>{type.questionCount} questions available</span>
+                      <span>{counts[type.id] || 0} questions available</span>
                     </div>
                   </div>
                   <div className="size-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-all">
