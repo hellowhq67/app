@@ -1,13 +1,5 @@
 import { useState, useEffect } from "react";
-
-interface UserAttempt {
-  questionId: string;
-  testType: string;
-  spokenText?: string;
-  score?: any;
-  durationSeconds?: number;
-  timestamp: Date;
-}
+import { UserAttempt } from "@/lib/types/useranalyticsType";
 
 export function useUserHistory() {
   const [attempts, setAttempts] = useState<UserAttempt[]>([]);

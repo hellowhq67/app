@@ -1,0 +1,72 @@
+[
+  {
+    "title": "Lab Safety Incident",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "You are working in a chemistry lab and accidentally knock over a beaker containing a mild acid near a shared workspace. Although you have neutralized and cleaned the spill according to safety protocols, the lab rules state that all accidents must be verbally reported to the supervisor immediately. You see your supervisor walking past your bench. What would you say to your supervisor?",
+    "media_url": ""
+  },
+  {
+    "title": "Fieldwork Equipment Failure",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "Your research team is conducting a biodiversity survey in a dense forest, but the electronic GPS trackers have stopped working due to heavy cloud cover and canopy interference. The team is worried about getting lost or recording inaccurate location data for the samples. You need to propose a manual mapping alternative to keep the project moving. What would you say to the team?",
+    "media_url": ""
+  },
+  {
+    "title": "Data Discrepancy Discussion",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "You are reviewing data for a joint biology paper and notice that the control group numbers provided by your research partner look unusually perfect, suggesting a possible calculation error or data entry mistake. You need to address this curious anomaly without accusing them of academic misconduct. You are meeting them for coffee to discuss the draft. What would you say to your partner?",
+    "media_url": ""
+  },
+  {
+    "title": "Equipment Conflict Resolution",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "You and a colleague both need to use the single available electron microscope this afternoon to meet a grant application deadline at 5 PM. The booking system is down, so neither of you has a confirmed slot, but you both have urgent work. You suggest a way to split the time fairly so both can finish. What would you say to your colleague?",
+    "media_url": ""
+  },
+  {
+    "title": "Methodology Flaw Extension",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "You have discovered a significant flaw in the temperature control methodology of your physics experiment just days before the final report is due. Ignoring it would skew the results, but fixing it requires re-running the experiment, which necessitates a deadline extension. You are meeting with your professor to ask for more time. What would you say to the professor?",
+    "media_url": ""
+  },
+  {
+    "title": "Public Science Communication",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "You are a marine biologist explaining to a group of local fishermen why a specific coral reef area has been designated as a 'no-fishing' zone. They are upset about losing immediate income, so you need to explain the long-term benefits for fish populations and their future catch. What would you say to the fishermen?",
+    "media_url": ""
+  },
+  {
+    "title": "Requesting Lab Resources",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "You are managing a university greenhouse and notice that the automatic watering system failed over the weekend, causing heat stress to several rare plant specimens. You need to explain the situation to the botany department head and request immediate funds for a backup generator and sensor system. What would you say to the department head?",
+    "media_url": ""
+  },
+  {
+    "title": "Correcting Junior Staff",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "A junior researcher has discarded biological waste in the general trash bin, which is a severe safety violation and biohazard risk. As the senior lab technician, you need to correct them firmly but supportively to ensure it doesn't happen again. What would you say to the junior researcher?",
+    "media_url": ""
+  },
+  {
+    "title": "Confronting Missed Deadlines",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "You are collaborating on a geology project, and your partner keeps missing deadlines for rock sample analysis, which is stalling the whole project. You need to confront them about their time management without ruining the working relationship, as you still need to finish the paper together. What would you say to your partner?",
+    "media_url": ""
+  },
+  {
+    "title": "Pitching for Budget",
+    "type": "Respond to a Situation",
+    "difficulty": "Medium",
+    "prompt": "You need to order an expensive enzyme for your genetics research, but the lab budget is currently frozen. You believe this enzyme is critical for a breakthrough that could secure more external funding. You are pitching this purchase exception to the budget committee. What would you say to the committee?",
+    "media_url": ""
+  }
+]

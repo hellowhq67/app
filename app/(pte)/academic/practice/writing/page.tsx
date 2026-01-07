@@ -54,7 +54,7 @@ export default function WritingPracticePage() {
       {/* Question Types */}
       <div className="grid gap-4">
         {writingTypes.map((type) => (
-          <Link key={type.id} href={`/practice/writing/${type.id}`}>
+          <Link key={type.id} href={`/pte/academic/practice/writing/${type.id}`}>
             <Card className="hover:shadow-md transition-all cursor-pointer hover:border-primary/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">

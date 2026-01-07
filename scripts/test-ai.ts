@@ -31,7 +31,7 @@ async function testAiScoring() {
 
         // Test 2: Audio Transcription (Describe Image)
         console.log('\n[Test 2] Testing Audio Transcription (Describe Image)...');
-        const audioUrl = 'https://storage.googleapis.com/aai-web-samples/5_common_sports_injuries.mp3';
+        const audioUrl = 'https://sgp1.digitaloceanspaces.com/liilab/quizbit/media/0q708i1sfeb.m4a '
 
         const audioFeedback = await scorePteAttemptV2(QuestionType.DESCRIBE_IMAGE, {
             questionContent: 'Describe the audio/image provided.',

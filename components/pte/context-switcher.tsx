@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { usePTE } from './pte-context'
+import { usePTE } from '@/components/providers/pte-provider'
 import { Badge } from '@/components/ui/badge'
 
 /**

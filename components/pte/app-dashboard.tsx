@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { ExamDateScheduler } from "@/components/pte/dashboard/exam-date-scheduler";
 import { cn } from "@/lib/utils";
-import { useVoiceAssistant } from "@/components/pte/voice-assistant-context";
+import { useVoiceAssistant } from '@/components/providers/voice-assistant-provider'
 
 const studyGuides = [
   {

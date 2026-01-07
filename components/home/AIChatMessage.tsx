@@ -5,8 +5,8 @@ import { motion } from 'motion/react'
 import { UIMessage } from '@ai-sdk/react'
 import { User, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import ReactMarkdown from 'react-markdown'
-import { Message } from '../ai-elements/message'
+
+import { Message, MessageContent, MessageResponse } from '../ai-elements/message'
 
 interface AIChatMessageProps {
   message: UIMessage
@@ -56,22 +56,22 @@ export function AIChatMessage({ message }: AIChatMessageProps) {
               : 'bg-muted text-foreground'
           )}
         >
-          {messages.map(({ role, parts }, index) => (
-            <Message from={role} key={index}>
-              <MessageContent>
-                {parts.map((part, i) => {
-                  switch (part.type) {
-                    case 'text':
-                      return <MessageResponse key={`${role}-${i}`}>{part.text}</MessageResponse>;
-                  }
-                })}
-              </MessageContent>
-            </Message>
-          ))}
+          <Message from={message.role}>
+            <MessageContent>
+              {message.parts.map((part, i) => {
+                switch (part.type) {
+                  case 'text':
+                    return <MessageResponse key={`${message.role}-${i}`}>{part.text}</MessageResponse>;
+                  default:
+                    return null;
+                }
+              })}
+            </MessageContent>
+          </Message>
 
         </div>
         <span className="text-xs text-muted-foreground px-1">
-          {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          {(message as any).createdAt?.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </span>
       </div>
     </motion.div>

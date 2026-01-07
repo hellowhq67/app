@@ -7,7 +7,7 @@ export async function proxy(request: NextRequest) {
 	const { pathname } = request.nextUrl;
 
 	// Protected routes: everything under /pte and /dashboard
-	const isProtectedRoute = pathname.startsWith("/pte") || pathname.startsWith("/dashboard");
+	const isProtectedRoute = pathname.startsWith("/") || pathname.startsWith("/dashboard");
 
 	if (isProtectedRoute && !sessionCookie) {
 		const signInUrl = new URL("/sign-in", request.url);

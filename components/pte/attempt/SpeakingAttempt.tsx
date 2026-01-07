@@ -7,9 +7,14 @@ import { ScoreDetailsModal } from '@/components/pte/attempt/ScoreDetailsModal'
 import { Button } from '@/components/ui/button'
 import { scoreSpeakingAttempt, scoreReadAloudAttempt } from '@/app/actions/pte'
 import { uploadAudioWithFallback } from '@/lib/pte/blob-upload'
-import type { SpeakingTimings, SpeakingType } from '@/lib/pte/types'
+import type { SpeakingTimings, SpeakingType } from '@/lib/types'
 import SpeakingBoards from '@/components/pte/speaking/SpeakingBoards'
-import { QuestionType } from '@/lib/types'
+import {
+  enqueueSubmission,
+  getDefaultTimings,
+  initQueueAutoRetry,
+  type StartSessionResponse,
+} from '@/lib/pte/attempts'
 
 type PromptLike = {
   title?: string | null
@@ -93,23 +98,23 @@ export default function SpeakingAttempt({
 
         // Call server action based on type
         if (questionType === 'read_aloud') {
-             result = await scoreReadAloudAttempt(file, promptContent, questionId);
+          result = await scoreReadAloudAttempt(file, promptContent, questionId);
         } else {
-             // Map string type to enum if necessary, or pass as is if compatible
-             // Assuming QuestionType enum values match strings like 'describe_image' etc.
-             // Need to ensure QuestionType enum is imported or compatible.
-             // Using 'as any' for safety if enum mapping is tricky here without full type context.
-             result = await scoreSpeakingAttempt(questionType as any, file, promptContent, questionId);
+          // Map string type to enum if necessary, or pass as is if compatible
+          // Assuming QuestionType enum values match strings like 'describe_image' etc.
+          // Need to ensure QuestionType enum is imported or compatible.
+          // Using 'as any' for safety if enum mapping is tricky here without full type context.
+          result = await scoreSpeakingAttempt(questionType as any, file, promptContent, questionId);
         }
 
         if (!result.success) {
-            throw new Error(result.error || 'Submission failed');
+          throw new Error(result.error || 'Submission failed');
         }
 
         // Success path
         setAudioUrl(result.audioUrl)
         setLastAttemptId(result.attemptId)
-        
+
         if (result.feedback) {
           setScoreData({
             total: result.feedback.overallScore,
@@ -117,7 +122,7 @@ export default function SpeakingAttempt({
             pronunciation: result.feedback.pronunciation?.score,
             fluency: result.feedback.fluency?.score,
             feedback: {
-                rationale: result.feedback.suggestions?.join('\n')
+              rationale: result.feedback.suggestions?.join('\n')
             }
           })
           setShowScoreModal(true)
@@ -176,7 +181,7 @@ export default function SpeakingAttempt({
               timers={{ prepMs: timers.prepMs, recordMs: timers.answerMs }}
               onRecorded={handleRecorded}
               auto={{ active: ctx.phase === 'answering' }}
-              onStateChange={(s) => {
+              onStateChange={(s: any) => {
                 // Light telemetry
                 if (typeof window !== 'undefined') {
                   console.log('[SpeakingRecorder] state=', s)

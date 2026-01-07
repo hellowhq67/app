@@ -189,7 +189,8 @@ export function ListeningPracticeClient({
                 <Checkbox
                   id={`opt-${idx}`}
                   checked={selectedOptions.includes(opt)}
-                  onCheckedChange={(checked) => {
+                  onChange={(e) => {
+                    const checked = e.target.checked;
                     if (checked) {
                       setSelectedOptions([...selectedOptions, opt]);
                     } else {

@@ -1,11 +1,40 @@
 import Link from "next/link";
-import { getRecentPosts } from "@/lib/blog";
 import { BlogCard } from "./BlogCard";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getFeaturedPostsFromSanity } from "@/sanity/lib/fetch";
+// import { BlogPost } from "@/lib/types/blogTypes";
+
+// Shim to adapt Sanity data to BlogPost interface if needed, or update BlogCard to accept Sanity data
+// For now, we will map it here.
+interface SanityPost {
+    title: string;
+    slug: string;
+    author: string;
+    image: string;
+    categories: string[];
+    publishedAt: string;
+    description: string;
+    isPaid?: boolean;
+}
 
 export async function FeaturedBlogs() {
-    const posts = getRecentPosts(3);
+    const sanityPosts = await getFeaturedPostsFromSanity();
+
+    // Transform Sanity data to match what BlogCard might expect or update BlogCard. 
+    // Assuming BlogCard expects BlogPost, we map minimal data.
+    const posts = sanityPosts.map((post: SanityPost) => ({
+        slug: post.slug,
+        title: post.title,
+        description: post.description,
+        author: post.author,
+        date: new Date(post.publishedAt).toLocaleDateString(),
+        tags: post.categories || [],
+        image: post.image,
+        seoKeywords: [], // defaulting
+        content: "", // defaulting
+        isPaid: post.isPaid
+    }));
 
     return (
         <section className="py-20 bg-muted/30">
@@ -28,9 +57,15 @@ export async function FeaturedBlogs() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    {posts.map(post => (
-                        <BlogCard key={post.slug} post={post} />
-                    ))}
+                    {posts.length > 0 ? (
+                        posts.map((post: any) => (
+                            <BlogCard key={post.slug} post={post} />
+                        ))
+                    ) : (
+                        <div className="col-span-3 text-center py-12 text-muted-foreground">
+                            No posts found. Add content in Sanity Studio.
+                        </div>
+                    )}
                 </div>
 
                 <div className="mt-8 text-center md:hidden">

@@ -10,6 +10,7 @@ import {
   submitReadingAttempt,
   type StartSessionResponse,
 } from '@/lib/pte/attempts'
+import { AnswerData } from '@/lib/types'
 
 type ReadingType =
   | 'multiple_choice_single'
@@ -58,7 +59,7 @@ export default function ReadingAttempt({
   const [loading, setLoading] = useState<boolean>(!initialPrompt)
   const [fetchError, setFetchError] = useState<string | null>(null)
 
-  const [userResponse, setUserResponse] = useState<any>(null)
+  const [userResponse, setUserResponse] = useState<AnswerData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [lastAttemptId, setLastAttemptId] = useState<string | undefined>(
     undefined
@@ -188,7 +189,7 @@ export default function ReadingAttempt({
     [onSubmitted, questionId, questionType, userResponse]
   )
 
-  const onResponseChange = useCallback((resp: any) => {
+  const onResponseChange = useCallback((resp: AnswerData) => {
     setError(null)
     setUserResponse(resp)
   }, [])

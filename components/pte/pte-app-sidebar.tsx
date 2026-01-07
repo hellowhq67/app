@@ -43,7 +43,7 @@ import {
 const navMain = [
   {
     title: "Dashboard",
-    url: "/pte/dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
@@ -54,120 +54,29 @@ const navMain = [
       {
         title: "Speaking",
         url: "/practice/speaking",
-        items: [
-          {
-            title: "Read Aloud",
-            url: "/practice/speaking/read_aloud",
-          },
-          {
-            title: "Repeat Sentence",
-            url: "/practice/speaking/repeat_sentence",
-          },
-          {
-            title: "Describe Image",
-            url: "/practice/speaking/describe_image",
-          },
-          {
-            title: "Re-tell Lecture",
-            url: "/practice/speaking/retell_lecture",
-          },
-          {
-            title: "Answer Short Question",
-            url: "/practice/speaking/answer_short_question",
-          },
-          {
-            title: "Respond to Situation",
-            url: "/practice/speaking/respond_to_situation",
-          },
-          {
-            title: "Summarize Discussion",
-            url: "/practice/speaking/summarize_group_discussion",
-          },
-        ],
       },
       {
         title: "Writing",
         url: "/practice/writing",
-        items: [
-          {
-            title: "Summarize Written Text",
-            url: "/practice/writing/summarize_written_text",
-          },
-          {
-            title: "Write Essay",
-            url: "/practice/writing/write_essay",
-          },
-        ],
       },
       {
         title: "Reading",
         url: "/practice/reading",
-        items: [
-          {
-            title: "MC Single Answer",
-            url: "/practice/reading/reading_mc_single",
-          },
-          {
-            title: "MC Multiple Answers",
-            url: "/practice/reading/reading_mc_multiple",
-          },
-          {
-            title: "Re-order Paragraphs",
-            url: "/practice/reading/reorder_paragraphs",
-          },
-          {
-            title: "Fill in the Blanks (Dropdown)",
-            url: "/practice/reading/reading_fill_blanks_dropdown",
-          },
-          {
-            title: "Fill in the Blanks (Drag)",
-            url: "/practice/reading/reading_fill_blanks_drag",
-          },
-        ],
       },
       {
         title: "Listening",
         url: "/practice/listening",
-        items: [
-          {
-            title: "Summarize Spoken Text",
-            url: "/practice/listening/summarize_spoken_text",
-          },
-          {
-            title: "MC Single Answer",
-            url: "/practice/listening/listening_mc_single",
-          },
-          {
-            title: "MC Multiple Answers",
-            url: "/practice/listening/listening_mc_multiple",
-          },
-          {
-            title: "Fill in the Blanks",
-            url: "/practice/listening/listening_fill_blanks",
-          },
-          {
-            title: "Highlight Correct Summary",
-            url: "/practice/listening/highlight_correct_summary",
-          },
-          {
-            title: "Select Missing Word",
-            url: "/practice/listening/select_missing_word",
-          },
-          {
-            title: "Highlight Incorrect Words",
-            url: "/practice/listening/highlight_incorrect_words",
-          },
-          {
-            title: "Write from Dictation",
-            url: "/practice/listening/write_from_dictation",
-          },
-        ],
       },
     ],
   },
   {
     title: "Mock Tests",
-    url: "/pte/mock-tests",
+    url: "/pte/mocktest",
+    icon: Trophy,
+  },
+  {
+    title: "Sections workflow",
+    url: "/mock-tests",
     icon: Trophy,
   },
   {
@@ -181,10 +90,11 @@ const navMain = [
     icon: MessageSquare,
   },
   {
-    title: "AI Voice Assistant",
+    title: "knowlodge Base",
     url: "/pte/ai-voice",
     icon: Bot,
   },
+
   {
     title: "Profile",
     url: "/pte/profile",
@@ -192,12 +102,12 @@ const navMain = [
   },
   {
     title: "Billing",
-    url: "/pte/billing",
+    url: "/billing",
     icon: BadgeCheck,
   },
   {
     title: "Settings",
-    url: "/pte/settings",
+    url: "/settings",
     icon: Settings,
   },
 ];
@@ -224,14 +134,22 @@ export function PTEAppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMainPTE items={navMain.map((item: any) => ({
-          ...item,
-          isActive: item.url === pathname || (item.items?.some((sub: any) => sub.url === pathname) ?? false) || pathname?.startsWith(item.url + '/'),
-          items: item.items?.map((sub: any) => ({
-            ...sub,
-            isActive: sub.url === pathname || (sub.items?.some((child: any) => child.url === pathname) ?? false)
-          }))
-        }))} />
+        <NavMainPTE
+          items={navMain.map((item: any) => ({
+            ...item,
+            isActive:
+              item.url === pathname ||
+              (item.items?.some((sub: any) => sub.url === pathname) ?? false) ||
+              pathname?.startsWith(item.url + "/"),
+            items: item.items?.map((sub: any) => ({
+              ...sub,
+              isActive:
+                sub.url === pathname ||
+                (sub.items?.some((child: any) => child.url === pathname) ??
+                  false),
+            })),
+          }))}
+        />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

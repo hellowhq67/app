@@ -2,9 +2,8 @@ import { BlogFeed } from "@/components/blog/BlogFeed";
 import { BlogNavbar } from "@/components/blog/BlogNavbar";
 import { BlogSearchAdvanced } from "@/components/blog/BlogSearchAdvanced";
 import { StickyScroll } from "@/components/ui/sticky-scroll-reveal";
-import { getAllPosts } from "@/lib/blog";
+import { getAllPostsFromSanity } from "@/sanity/lib/fetch";
 import { Metadata } from "next";
-import Image from "next/image";
 
 export const metadata: Metadata = {
     title: "Blog | PTE Practice & Study Guides",
@@ -49,13 +48,37 @@ const featureContent = [
     },
 ];
 
-export default function BlogPage() {
-    const posts = getAllPosts();
+interface SanityPost {
+    title: string;
+    slug: string;
+    author: string;
+    image: string;
+    categories: string[];
+    publishedAt: string;
+    description: string;
+    isPaid?: boolean;
+}
+
+export default async function BlogPage() {
+    const sanityPosts = await getAllPostsFromSanity();
+
+    const posts = sanityPosts.map((post: SanityPost) => ({
+        slug: post.slug,
+        title: post.title,
+        description: post.description,
+        author: post.author,
+        date: new Date(post.publishedAt).toLocaleDateString(),
+        tags: post.categories || [],
+        image: post.image,
+        seoKeywords: [],
+        content: "",
+        isPaid: post.isPaid
+    }));
 
     return (
         <div className="min-h-screen bg-background">
             <BlogNavbar />
-            
+
             {/* Hero Section */}
             <section className="pt-32 pb-20 relative overflow-hidden">
                 <div className="container mx-auto px-4 relative z-10 text-center">

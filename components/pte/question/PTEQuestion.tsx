@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { PTEQuestion as PTEQuestionType, PTEResponse } from '@/types/pte-types'
+import { PTEQuestion as PTEQuestionType, PTEResponse } from '@/lib/types/qustionsType'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'

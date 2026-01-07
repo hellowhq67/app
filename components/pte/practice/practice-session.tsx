@@ -19,9 +19,7 @@ import { ScoreResult } from "@/lib/scoring";
 import { BookOpen, History, Menu, ListFilter, ChevronLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-type SectionType = "speaking" | "writing" | "reading" | "listening";
-type AllTestTypes = TestType | WritingTestType | ReadingTestType | ListeningTestType;
+import { SectionType, AllTestTypes } from "@/lib/types/moktestType";
 
 interface PracticeSessionProps {
   initialSection?: SectionType;

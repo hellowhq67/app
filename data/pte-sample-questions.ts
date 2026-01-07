@@ -1,4 +1,4 @@
-import { PTEQuestion } from '@/types/pte-types';
+import { PTEQuestion } from '@/lib/types/qustionsType';
 import { PTE_SECTIONS, PTE_QUESTION_TYPES, PTE_QUESTION_TIMING, PTE_AUDIO_RESTRICTIONS, PTE_WORD_COUNTS } from '@/constants/pte-constants';
 
 // Sample questions for each section

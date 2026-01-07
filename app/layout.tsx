@@ -1,7 +1,7 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { Suspense } from 'react'
-import { NonceWrapper } from '@/components/nonce-wrapper'
+import { RootProvider } from '@/components/providers/root-provider'
 import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
@@ -46,10 +46,10 @@ export default function RootLayout({
     <html lang="en" className={fontVariable} suppressHydrationWarning>
       <body className={`min-h-[100dvh] ${fontClassName} antialiased`} suppressHydrationWarning>
         <Suspense fallback={null}>
-          <NonceWrapper>
+          <RootProvider>
             {children}
             <Toaster />
-          </NonceWrapper>
+          </RootProvider>
         </Suspense>
       </body>
     </html>

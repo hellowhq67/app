@@ -157,6 +157,40 @@ export const getPromptForQuestionType = (
         Your response MUST be a valid JSON object. Do not include any text outside of the JSON structure.
         The overallScore should be calculated by converting the total points (out of 15) to the PTE 90-point scale.
         Example for calculating overallScore: (Total Points / 15) * 90.
+
+        Assume the provided userTranscript accurately represents the user's pronunciation and fluency for scoring purposes.
+      `
+    case QuestionType.DESCRIBE_IMAGE:
+      if (!promptTopic || !userTranscript) {
+        throw new Error('Missing parameters for DESCRIBE_IMAGE prompt.')
+      }
+      return `
+        You are a strict, expert PTE Academic examiner. Your task is to score a "Describe Image" response.
+
+        **Image Topic/Description**: "${promptTopic}"
+        **Test-taker's Transcript (from their audio)**: "${userTranscript}"
+
+        **Instructions**:
+        1.  Analyze the user's transcript against the provided image topic/description.
+        2.  Provide scores (integer from 0-5) for Content, Pronunciation, and Fluency.
+        3.  Content Score (0-5): Does the test-taker accurately describe all key features, relationships, and implications of the image (based on the provided topic)?
+            - 5: Describes all key elements, relationships, and implications. Summarizes the main idea perfectly.
+            - 4: Describes most key elements.
+            - 3: Describes some key elements but misses major points.
+            - 1-2: Identifying disconnected elements.
+            - 0: Non-related description.
+        4.  Provide specific, constructive feedback for each criterion.
+        5.  Generate a list of specific strengths and areas for improvement.
+        6.  The final JSON output must conform to the SpeakingFeedbackData Zod schema.
+
+        **Scoring Criteria Details (0-5 points for each)**:
+        - **Content**: See specific instructions above.
+        - **${PTE_SCORING_CRITERIA_SPEAKING.PRONUNCIATION}**
+        - **${PTE_SCORING_CRITERIA_SPEAKING.FLUENCY}**
+
+        Your response MUST be a valid JSON object. Do not include any text outside of the JSON structure.
+        The overallScore should be calculated by converting the total points (out of 15) to the PTE 90-point scale.
+        Example for calculating overallScore: (Total Points / 15) * 90.
         Assume the provided userTranscript accurately represents the user's pronunciation and fluency for scoring purposes.
       `
     case QuestionType.MULTIPLE_CHOICE_SINGLE:
@@ -361,7 +395,40 @@ export const getPromptForQuestionType = (
         - **Accuracy**: ${PTE_SCORING_CRITERIA_LISTENING.WRITE_FROM_DICTATION}
 
         Your response MUST be a valid JSON object. Do not include any text outside of the JSON structure.
+
         The overallScore should be calculated as (Accuracy Score / Total Words in Dictation) * 90.
+      `
+    case QuestionType.SUMMARIZE_GROUP_DISCUSSION:
+      if (!userTranscript) {
+        throw new Error('Missing parameters for SUMMARIZE_GROUP_DISCUSSION prompt.')
+      }
+      return `
+        You are a strict, expert PTE Academic examiner. Your task is to score a "Summarize Group Discussion" response.
+
+        **Test-taker's Transcript (from their audio)**: "${userTranscript}"
+
+        **Instructions**:
+        1.  Analyze the user's transcript as a summary of a group discussion.
+        2.  Provide scores (integer from 0-5) for Content, Pronunciation, and Fluency.
+        3.  Content Score (0-5): Does the test-taker accurately summarize the main points and key details of the discussion?
+            - 5: Captures all main points and key details.
+            - 4: Captures most main points.
+            - 3: Captures some main points but misses details.
+            - 1-2: Identifying disconnected elements.
+            - 0: Non-related summary.
+        4.  Provide specific, constructive feedback for each criterion.
+        5.  Generate a list of specific strengths and areas for improvement.
+        6.  The final JSON output must conform to the SpeakingFeedbackData Zod schema.
+
+        **Scoring Criteria Details (0-5 points for each)**:
+        - **Content**: See specific instructions above.
+        - **${PTE_SCORING_CRITERIA_SPEAKING.PRONUNCIATION}**
+        - **${PTE_SCORING_CRITERIA_SPEAKING.FLUENCY}**
+
+        Your response MUST be a valid JSON object. Do not include any text outside of the JSON structure.
+        The overallScore should be calculated by converting the total points (out of 15) to the PTE 90-point scale.
+        Example for calculating overallScore: (Total Points / 15) * 90.
+        Assume the provided userTranscript accurately represents the user's pronunciation and fluency for scoring purposes.
       `
     default:
       throw new Error(`Scoring prompt for question type "${type}" is not implemented.`)

@@ -1,39 +1,43 @@
-import React from 'react'
-import { auth } from '@/lib/auth/auth'
-import { headers } from 'next/headers'
-import { getQuestionById, getUserPracticeStatus } from '@/lib/pte/practice'
-import { AccessGate } from '@/components/pte/AccessGate'
-import { notFound, redirect } from 'next/navigation'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { ArrowLeft, Clock, BarChart } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import { SpeakingPracticeClient } from '@/components/pte/speaking/SpeakingPracticeClient'
+import React from "react";
+import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
+import { getQuestionById, getUserPracticeStatus } from "@/lib/pte/practice";
+import { AccessGate } from "@/components/pte/AccessGate";
+import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Clock, BarChart } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { SpeakingPracticeClient } from "@/components/pte/speaking/SpeakingPracticeClient";
 
-export default async function QuestionPage({ params }: { params: { question: string, id: string } }) {
+export default async function QuestionPage({
+    params,
+}: {
+    params: { question: string; id: string };
+}) {
     // 1. Get Session
     const session = await auth.api.getSession({
-        headers: await headers()
-    })
+        headers: await headers(),
+    });
 
     if (!session?.user) {
         // Redirect to login or show limited view? For now redirect.
-        // redirect('/login') 
+        // redirect('/login')
         // Or specific access gate behavior for null user
     }
 
     // 2. Fetch Data
-    const questionData = await getQuestionById(params.id)
+    const questionData = await getQuestionById(params.id);
     if (!questionData) {
-        notFound()
+        notFound();
     }
 
     // 3. Fetch User Status for Gate
-    let userTier: 'free' | 'basic' | 'premium' | 'unlimited' = 'free'
+    let userTier: "free" | "basic" | "premium" | "unlimited" = "free";
     if (session?.user?.id) {
-        const userStatus = await getUserPracticeStatus(session.user.id)
+        const userStatus = await getUserPracticeStatus(session.user.id);
         if (userStatus?.subscriptionTier) {
-            userTier = userStatus.subscriptionTier
+            userTier = userStatus.subscriptionTier;
         }
     }
 
@@ -42,13 +46,20 @@ export default async function QuestionPage({ params }: { params: { question: str
             {/* Header / Nav */}
             <div className="flex items-center justify-between">
                 <Link href={`/academic/practice/speaking/${params.question}`}>
-                    <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        className="gap-2 text-muted-foreground"
+                    >
                         <ArrowLeft className="size-4" /> Back to list
                     </Button>
                 </Link>
                 <div className="flex items-center gap-2">
                     {questionData.isPremium && (
-                        <Badge variant="secondary" className="bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 gap-1">
+                        <Badge
+                            variant="secondary"
+                            className="bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400 gap-1"
+                        >
                             Premium Question
                         </Badge>
                     )}
@@ -76,15 +87,18 @@ export default async function QuestionPage({ params }: { params: { question: str
                             <div className="prose dark:prose-invert max-w-none mb-8">
                                 <h3 className="text-lg font-semibold mb-2">Question Text</h3>
                                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
-                                    {questionData.content || 'No content available for this question.'}
+                                    {questionData.content ||
+                                        "No content available for this question."}
                                 </p>
                             </div>
 
                             {/* Practice UI Area */}
                             <SpeakingPracticeClient
                                 questionId={questionData.id}
-                                questionType={questionData.questionType?.code || questionData.typeId}
-                                content={questionData.content || ''}
+                                questionType={
+                                    questionData.questionType?.code || questionData.questionTypeId
+                                }
+                                content={questionData.content || ""}
                                 timeLimit={60}
                             />
                         </div>
@@ -94,13 +108,16 @@ export default async function QuestionPage({ params }: { params: { question: str
                 {/* Sidebar Info */}
                 <div className="space-y-6">
                     <div className="bg-blue-50/50 dark:bg-blue-900/10 rounded-xl p-6 border border-blue-100 dark:border-blue-900/20">
-                        <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-2">Tips & Tricks</h3>
+                        <h3 className="font-bold text-blue-900 dark:text-blue-100 mb-2">
+                            Tips & Tricks
+                        </h3>
                         <p className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
-                            Remember to speak clearly and at a natural pace. Avoid long pauses and try to mimic the intonation of native speakers.
+                            Remember to speak clearly and at a natural pace. Avoid long pauses
+                            and try to mimic the intonation of native speakers.
                         </p>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }

@@ -43,6 +43,10 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "www.gravatar.com" },
       { protocol: "https", hostname: "pedagogistspte.com" },
+      {
+        protocol: "https",
+        hostname: "vton1rkowdqbunkl.public.blob.vercel-storage.com",
+      },
     ],
   },
   serverExternalPackages: [
@@ -54,8 +58,6 @@ const nextConfig: NextConfig = {
     "@huggingface/transformers",
     "typescript",
   ],
-  // 4. Turbopack (Native v16+ implementation)
-  // This replaces almost all of your previous 'webpack' fallback logic
   experimental: {
     // Optimize package imports
     optimizePackageImports: [

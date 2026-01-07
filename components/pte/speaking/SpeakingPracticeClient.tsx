@@ -134,22 +134,22 @@ export function SpeakingPracticeClient({
                         <CardContent className="space-y-4">
                             <div className="flex items-center justify-between">
                                 <span className="text-sm font-medium">Overall</span>
-                                <span className="text-2xl font-bold text-blue-600">{feedback.overall}</span>
+                                <span className="text-2xl font-bold text-blue-600">{feedback.overallScore}</span>
                             </div>
-                            <Progress value={feedback.overall} className="h-2" />
+                            <Progress value={feedback.overallScore} className="h-2" />
 
                             <div className="grid grid-cols-3 gap-2 mt-4">
                                 <div className="text-center p-2 bg-gray-50 dark:bg-white/5 rounded-lg">
                                     <div className="text-xs text-muted-foreground uppercase">Fluency</div>
-                                    <div className="font-bold text-lg">{feedback.fluency}</div>
+                                    <div className="font-bold text-lg">{feedback.fluency?.score || 0}</div>
                                 </div>
                                 <div className="text-center p-2 bg-gray-50 dark:bg-white/5 rounded-lg">
                                     <div className="text-xs text-muted-foreground uppercase">Pronunciation</div>
-                                    <div className="font-bold text-lg">{feedback.pronunciation}</div>
+                                    <div className="font-bold text-lg">{feedback.pronunciation?.score || 0}</div>
                                 </div>
                                 <div className="text-center p-2 bg-gray-50 dark:bg-white/5 rounded-lg">
                                     <div className="text-xs text-muted-foreground uppercase">Content</div>
-                                    <div className="font-bold text-lg">{feedback.content}</div>
+                                    <div className="font-bold text-lg">{feedback.content?.score || 0}</div>
                                 </div>
                             </div>
                         </CardContent>
@@ -160,12 +160,19 @@ export function SpeakingPracticeClient({
                             <CardTitle>Details</CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-4 max-h-[250px] overflow-y-auto">
-                            <p className="text-sm text-gray-600 dark:text-gray-300 italic">{feedback.feedback}</p>
-                            {feedback.mistakes && feedback.mistakes.length > 0 && (
+                            <div className="space-y-2">
+                                <h4 className="text-xs font-bold uppercase text-blue-500">Suggestions</h4>
+                                <ul className="list-disc list-inside text-sm space-y-1 text-gray-600 dark:text-gray-400">
+                                    {feedback.suggestions.map((s, i) => (
+                                        <li key={i}>{s}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                            {feedback.areasForImprovement && feedback.areasForImprovement.length > 0 && (
                                 <div className="space-y-2">
-                                    <h4 className="text-xs font-bold uppercase text-red-500">Mistakes to avoid</h4>
+                                    <h4 className="text-xs font-bold uppercase text-red-500">Areas for Improvement</h4>
                                     <ul className="list-disc list-inside text-sm space-y-1 text-gray-600 dark:text-gray-400">
-                                        {feedback.mistakes.map((m, i) => (
+                                        {feedback.areasForImprovement.map((m, i) => (
                                             <li key={i}>{m}</li>
                                         ))}
                                     </ul>
