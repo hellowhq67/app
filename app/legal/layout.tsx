@@ -28,7 +28,7 @@ export default function LegalLayout({
         <div className="container flex h-16 items-center">
           <Link href="/" className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600" />
-            <span className="font-bold">Pedagogist's PTE</span>
+            <span className="font-bold">Pedagogist&apos;s PTE</span>
           </Link>
           <nav className="ml-auto flex items-center space-x-6">
             <Link
@@ -86,7 +86,7 @@ export default function LegalLayout({
       <footer className="border-t py-6">
         <div className="container text-center text-sm text-muted-foreground">
           <p>
-            &copy; 2024-2025 Pedagogist's PTE. All rights reserved.
+            &copy; 2024-2025 Pedagogist&apos;s PTE. All rights reserved.
           </p>
           <p className="mt-2">
             Questions? <Link href="/contact" className="underline">Contact us</Link>

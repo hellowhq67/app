@@ -48,6 +48,17 @@ export function MockTestClient({ testData }: MockTestClientProps) {
 
     const currentSection = testData.sections[currentSectionIndex];
 
+    const handleSectionFinish = () => {
+        if (currentSectionIndex < testData.sections.length - 1) {
+            const nextIndex = currentSectionIndex + 1;
+            setCurrentSectionIndex(nextIndex);
+            setCurrentQuestionIndex(0);
+            setTimeLeft(testData.sections[nextIndex].duration);
+        } else {
+            setIsFinished(true);
+        }
+    };
+
     // Timer logic
     useEffect(() => {
         if (isFinished || timeLeft <= 0) return;
@@ -84,17 +95,6 @@ export function MockTestClient({ testData }: MockTestClientProps) {
             setCurrentQuestionIndex(currentQuestionIndex + 1);
         } else {
             handleSectionFinish();
-        }
-    };
-
-    const handleSectionFinish = () => {
-        if (currentSectionIndex < testData.sections.length - 1) {
-            const nextIndex = currentSectionIndex + 1;
-            setCurrentSectionIndex(nextIndex);
-            setCurrentQuestionIndex(0);
-            setTimeLeft(testData.sections[nextIndex].duration);
-        } else {
-            setIsFinished(true);
         }
     };
 

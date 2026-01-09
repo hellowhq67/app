@@ -35,7 +35,7 @@ export default function SignInPage() {
 					<div className="mr-2 flex h-8 w-8 items-center justify-center rounded bg-blue-600">
 						P
 					</div>
-					Pedagogist's PTE
+					Pedagogist&apos;s PTE
 				</div>
 				<div className="relative z-20 mt-auto">
 					<blockquote className="space-y-2">
@@ -58,7 +58,7 @@ export default function SignInPage() {
 					</div>
 					<AuthForm mode="sign-in" />
 					<p className="px-8 text-center text-sm text-muted-foreground">
-						Don't have an account?{" "}
+						Don&apos;t have an account?{" "}
 						<Link
 							href="/sign-up"
 							className="underline underline-offset-4 hover:text-primary"

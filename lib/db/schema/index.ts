@@ -1,4 +1,5 @@
 export * from "./users";
+export * from "./benchmarks";
 export * from "./user-progress";
 export * from "./community";
 export * from "./activity";
@@ -11,3 +12,4 @@ export * from "./pte-sessions";
 export * from "./billing";
 export * from "./questions";
 export * from "./user-settings";
+export * from "./mock-tests";

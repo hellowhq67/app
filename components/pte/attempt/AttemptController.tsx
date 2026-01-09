@@ -329,12 +329,9 @@ export default function AttemptController({
           {resolved.prepMs > 0 && phase !== 'idle' && (
             <div className={phase === 'prepare' ? '' : 'opacity-60'}>
               <CountdownTimer
-                durationMs={Math.max(0, resolved.prepMs)}
-                startTsServer={prepStartAt!}
-                endTsServer={prepEndAt}
-                onExpire={onPrepExpire}
+                initialSeconds={Math.ceil(Math.max(0, resolved.prepMs) / 1000)}
+                onComplete={onPrepExpire}
                 label="Preparation"
-                srLabel="Preparation countdown"
               />
             </div>
           )}
@@ -350,13 +347,9 @@ export default function AttemptController({
             }
           >
             <CountdownTimer
-              durationMs={Math.max(0, resolved.answerMs)}
-              // Important: for the answer timer we pin start to answerStartAt so the display is only for answer phase
-              startTsServer={answerStartAt!}
-              endTsServer={answerEndAt}
-              onExpire={onAnswerExpire}
+              initialSeconds={Math.ceil(Math.max(0, resolved.answerMs) / 1000)}
+              onComplete={onAnswerExpire}
               label="Answer time"
-              srLabel="Answer countdown"
             />
           </div>
         </>
@@ -374,12 +367,12 @@ export default function AttemptController({
       {/* Custom child renderer (e.g., SpeakingAttempt injects recorder) */}
       {children
         ? children({
-            phase,
-            token: session?.token,
-            session,
-            controls,
-            times,
-          })
+          phase,
+          token: session?.token,
+          session,
+          controls,
+          times,
+        })
         : null}
     </div>
   )

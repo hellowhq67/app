@@ -8,13 +8,14 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock, BarChart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { SpeakingPracticeClient } from "@/components/pte/speaking/SpeakingPracticeClient";
+import { SpeakingPracticeClient } from "@/components/pte/speaking/speaking-client";
 
 export default async function QuestionPage({
     params,
 }: {
-    params: { question: string; id: string };
+    params: Promise<{ question: string; id: string }>;
 }) {
+    const { question, id } = await params;
     // 1. Get Session
     const session = await auth.api.getSession({
         headers: await headers(),
@@ -27,7 +28,7 @@ export default async function QuestionPage({
     }
 
     // 2. Fetch Data
-    const questionData = await getQuestionById(params.id);
+    const questionData = await getQuestionById(id);
     if (!questionData) {
         notFound();
     }
@@ -45,7 +46,7 @@ export default async function QuestionPage({
         <div className="container mx-auto p-6 max-w-5xl space-y-6">
             {/* Header / Nav */}
             <div className="flex items-center justify-between">
-                <Link href={`/academic/practice/speaking/${params.question}`}>
+                <Link href={`/academic/practice/speaking/${question}`}>
                     <Button
                         variant="ghost"
                         size="sm"
@@ -99,7 +100,9 @@ export default async function QuestionPage({
                                     questionData.questionType?.code || questionData.questionTypeId
                                 }
                                 content={questionData.content || ""}
-                                timeLimit={60}
+                                audioUrl={questionData.audioUrl || undefined}
+                                imageUrl={questionData.imageUrl || undefined}
+                                timeLimit={(questionData as any).timeLimit}
                             />
                         </div>
                     </AccessGate>

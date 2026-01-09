@@ -39,7 +39,7 @@ export default async function ReadingQuestionListPage({ params }: PageProps) {
             {/* Header */}
             <div className="flex flex-col gap-4">
                 <Link
-                    href="/pte/academic/practice/reading"
+                    href="/academic/practice/reading"
                     className="flex items-center text-sm text-muted-foreground hover:text-primary transition-colors w-fit"
                 >
                     <ArrowLeft className="mr-2 h-4 w-4" />
@@ -66,7 +66,7 @@ export default async function ReadingQuestionListPage({ params }: PageProps) {
                     </div>
                 ) : (
                     questions.map((q, index) => (
-                        <Link key={q.id} href={`/pte/academic/practice/reading/${questionTypeCode}/${q.id}`}>
+                        <Link key={q.id} href={`/academic/practice/reading/${questionTypeCode}/${q.id}`}>
                             <Card className="hover:shadow-md transition-all cursor-pointer hover:border-primary/50 group">
                                 <CardContent className="p-4 flex items-center justify-between">
                                     <div className="flex items-center gap-4">

@@ -1,8 +1,14 @@
 import { apiSuccess, handleApiError, requireAuth } from "@/lib/api";
+import { getUser } from "@/lib/db/queries";
 
 export async function POST() {
   try {
-    const { userId, userEmail } = await requireAuth();
+    const { userId } = await requireAuth();
+    const user = await getUser(userId);
+
+    if (!user) {
+      throw new Error("User not found");
+    }
 
     // In a real application, this would:
     // 1. Generate a 2FA secret

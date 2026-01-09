@@ -133,6 +133,143 @@ export const getPromptForQuestionType = (
         The overallScore should be calculated by converting the total points (out of 13) to the PTE 90-point scale.
         Example for calculating overallScore: (Total Points / 13) * 90.
       `
+    case QuestionType.SUMMARIZE_WRITTEN_TEXT:
+      if (!userInput || wordCount === undefined) {
+        throw new Error('Missing parameters for SUMMARIZE_WRITTEN_TEXT prompt.')
+      }
+      return `
+        You are a strict, expert PTE Academic examiner. Your task is to score a "Summarize Written Text" response.
+
+        **Test-taker's Summary**: "${userInput}"
+        **Word Count**: ${wordCount}
+
+        **Instructions**:
+        1.  Analyze the summary based on the PTE scoring criteria below.
+        2.  Provide scores (integer) for Content (0-2), Form (0-1), Grammar (0-2), and Vocabulary (0-2).
+        3.  Content: Does the summary capture the main point?
+        4.  Form: Is it a single complete sentence between 5 and 75 words?
+        5.  Generate a list of strengths and areas for improvement.
+        6.  The final JSON output must conform to the AIFeedbackData Zod schema.
+
+        **Scoring Criteria Details**:
+        - **Content**: 2=Good summary, 1=Missing points, 0=Misrepresentation.
+        - **Form**: 1=One sentence 5-75 words, 0=Otherwise.
+        - **${PTE_SCORING_CRITERIA_WRITING.GRAMMAR}**
+        - **${PTE_SCORING_CRITERIA_WRITING.VOCABULARY}**
+
+        Your response MUST be a valid JSON object.
+        The overallScore should be calculated as (Total Points / 7) * 90.
+      `
+    case QuestionType.REPEAT_SENTENCE:
+      if (!audioTranscript || !userTranscript) {
+        throw new Error('Missing parameters for REPEAT_SENTENCE prompt.')
+      }
+      return `
+        You are a strict, expert PTE Academic examiner. Your task is to score a "Repeat Sentence" response.
+
+        **Original Sentence**: "${audioTranscript}"
+        **Test-taker's Transcript**: "${userTranscript}"
+
+        **Instructions**:
+        1.  Compare the user's transcript with the original sentence.
+        2.  Score Content (0-3): 3=All words, 2=50%+, 1=Some words, 0=None.
+        3.  Score Pronunciation (0-5) and Fluency (0-5).
+        4.  Provide specific feedback.
+        5.  The final JSON output must conform to the SpeakingFeedbackData Zod schema.
+
+        **Scoring Criteria Details**:
+        - **Content**: See above.
+        - **${PTE_SCORING_CRITERIA_SPEAKING.PRONUNCIATION}**
+        - **${PTE_SCORING_CRITERIA_SPEAKING.FLUENCY}**
+
+        Your response MUST be a valid JSON object.
+        The overallScore should be calculated as (Total Points / 13) * 90.
+      `
+    case QuestionType.RE_TELL_LECTURE:
+      if (!promptTopic || !userTranscript) {
+        throw new Error('Missing parameters for RE_TELL_LECTURE prompt.')
+      }
+      return `
+        You are a strict, expert PTE Academic examiner. Your task is to score a "Re-tell Lecture" response.
+
+        **Lecture Topic/Key Points**: "${promptTopic}"
+        **Test-taker's Transcript**: "${userTranscript}"
+
+        **Instructions**:
+        1.  Analyze the transcript against the lecture topic.
+        2.  Score Content (0-5), Pronunciation (0-5), and Fluency (0-5).
+        3.  Content: 5=Re-tells all key points, 0=Irrelevant.
+        4.  Provide specific feedback.
+        5.  The final JSON output must conform to the SpeakingFeedbackData Zod schema.
+
+        **Scoring Criteria Details**:
+        - **Content**: See above.
+        - **${PTE_SCORING_CRITERIA_SPEAKING.PRONUNCIATION}**
+        - **${PTE_SCORING_CRITERIA_SPEAKING.FLUENCY}**
+
+        Your response MUST be a valid JSON object.
+        The overallScore should be calculated as (Total Points / 15) * 90.
+      `
+    case QuestionType.ANSWER_SHORT_QUESTION:
+      if (!answerKey || !userTranscript) {
+        throw new Error('Missing parameters for ANSWER_SHORT_QUESTION prompt.')
+      }
+      return `
+        You are a strict, expert PTE Academic examiner. Your task is to score an "Answer Short Question" response.
+
+        **Correct Answer(s)**: "${answerKey}"
+        **Test-taker's Transcript**: "${userTranscript}"
+
+        **Instructions**:
+        1.  Check if the test-taker's answer matches the correct answer (synonyms allowed).
+        2.  Score Vocabulary (0-1): 1=Correct word/phrase, 0=Incorrect.
+        3.  Provide feedback.
+        4.  The final JSON output must conform to the SpeakingFeedbackData Zod schema. (Use vocabulary score for accuracy).
+
+        **Scoring Criteria Details**:
+        - **Vocabulary**: 1=Correct, 0=Incorrect.
+
+        Your response MUST be a valid JSON object.
+        The overallScore should be calculated as (Vocabulary Score / 1) * 90.
+      `
+    case QuestionType.RESPOND_TO_A_SITUATION:
+      if (!promptTopic || !userTranscript) {
+        throw new Error('Missing parameters for RESPOND_TO_A_SITUATION prompt.')
+      }
+      return `
+        You are a strict, expert PTE Core examiner. Your task is to score a "Respond to a Situation" response.
+
+        **Situation**: "${promptTopic}"
+        **Test-taker's Response**: "${userTranscript}"
+
+        **Instructions**:
+        1.  Evaluate appropriateness and tone.
+        2.  Score Content (0-5), Pronunciation (0-5), Fluency (0-5).
+        3.  Provide feedback.
+        4.  The final JSON output must conform to the SpeakingFeedbackData Zod schema.
+
+        Your response MUST be a valid JSON object.
+        The overallScore should be calculated as (Total Points / 15) * 90.
+      `
+    case QuestionType.SUMMARIZE_GROUP_DISCUSSION:
+      if (!promptTopic || !userTranscript) {
+        throw new Error('Missing parameters for SUMMARIZE_GROUP_DISCUSSION prompt.')
+      }
+      return `
+        You are a strict, expert PTE Core examiner. Your task is to score a "Summarize Group Discussion" response.
+
+        **Discussion Context**: "${promptTopic}"
+        **Test-taker's Summary**: "${userTranscript}"
+
+        **Instructions**:
+        1.  Evaluate the summary of the discussion.
+        2.  Score Content (0-2), Pronunciation (0-5), Fluency (0-5).
+        3.  Provide feedback.
+        4.  The final JSON output must conform to the SpeakingFeedbackData Zod schema.
+
+        Your response MUST be a valid JSON object.
+        The overallScore should be calculated as (Total Points / 12) * 90.
+      `
     case QuestionType.READ_ALOUD:
       if (!originalText || !userTranscript) {
         throw new Error('Missing parameters for READ_ALOUD prompt.')

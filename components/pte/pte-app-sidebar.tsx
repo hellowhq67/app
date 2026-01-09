@@ -3,26 +3,18 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  AudioWaveform,
   BookOpen,
   Bot,
-  Command,
   Frame,
-  GalleryVerticalEnd,
-  Map,
   PieChart,
-  Settings2,
   SquareTerminal,
   Home,
   Trophy,
   History,
-  MessageSquare,
   Headphones,
   Mic,
   PenTool,
-  BadgeCheck,
   Settings,
-  User,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -39,7 +31,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
+// Navigation structure
 const navMain = [
   {
     title: "Dashboard",
@@ -48,62 +40,56 @@ const navMain = [
   },
   {
     title: "Practice Hub",
-    url: "/practice",
+    url: "/academic/practice",
+    icon: SquareTerminal,
     isActive: true,
     items: [
       {
         title: "Speaking",
-        url: "/practice/speaking",
+        url: "/academic/practice/speaking",
+        icon: Mic,
       },
       {
         title: "Writing",
-        url: "/practice/writing",
+        url: "/academic/practice/writing",
+        icon: PenTool,
       },
       {
         title: "Reading",
-        url: "/practice/reading",
+        url: "/academic/practice/reading",
+        icon: BookOpen,
       },
       {
         title: "Listening",
-        url: "/practice/listening",
+        url: "/academic/practice/listening",
+        icon: Headphones,
       },
     ],
   },
   {
     title: "Mock Tests",
-    url: "/pte/mocktest",
+    url: "/academic/mock-tests",
     icon: Trophy,
   },
   {
-    title: "Sections workflow",
-    url: "/mock-tests",
-    icon: Trophy,
+    title: "Sectional Tests",
+    url: "/academic/sectional-tests",
+    icon: Frame,
   },
   {
-    title: "History",
-    url: "/pte/history",
+    title: "Practice History",
+    url: "/academic/practice-attempts",
     icon: History,
   },
   {
-    title: "Community",
-    url: "/pte/community",
-    icon: MessageSquare,
+    title: "Analytics",
+    url: "/academic/analytics",
+    icon: PieChart,
   },
   {
-    title: "knowlodge Base",
-    url: "/pte/ai-voice",
+    title: "AI Tutor",
+    url: "/ai-tutor",
     icon: Bot,
-  },
-
-  {
-    title: "Profile",
-    url: "/pte/profile",
-    icon: User,
-  },
-  {
-    title: "Billing",
-    url: "/billing",
-    icon: BadgeCheck,
   },
   {
     title: "Settings",

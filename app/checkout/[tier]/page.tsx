@@ -15,10 +15,10 @@ interface CheckoutPageProps {
   }>
 }
 
-export default async function CheckoutPage({
+export default function CheckoutPage({
   params,
 }: CheckoutPageProps) {
-  const { tier } = await params
+  const { tier } = use(params)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
   const tierParam = tier as SubscriptionTier
@@ -37,8 +37,8 @@ export default async function CheckoutPage({
     )
   }
 
-  const pricing = TIER_PRICING[tier]
-  const features = TIER_FEATURES_DISPLAY[tier]
+  const pricing = TIER_PRICING[tierParam]
+  const features = TIER_FEATURES_DISPLAY[tierParam]
 
   const handleCheckout = async (provider: 'stripe' | 'polar') => {
     setIsLoading(true)

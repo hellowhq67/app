@@ -3,6 +3,7 @@ import { db } from '@/lib/db/drizzle';
 import { pteAttempts, aiCreditUsage } from '@/lib/db/schema';
 import { AIFeedbackData, QuestionType } from '@/lib/types';
 import { eq, and, desc } from 'drizzle-orm';
+import { upsertRecord } from '@/lib/ai/vector-store';
 
 /**
  * Save PTE attempt with AI scoring results to the database
@@ -62,9 +63,9 @@ export async function savePteAttempt(params: {
     if (aiFeedback.structure) feedbackParts.push(`Structure: ${aiFeedback.structure.feedback}`);
     if (aiFeedback.accuracy) feedbackParts.push(`Accuracy: ${aiFeedback.accuracy.feedback}`);
 
-    feedbackParts.push(`\n\nStrengths:\n${aiFeedback.strengths.map(s => `- ${s}`).join('\n')}`);
-    feedbackParts.push(`\n\nAreas for Improvement:\n${aiFeedback.areasForImprovement.map(a => `- ${a}`).join('\n')}`);
-    feedbackParts.push(`\n\nSuggestions:\n${aiFeedback.suggestions.map(s => `- ${s}`).join('\n')}`);
+    if (aiFeedback.strengths?.length) feedbackParts.push(`\n\nStrengths:\n${aiFeedback.strengths.map(s => `- ${s}`).join('\n')}`);
+    if (aiFeedback.areasForImprovement?.length) feedbackParts.push(`\n\nAreas for Improvement:\n${aiFeedback.areasForImprovement.map(a => `- ${a}`).join('\n')}`);
+    if (aiFeedback.suggestions?.length) feedbackParts.push(`\n\nSuggestions:\n${aiFeedback.suggestions.map(s => `- ${s}`).join('\n')}`);
 
     const aiFeedbackText = feedbackParts.join('\n\n');
 
@@ -89,13 +90,24 @@ export async function savePteAttempt(params: {
         })
         .returning();
 
-    // NEW: Vector Embedding Logic for Weak Areas (Client-side trigger or Server Action trigger)
-    // If score is low (< 60) and we can identify a weakness, we should ideally store it in Supabase Vector Store.
-    // Since this function is running in Next.js Server Environment, we can use Supabase Admin Client if available,
-    // or rely on the Edge Function to have done it (which we implemented in the Edge Function code previously).
-
-    // However, if we are NOT using the Edge Function for scoring (fallback), we might want to do it here.
-    // For now, we'll keep the scoring pure and assume the Edge Function handles the "embedding" insertion if it was used.
+    // NEW: Vector Embedding Logic for Weak Areas
+    // If we have text content (user response or transcript), upsert it to Pinecone
+    try {
+        const textToEmbed = responseText || aiFeedback.transcript;
+        if (textToEmbed && textToEmbed.length > 10) { // Embed only significant content
+            // Fire and forget or await? For reliability, we await, but wrapped in try/catch so it doesn't block the UI response if it key fails
+            await upsertRecord(userId, attempt.id, textToEmbed, {
+                questionId,
+                questionType,
+                score: aiFeedback.overallScore,
+                isWeakness: aiFeedback.overallScore < 60,
+                feedbackStrengths: aiFeedback.strengths,
+                feedbackImprovements: aiFeedback.areasForImprovement,
+            });
+        }
+    } catch (vectorError) {
+        console.error('[savePteAttempt] Vector embedding failed (non-critical):', vectorError);
+    }
 
     return attempt;
 }
@@ -158,4 +170,25 @@ export async function getUserAttempts(userId: string, questionId: string) {
 export async function getLatestAttempt(userId: string, questionId: string) {
     const attempts = await getUserAttempts(userId, questionId);
     return attempts[0] || null;
+}
+
+/**
+ * Get all attempts for a user
+ */
+export async function getAllUserAttempts(userId: string) {
+    return await db.query.pteAttempts.findMany({
+        where: eq(pteAttempts.userId, userId),
+        with: {
+            question: {
+                with: {
+                    questionType: {
+                        with: {
+                            category: true
+                        }
+                    }
+                }
+            },
+        },
+        orderBy: desc(pteAttempts.createdAt),
+    });
 }

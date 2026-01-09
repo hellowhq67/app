@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 
 export function ExamCountdown({ examDate }: { examDate: Date | null }) {
+  const [mounted, setMounted] = useState(false)
   const [countdown, setCountdown] = useState({
     days: 0,
     hours: 0,
@@ -10,6 +11,7 @@ export function ExamCountdown({ examDate }: { examDate: Date | null }) {
   })
 
   useEffect(() => {
+    setMounted(true)
     if (!examDate) return
 
     const interval = setInterval(() => {
@@ -37,15 +39,15 @@ export function ExamCountdown({ examDate }: { examDate: Date | null }) {
   return (
     <div className="flex justify-around text-center">
       <div>
-        <div className="text-3xl font-bold">{countdown.days}</div>
+        <div className="text-3xl font-bold" suppressHydrationWarning>{countdown.days}</div>
         <div className="text-sm text-gray-500">Days</div>
       </div>
       <div>
-        <div className="text-3xl font-bold">{countdown.hours}</div>
+        <div className="text-3xl font-bold" suppressHydrationWarning>{countdown.hours}</div>
         <div className="text-sm text-gray-500">Hours</div>
       </div>
       <div>
-        <div className="text-3xl font-bold">{countdown.minutes}</div>
+        <div className="text-3xl font-bold" suppressHydrationWarning>{countdown.minutes}</div>
         <div className="text-sm text-gray-500">Minutes</div>
       </div>
     </div>

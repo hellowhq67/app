@@ -22,7 +22,7 @@ export async function GET() {
     const { userId } = await requireAuth()
 
     // Try to get progress from userProgress table first
-    const userProgress = await getUserProgress()
+    const userProgress = await getUserProgress(userId)
     if (userProgress) {
       return apiSuccess({
         overallScore: userProgress.overallScore || 0,
@@ -39,16 +39,16 @@ export async function GET() {
 
     // Fallback: Calculate progress from attempts and analytics
     const [analytics, fallback] = await Promise.all([
-      getUserAnalytics(),
+      getUserAnalytics(userId),
       calculateUserProgressFallback(userId)
     ])
 
     const progressData: ProgressData = {
-      overallScore: analytics?.averageScores?.overall || 0,
-      speakingScore: analytics?.averageScores?.speaking || 0,
-      writingScore: analytics?.averageScores?.writing || 0,
-      readingScore: analytics?.averageScores?.reading || 0,
-      listeningScore: analytics?.averageScores?.listening || 0,
+      overallScore: analytics?.averageScore?.overall || 0,
+      speakingScore: analytics?.averageScore?.speaking || 0,
+      writingScore: analytics?.averageScore?.writing || 0,
+      readingScore: analytics?.averageScore?.reading || 0,
+      listeningScore: analytics?.averageScore?.listening || 0,
       testsCompleted: analytics?.totalAttempts || 0,
       questionsAnswered: fallback.questionsAnswered,
       studyStreak: 0,

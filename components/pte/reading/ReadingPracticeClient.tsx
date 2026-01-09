@@ -2,14 +2,17 @@
 
 import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { ArrowLeft, Loader2, Save, Send } from 'lucide-react'
+import { ArrowLeft, Loader2, Send } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import ReadingInput from './ReadingInput'
-import { AnswerData, QuestionData, QuestionType } from '@/lib/types'
+import { AnswerData, AIFeedbackData } from '@/lib/types'
 import { scoreReadingAttempt } from '@/app/actions/pte'
+import { CountdownTimer } from '@/components/pte/timers/CountdownTimer'
+import { FeedbackCard } from '@/components/pte/feedback/FeedbackCard'
 
 interface ReadingPracticeClientProps {
     question: {
@@ -17,6 +20,7 @@ interface ReadingPracticeClientProps {
         title: string
         content: string | null
         promptText: string | null
+        imageUrl: string | null
         questionTypeId: string
         questionType: {
             code: string
@@ -35,7 +39,7 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
     const router = useRouter()
     const [answer, setAnswer] = useState<AnswerData | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [feedback, setFeedback] = useState<any>(null)
+    const [feedback, setFeedback] = useState<AIFeedbackData | null>(null)
 
     const handleAnswerChange = (val: AnswerData) => {
         setAnswer(val)
@@ -111,13 +115,22 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
     return (
         <div className="container mx-auto p-6 space-y-6 max-w-4xl">
             <div className="flex items-center justify-between">
-                <Button variant="ghost" className="pl-0 gap-2" onClick={() => router.back()}>
-                    <ArrowLeft className="h-4 w-4" /> Back
-                </Button>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-4">
+                    <Button variant="ghost" className="pl-0 gap-2" onClick={() => router.back()}>
+                        <ArrowLeft className="h-4 w-4" /> Back
+                    </Button>
                     <Badge variant="outline">{question.questionType.name}</Badge>
-                    {/* Timer could go here */}
                 </div>
+                <CountdownTimer
+                    initialSeconds={600} // Default 10m, should ideally come from props/config
+                    onComplete={() => {
+                        toast({
+                            title: "Time's up!",
+                            description: "Submitting your answer automatically.",
+                        });
+                        handleSubmit();
+                    }}
+                />
             </div>
 
             <div className="grid gap-6">
@@ -126,6 +139,19 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
                         <CardTitle>{question.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
+                        {/* Image */}
+                        {question.imageUrl && (
+                            <div className="mb-6 rounded-lg overflow-hidden border flex justify-center bg-muted/10">
+                                <Image
+                                    src={question.imageUrl}
+                                    alt="Question Image"
+                                    width={600}
+                                    height={400}
+                                    className="max-h-[400px] w-auto object-contain"
+                                />
+                            </div>
+                        )}
+
                         {/* Passage */}
                         {question.reading?.passageText && (
                             <div className="prose dark:prose-invert max-w-none mb-8 p-4 bg-muted/30 rounded-lg">
@@ -161,32 +187,14 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
 
                 {/* Feedback Section */}
                 {feedback && (
-                    <Card className="border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-900">
-                        <CardHeader>
-                            <CardTitle className="text-green-800 dark:text-green-300">Feedback & Score</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="flex items-center gap-4">
-                                <div className="text-4xl font-bold text-green-700 dark:text-green-400">
-                                    {feedback.overallScore} / 90
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                    Overall Score
-                                </div>
-                            </div>
-
-                            {feedback.suggestions && feedback.suggestions.length > 0 && (
-                                <div>
-                                    <h4 className="font-semibold mb-2">Suggestions</h4>
-                                    <ul className="list-disc pl-5 space-y-1">
-                                        {feedback.suggestions.map((s: string, i: number) => (
-                                            <li key={i} className="text-sm">{s}</li>
-                                        ))}
-                                    </ul>
-                                </div>
-                            )}
-                        </CardContent>
-                    </Card>
+                    <FeedbackCard
+                        feedback={feedback}
+                        questionType={question.questionType.code}
+                        onRetry={() => {
+                            setFeedback(null);
+                            setAnswer(null);
+                        }}
+                    />
                 )}
             </div>
         </div>

@@ -9,6 +9,7 @@ export const useAuth = () => {
     return {
         ...session,
         user: session.data?.user,
-        isAuthenticated: !!session.data?.user
+        isAuthenticated: !!session.data?.user,
+        isLoading: session.isPending
     }
 }

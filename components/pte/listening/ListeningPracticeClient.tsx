@@ -5,19 +5,19 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Play, Pause, RotateCcw, Volume2, Ear } from "lucide-react";
-import { QuestionType } from "@/lib/types";
-import { scoreListeningAttempt } from "@/app/actions/pte"; // We will create this
+import { Loader2, Play, Pause, Volume2, Ear } from "lucide-react";
+import { QuestionType, AIFeedbackData } from "@/lib/types";
+import { scoreListeningAttempt } from "@/app/actions/pte";
+import { CountdownTimer } from "@/components/pte/timers/CountdownTimer";
+import { FeedbackCard } from "@/components/pte/feedback/FeedbackCard";
+import { ListeningFillBlanks } from "./ListeningFillBlanks";
+import { HighlightIncorrectWords } from "./HighlightIncorrectWords";
 
 interface ListeningPracticeClientProps {
   questionId: string;
@@ -40,7 +40,7 @@ export function ListeningPracticeClient({
 }: ListeningPracticeClientProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [feedback, setFeedback] = useState<any>(null);
+  const [feedback, setFeedback] = useState<AIFeedbackData | null>(null);
 
   // Audio State
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -51,6 +51,8 @@ export function ListeningPracticeClient({
   const [textAnswer, setTextAnswer] = useState("");
   const [selectedOption, setSelectedOption] = useState<string>("");
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [filledBlanks, setFilledBlanks] = useState<Record<string, string>>({});
+  const [highlightedWords, setHighlightedWords] = useState<number[]>([]);
 
   // Handle Audio Events
   useEffect(() => {
@@ -94,6 +96,8 @@ export function ListeningPracticeClient({
         text: textAnswer,
         selectedOption,
         selectedOptions,
+        filledBlanks,
+        highlightedWords,
       };
 
       // Server Action
@@ -208,6 +212,26 @@ export function ListeningPracticeClient({
           </div>
         );
 
+      case QuestionType.LISTENING_BLANKS:
+      case "fill_blanks":
+        return (
+          <ListeningFillBlanks
+            transcript={content}
+            value={filledBlanks}
+            onChange={setFilledBlanks}
+          />
+        );
+
+      case QuestionType.HIGHLIGHT_INCORRECT_WORDS:
+      case "highlight_incorrect_words":
+        return (
+          <HighlightIncorrectWords
+            transcript={content}
+            value={highlightedWords}
+            onChange={setHighlightedWords}
+          />
+        );
+
       default:
         return (
           <div className="text-red-500">
@@ -258,16 +282,34 @@ export function ListeningPracticeClient({
       </Card>
 
       {/* Actions */}
-      <div className="flex justify-between items-center">
-        <div className="text-sm text-muted-foreground">
-          <Ear className="inline-block mr-2 w-4 h-4" />
+      <div className="flex justify-between items-center bg-muted/30 p-4 rounded-lg">
+        <div className="text-sm text-muted-foreground flex items-center gap-2">
+          <Ear className="w-4 h-4" />
           Listen closely and answer carefully.
         </div>
+        <CountdownTimer
+          initialSeconds={timeLimit}
+          onComplete={() => {
+            toast({
+              title: "Time's up!",
+              description: "Submitting your answer automatically.",
+            });
+            handleSubmit();
+          }}
+        />
+      </div>
+
+      <div className="flex justify-end items-center">
+
         <Button
           onClick={handleSubmit}
           disabled={
             isSubmitting ||
-            (!textAnswer && !selectedOption && selectedOptions.length === 0)
+            (!textAnswer &&
+             !selectedOption &&
+             selectedOptions.length === 0 &&
+             Object.keys(filledBlanks).length === 0 &&
+             highlightedWords.length === 0)
           }
           size="lg"
           className="min-w-[150px]"
@@ -285,31 +327,23 @@ export function ListeningPracticeClient({
 
       {/* Feedback Display */}
       {feedback && (
-        <Card className="bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/30">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              Score: {feedback.overallScore}/90
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              {feedback.content && (
-                <p>
-                  <strong>Content:</strong> {feedback.content.score}
-                </p>
-              )}
-              {feedback.grammar && (
-                <p>
-                  <strong>Grammar:</strong> {feedback.grammar.score}
-                </p>
-              )}
-              {/* Generic feedback display */}
-              <pre className="text-xs bg-black/5 p-2 rounded mt-2 overflow-auto max-h-40">
-                {JSON.stringify(feedback, null, 2)}
-              </pre>
-            </div>
-          </CardContent>
-        </Card>
+        <FeedbackCard
+          feedback={feedback}
+          questionType={questionType}
+          onRetry={() => {
+            setFeedback(null);
+            setTextAnswer("");
+            setSelectedOption("");
+            setSelectedOptions([]);
+            setFilledBlanks({});
+            setHighlightedWords([]);
+            // Reset audio
+            if (audioRef.current) {
+              audioRef.current.currentTime = 0;
+              setProgress(0);
+            }
+          }}
+        />
       )}
     </div>
   );

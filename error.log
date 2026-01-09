@@ -1,0 +1,8 @@
+
+> nextjs@0.1.0 type-check C:\Users\lemon\Documents\GitHub\pedagogistspte.v.0.2
+> tsc --noEmit
+
+app/(pte)/academic/practice/speaking/[question]/[id]/page.tsx(105,57): error TS2339: Property 'timeLimit' does not exist on type '{ id: string; questionId: undefined; createdAt: Date; updatedAt: Date; passageText: string; questionText: string | null; options: { [key: string]: any; choices?: string[] | undefined; blanks?: { ...; }[] | undefined; paragraphs?: string[] | undefined; } | null; ... 29 more ...; questionType: { ...; }; }'.
+components/pte/app-dashboard.tsx(432,23): error TS2304: Cannot find name 'fetchData'.
+components/pte/app-dashboard.tsx(493,27): error TS2304: Cannot find name 'fetchData'.
+ΓÇëELIFECYCLEΓÇë Command failed with exit code 1.

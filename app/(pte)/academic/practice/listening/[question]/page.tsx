@@ -1,13 +1,15 @@
 import { getPracticeQuestions } from '@/lib/pte/practice'
 import { redirect, notFound } from 'next/navigation'
 
-export default async function ListeningTypePage({ params }: { params: { question: string } }) {
+export default async function ListeningTypePage({ params }: { params: Promise<{ question: string }> }) {
+    const { question } = await params
     // 1. Fetch questions for this type
-    const questions = await getPracticeQuestions(params.question, 1, 1)
+    const questions = await getPracticeQuestions(question, 1, 1)
 
     // 2. If questions exist, redirect to the first one
+    // 2. If questions exist, redirect to the first one
     if (questions && questions.length > 0) {
-        redirect(`/academic/practice/listening/${params.question}/${questions[0].id}`)
+        redirect(`/academic/practice/listening/${question}/${questions[0].id}`)
     }
 
     // 3. If no questions, show 404 or empty state

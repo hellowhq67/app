@@ -65,11 +65,13 @@ async function handleCheckoutCompleted(checkoutData: any) {
 
   try {
     await upsertUserSubscription(metadata.userId, {
-      planType: tier,
+      polarProductId: 'unknown', // Needs to be provided or fetched
+      polarSubscriptionId: checkoutData.subscription_id || 'unknown',
+      tier: tier,
       status: 'active',
-      startDate,
-      endDate,
-      autoRenew: true,
+      currentPeriodStart: startDate,
+      currentPeriodEnd: endDate,
+      cancelAtPeriodEnd: false,
     })
     console.log(`Updated subscription for user ${metadata.userId} to ${tier} plan`)
   } catch (error) {

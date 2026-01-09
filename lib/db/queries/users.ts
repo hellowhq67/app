@@ -441,7 +441,13 @@ export async function getUserAnalytics(userId: string) {
       progress,
       fallback,
       totalAttempts: fallback.questionsAnswered,
-      averageScore: 0, // Calculate from attempts if needed
+      averageScore: {
+        overall: 0,
+        speaking: 0,
+        writing: 0,
+        reading: 0,
+        listening: 0,
+      }, // Calculate from attempts if needed
       studyTime: fallback.totalStudyTimeHours,
     };
   } catch (error) {

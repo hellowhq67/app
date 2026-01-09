@@ -71,7 +71,10 @@ const listeningTypes = [
     },
 ]
 
-export default function ListeningPracticePage() {
+import { getPteQuestionCounts } from '@/lib/db/queries/metrics'
+
+export default async function ListeningPracticePage() {
+    const counts = await getPteQuestionCounts()
     return (
         <div className="container mx-auto p-6 space-y-8">
             {/* Header */}

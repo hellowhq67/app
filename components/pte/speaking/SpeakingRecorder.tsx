@@ -1,30 +1,20 @@
-import React, { useEffect } from 'react'
-import { Button } from '@/components/ui/button'
+"use client";
+import React from "react";
+import { Button } from "@/components/ui/button";
 
-export default function SpeakingRecorder({
-    type,
-    timers,
-    onRecorded,
-    auto,
-    onStateChange,
-}: any) {
-    // Mock recording logic for build pass
-    const handleMockRecord = () => {
-        onStateChange?.('recording')
-        setTimeout(() => {
-            onStateChange?.('idle')
-            // Mock blob
-            const blob = new Blob(['mock audio'], { type: 'audio/webm' })
-            onRecorded({ blob, durationMs: 5000, timings: {} })
-        }, 1000)
-    }
-
+export default function SpeakingRecorder(props: any) {
     return (
-        <div className="border p-4 rounded-md text-center">
-            <p className="text-sm text-muted-foreground mb-2">Recorder Placeholder</p>
-            <Button onClick={handleMockRecord} variant="secondary">
+        <div className="flex flex-col gap-2 border p-4 rounded items-center justify-center bg-muted/20">
+            <span className="text-sm text-muted-foreground">Recorder Placeholder</span>
+            <Button
+                variant="secondary"
+                onClick={() =>
+                    props.onRecorded &&
+                    props.onRecorded({ blob: new Blob([]), durationMs: 2000, timings: { prepMs: 0, answerMs: 2000 } })
+                }
+            >
                 Simulate Recording
             </Button>
         </div>
-    )
+    );
 }
