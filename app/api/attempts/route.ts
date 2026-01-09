@@ -2,7 +2,7 @@ import 'server-only'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth/session'
 import { db } from '@/lib/db/drizzle'
-import { pteAttempts, pteQuestions, pteQuestionTypes } from '@/lib/db/schema'
+import { pteAttempts, pteQuestions, pteQuestionTypes, pteCategories } from '@/lib/db/schema'
 import { eq, and, desc, sql, getTableColumns, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 
@@ -85,13 +85,14 @@ export async function GET(request: NextRequest) {
         questionType: {
           id: pteQuestionTypes.id,
           name: pteQuestionTypes.name,
-          section: pteQuestionTypes.section,
-          slug: pteQuestionTypes.slug,
+          section: pteCategories.code,
+          slug: pteQuestionTypes.code,
         },
       })
       .from(pteAttempts)
       .innerJoin(pteQuestions, eq(pteAttempts.questionId, pteQuestions.id))
       .innerJoin(pteQuestionTypes, eq(pteQuestions.questionTypeId, pteQuestionTypes.id))
+      .innerJoin(pteCategories, eq(pteQuestionTypes.categoryId, pteCategories.id))
       .where(and(...conditions))
       .orderBy(desc(pteAttempts.createdAt))
       .limit(limit)
@@ -99,7 +100,7 @@ export async function GET(request: NextRequest) {
 
     // Filter by section if provided
     if (section) {
-      conditions.push(eq(pteQuestionTypes.section, section))
+      conditions.push(eq(pteCategories.code, section))
       query = db
         .select({
           ...getTableColumns(pteAttempts),
@@ -112,13 +113,14 @@ export async function GET(request: NextRequest) {
           questionType: {
             id: pteQuestionTypes.id,
             name: pteQuestionTypes.name,
-            section: pteQuestionTypes.section,
-            slug: pteQuestionTypes.slug,
+            section: pteCategories.code,
+            slug: pteQuestionTypes.code,
           },
         })
         .from(pteAttempts)
         .innerJoin(pteQuestions, eq(pteAttempts.questionId, pteQuestions.id))
         .innerJoin(pteQuestionTypes, eq(pteQuestions.questionTypeId, pteQuestionTypes.id))
+        .innerJoin(pteCategories, eq(pteQuestionTypes.categoryId, pteCategories.id))
         .where(and(...conditions))
         .orderBy(desc(pteAttempts.createdAt))
         .limit(limit)
@@ -133,6 +135,7 @@ export async function GET(request: NextRequest) {
       .from(pteAttempts)
       .innerJoin(pteQuestions, eq(pteAttempts.questionId, pteQuestions.id))
       .innerJoin(pteQuestionTypes, eq(pteQuestions.questionTypeId, pteQuestionTypes.id))
+      .innerJoin(pteCategories, eq(pteQuestionTypes.categoryId, pteCategories.id))
       .where(and(...conditions))
 
     const total = countResult?.count ?? 0
