@@ -22,9 +22,9 @@ const createAttemptSchema = z.object({
   questionId: z.string().uuid(),
   responseText: z.string().optional(),
   responseAudioUrl: z.string().url().optional(),
-  responseData: z.record(z.any()).optional(),
+  responseData: z.record(z.string(), z.any()).optional(),
   timeTaken: z.number().int().min(0).optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 })
 
 function error(status: number, message: string, code?: string) {
