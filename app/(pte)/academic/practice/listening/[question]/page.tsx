@@ -1,23 +1,50 @@
-import { getPracticeQuestions } from '@/lib/pte/practice'
-import { redirect, notFound } from 'next/navigation'
+import { db } from "@/lib/db/drizzle";
+import { pteQuestionTypes } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
+import QuestionListTable from "@/components/pte/practice/QuestionListTable";
+import { getPracticeQuestions } from "@/lib/pte/practice";
+import { auth } from "@/lib/auth/auth";
+import { headers } from "next/headers";
 
-export default async function ListeningTypePage({ params }: { params: Promise<{ question: string }> }) {
-    const { question } = await params
-    // 1. Fetch questions for this type
-    const questions = await getPracticeQuestions(question, 1, 1)
+export const dynamic = "force-dynamic";
 
-    // 2. If questions exist, redirect to the first one
-    // 2. If questions exist, redirect to the first one
-    if (questions && questions.length > 0) {
-        redirect(`/academic/practice/listening/${question}/${questions[0].id}`)
-    }
+interface PageProps {
+  params: Promise<{
+    question: string;
+  }>;
+}
 
-    // 3. If no questions, show 404 or empty state
-    // For now, simple notFound, but ideally an "Coming Soon" page
-    return (
-        <div className="container mx-auto p-12 text-center">
-            <h1 className="text-xl font-bold">No questions available yet.</h1>
-            <p className="text-muted-foreground">We are adding new questions daily. Please check back later.</p>
-        </div>
-    )
+export default async function ListeningQuestionListPage({ params }: PageProps) {
+  const { question: questionTypeCode } = await params;
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  // 1. Get the Question Type ID
+  const questionType = await db.query.pteQuestionTypes.findFirst({
+    where: eq(pteQuestionTypes.code, questionTypeCode as any),
+  });
+
+  if (!questionType) {
+    return notFound();
+  }
+
+  // 2. Get Questions for this type using helper
+  const questions = await getPracticeQuestions(
+    questionTypeCode,
+    1,
+    100, // Fetch all for list
+    session?.user?.id
+  );
+
+  return (
+    <QuestionListTable
+      questionType={questionType}
+      questions={questions}
+      basePath={`/academic/practice/listening/${questionTypeCode}`}
+      backLink="/academic/practice/listening"
+      title="Back to Listening Practice"
+    />
+  );
 }

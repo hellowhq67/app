@@ -5,28 +5,22 @@ import { users } from '@/lib/db/schema/users';
 import { userProgress, userProfiles } from '@/lib/db/schema/user-progress';
 import { eq, and, sql, desc, inArray, avg, count } from 'drizzle-orm';
 import { pteQuestionTypes } from '@/lib/db/schema/pte-categories';
-
-export interface PracticeQuestion {
-    id: string;
-    title: string;
-    content: string | null;
-    typeId: string;
-    difficulty: string | null;
-    isPremium: boolean;
-    userStatus?: 'unpracticed' | 'completed' | 'mistake';
-    lastScore?: number;
-    audioUrl?: string | null;
-    imageUrl?: string | null;
-    transcript?: string | null;
-    sampleAnswer?: string | null;
-}
+import { 
+    BasePteQuestion, 
+    ReadingQuestion, 
+    SpeakingQuestion, 
+    WritingQuestion, 
+    ListeningQuestion,
+    Difficulty,
+    PracticeQuestion
+} from '@/lib/types';
 
 export async function getPracticeQuestions(
     typeIdOrSlug: string,
     page: number = 1,
     limit: number = 20,
     userId?: string
-) {
+): Promise<PracticeQuestion[]> {
     const offset = (page - 1) * limit;
 
     let typeId = typeIdOrSlug;
@@ -51,7 +45,7 @@ export async function getPracticeQuestions(
         id: pteQuestions.id,
         title: pteQuestions.title,
         content: pteQuestions.content,
-        typeId: pteQuestions.questionTypeId,
+        questionTypeId: pteQuestions.questionTypeId,
         difficulty: pteQuestions.difficulty,
         isPremium: pteQuestions.isPremium,
         audioUrl: pteQuestions.audioUrl,
@@ -63,8 +57,9 @@ export async function getPracticeQuestions(
         .offset(offset);
 
     // Fetch user progress if userId is provided
-    let questionsWithStatus = questions.map(q => ({
+    let questionsWithStatus: PracticeQuestion[] = questions.map(q => ({
         ...q,
+        difficulty: q.difficulty as Difficulty,
         userStatus: 'unpracticed' as 'unpracticed' | 'completed' | 'mistake',
         lastScore: undefined as number | undefined
     }));
@@ -111,7 +106,7 @@ export async function getPracticeQuestions(
     return questionsWithStatus;
 }
 
-export async function getQuestionById(id: string) {
+export async function getQuestionById(id: string): Promise<ReadingQuestion | SpeakingQuestion | WritingQuestion | ListeningQuestion | null> {
     // Note: We use db.query to take advantage of relations
     const question = await db.query.pteQuestions.findFirst({
         where: eq(pteQuestions.id, id),
@@ -126,24 +121,11 @@ export async function getQuestionById(id: string) {
 
     if (!question) return null;
 
-    const { listening, speaking, writing, reading, ...base } = question;
-
-    // Merge extended data, ensuring base properties (like id) take precedence or are handled correctly
-    // We explicitly exclude id from extended tables to avoid overwriting the main question id
-    // However, since we spread base first, later spreads would overwrite.
-    // So we should construct it carefully or rely on spread order if we want extensions to override.
-    // Usually extensions add fields. BUT they also have their own IDs.
-    // We want the MAIN question ID usually.
-
-    return {
-        ...base,
-        ...(listening && { ...listening, id: undefined, questionId: undefined }),
-        ...(speaking && { ...speaking, id: undefined, questionId: undefined }),
-        ...(writing && { ...writing, id: undefined, questionId: undefined }),
-        ...(reading && { ...reading, id: undefined, questionId: undefined }),
-        id: base.id, // Ensure strict ID preservation
-    };
+    // Construct the standard response matching our production types
+    // Using explicit casting to satisfy the discriminated union or specific interfaces
+    return question as any;
 }
+
 
 export async function getUserPracticeStatus(userId: string) {
     const user = await db.query.users.findFirst({
@@ -189,8 +171,12 @@ export async function updateUserProgress(
 
     // Update section-specific score (rolling average)
     if (section) {
-        const scoreField = `${section}Score` as keyof typeof userProgress;
-        const currentScore = progress[scoreField] as number || 0;
+        let currentScore = 0;
+        if (section === 'speaking') currentScore = progress.speakingScore || 0;
+        else if (section === 'writing') currentScore = progress.writingScore || 0;
+        else if (section === 'reading') currentScore = progress.readingScore || 0;
+        else if (section === 'listening') currentScore = progress.listeningScore || 0;
+
         const questionsAnswered = progress.questionsAnswered || 0;
 
         // Calculate new rolling average

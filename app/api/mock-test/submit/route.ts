@@ -104,7 +104,6 @@ export async function POST(req: Request) {
                 questionContent: content,
                 submission: answer, // { text?, audioUrl? }
                 idealAnswer: ideal,
-                mode: 'mock'
             });
 
             // SAVE ANSWER

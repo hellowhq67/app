@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Clock, BarChart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SpeakingPracticeClient } from "@/components/pte/speaking/speaking-client";
+import { SpeakingQuestion } from "@/lib/types";
 
 export default async function QuestionPage({
     params,
@@ -21,14 +22,8 @@ export default async function QuestionPage({
         headers: await headers(),
     });
 
-    if (!session?.user) {
-        // Redirect to login or show limited view? For now redirect.
-        // redirect('/login')
-        // Or specific access gate behavior for null user
-    }
-
     // 2. Fetch Data
-    const questionData = await getQuestionById(id);
+    const questionData = await getQuestionById(id) as SpeakingQuestion;
     if (!questionData) {
         notFound();
     }
@@ -38,7 +33,7 @@ export default async function QuestionPage({
     if (session?.user?.id) {
         const userStatus = await getUserPracticeStatus(session.user.id);
         if (userStatus?.subscriptionTier) {
-            userTier = userStatus.subscriptionTier;
+            userTier = userStatus.subscriptionTier as any;
         }
     }
 
@@ -95,14 +90,7 @@ export default async function QuestionPage({
 
                             {/* Practice UI Area */}
                             <SpeakingPracticeClient
-                                questionId={questionData.id}
-                                questionType={
-                                    questionData.questionType?.code || questionData.questionTypeId
-                                }
-                                content={questionData.content || ""}
-                                audioUrl={questionData.audioUrl || undefined}
-                                imageUrl={questionData.imageUrl || undefined}
-                                timeLimit={(questionData as any).timeLimit}
+                                question={questionData}
                             />
                         </div>
                     </AccessGate>

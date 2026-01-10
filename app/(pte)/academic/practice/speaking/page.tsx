@@ -72,7 +72,9 @@ export default async function SpeakingPracticePage() {
             <Mic className="h-6 w-6 text-blue-600" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Speaking Practice</h1>
+            <h1 className="text-3xl font-bold tracking-tight">
+              Speaking Practice
+            </h1>
             <p className="text-muted-foreground">
               Master all 7 speaking question types with real-time AI feedback
             </p>
@@ -82,7 +84,9 @@ export default async function SpeakingPracticePage() {
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Link href="/academic/practice" className="hover:text-primary">Practice</Link>
+        <Link href="/academic/practice" className="hover:text-primary">
+          Practice
+        </Link>
         <span>/</span>
         <span className="text-foreground font-medium">Speaking</span>
       </nav>
@@ -91,14 +95,24 @@ export default async function SpeakingPracticePage() {
       <div className="grid gap-4">
         {speakingTypes.map((type) => (
           <Link key={type.id} href={`/academic/practice/speaking/${type.id}`}>
-            <Card className={`hover:shadow-md transition-all cursor-pointer hover:border-primary/50 group ${type.isHighValue ? 'border-blue-200 dark:border-blue-900 bg-blue-50/30 dark:bg-blue-950/20' : ''}`}>
+            <Card
+              className={`hover:shadow-md transition-all cursor-pointer hover:border-primary/50 group ${
+                type.isHighValue
+                  ? "border-blue-200 dark:border-blue-900 bg-blue-50/30 dark:bg-blue-950/20"
+                  : ""
+              }`}
+            >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-lg group-hover:text-blue-600 transition-colors">{type.name}</h3>
+                      <h3 className="font-semibold text-lg group-hover:text-blue-600 transition-colors">
+                        {type.name}
+                      </h3>
                       {type.aiScored && (
-                        <Badge variant="secondary" className="text-xs">AI Scored</Badge>
+                        <Badge variant="secondary" className="text-xs">
+                          AI Scored
+                        </Badge>
                       )}
                       {type.isHighValue && (
                         <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300 hover:bg-blue-200 border-0 text-xs gap-1">
@@ -106,7 +120,12 @@ export default async function SpeakingPracticePage() {
                         </Badge>
                       )}
                       {type.isCore && (
-                        <Badge variant="outline" className="text-xs border-gray-300 text-gray-500">Core</Badge>
+                        <Badge
+                          variant="outline"
+                          className="text-xs border-gray-300 text-gray-500"
+                        >
+                          Core
+                        </Badge>
                       )}
                     </div>
                     <p className="text-muted-foreground text-sm mb-2 max-w-xl">
@@ -130,5 +149,5 @@ export default async function SpeakingPracticePage() {
         ))}
       </div>
     </div>
-  )
+  );
 }

@@ -76,10 +76,7 @@ export default async function ReadingPracticePage() {
       {/* Question Types */}
       <div className="grid gap-4">
         {readingTypes.map((type) => (
-          <Link
-            key={type.id}
-            href={`/academic/practice/reading/${type.id}`}
-          >
+          <Link key={type.id} href={`/academic/practice/reading/${type.id}`}>
             <Card className="hover:shadow-md transition-all cursor-pointer hover:border-primary/50">
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">

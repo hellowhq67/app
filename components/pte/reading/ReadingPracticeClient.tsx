@@ -9,30 +9,13 @@ import { Badge } from '@/components/ui/badge'
 import { ArrowLeft, Loader2, Send } from 'lucide-react'
 import { toast } from '@/hooks/use-toast'
 import ReadingInput from './ReadingInput'
-import { AnswerData, AIFeedbackData } from '@/lib/types'
+import { AnswerData, AIFeedbackData, ReadingQuestion, QuestionType } from '@/lib/types'
 import { scoreReadingAttempt } from '@/app/actions/pte'
 import { CountdownTimer } from '@/components/pte/timers/CountdownTimer'
-import { FeedbackCard } from '@/components/pte/feedback/FeedbackCard'
+import { ReadingScoreModal } from './ReadingScoreModal'
 
 interface ReadingPracticeClientProps {
-    question: {
-        id: string
-        title: string
-        content: string | null
-        promptText: string | null
-        imageUrl: string | null
-        questionTypeId: string
-        questionType: {
-            code: string
-            name: string
-        }
-        reading: {
-            options: any
-            passageText: string
-            questionText: string | null
-            correctAnswerPositions: number[] | null
-        } | null
-    }
+    question: ReadingQuestion
 }
 
 export default function ReadingPracticeClient({ question }: ReadingPracticeClientProps) {
@@ -40,6 +23,7 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
     const [answer, setAnswer] = useState<AnswerData | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [feedback, setFeedback] = useState<AIFeedbackData | null>(null)
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
     const handleAnswerChange = (val: AnswerData) => {
         setAnswer(val)
@@ -58,27 +42,16 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
         setIsSubmitting(true)
         try {
             // Determine question type enum from code
-            let typeEnum: any = question.questionType.code
-
-            // Map code to enum if needed (though strings might work if matched)
-            // The action expects QuestionType enum values string
+            let typeEnum: any = question.questionType?.code
 
             // Prepare response data based on type
             let userResponse: any = null
-            let answerKey: any = null
-
-            // This logic depends on the specific question type structures
-            // For now, passing the whole answer object
+            
+            // Map AnswerData to what the action expects
             userResponse = answer
 
-            // Answer Key extraction (this should ideally be server-side but for practice mode we might have it)
-            // In a real secure environment, verify on server. Here we pass it for the "Auto Scored" action helper if needed,
-            // but predominantly the AI/Server should know the answer.
-            // The action `scoreReadingAttempt` signature requires `answerKey`.
-            // We'll pass what we have from the DB `reading.options` or `reading.correctAnswerPositions`
-
             const result = await scoreReadingAttempt(
-                typeEnum,
+                typeEnum as any,
                 question.reading?.questionText || question.content || '',
                 question.id,
                 question.reading?.options?.choices as string[],
@@ -88,7 +61,8 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
             )
 
             if (result.success) {
-                setFeedback(result.feedback)
+                setFeedback(result.feedback || null)
+                setIsModalOpen(true)
                 toast({
                     title: "Submitted successfully",
                     description: "Your answer has been scored.",
@@ -119,10 +93,10 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
                     <Button variant="ghost" className="pl-0 gap-2" onClick={() => router.back()}>
                         <ArrowLeft className="h-4 w-4" /> Back
                     </Button>
-                    <Badge variant="outline">{question.questionType.name}</Badge>
+                    <Badge variant="outline">{question.questionType?.name}</Badge>
                 </div>
                 <CountdownTimer
-                    initialSeconds={600} // Default 10m, should ideally come from props/config
+                    initialSeconds={question.questionType?.timeLimit || 600}
                     onComplete={() => {
                         toast({
                             title: "Time's up!",
@@ -161,16 +135,14 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
 
                         {/* Question Input */}
                         <ReadingInput
-                            questionType={question.questionType.code}
+                            questionType={question.questionType?.code || question.questionTypeId}
                             question={{
                                 id: question.id,
                                 title: question.title,
                                 promptText: question.reading?.questionText || question.content,
                                 options: question.reading?.options?.choices || question.reading?.options?.options || question.reading?.options,
                                 paragraphs: question.reading?.options?.paragraphs,
-                                // For FIB types where text contains blanks
                                 textWithBlanks: question.reading?.passageText
-                                // Note: Some schemas might store textWithBlanks in content/promptText. Adjust based on real data.
                             }}
                             value={answer}
                             onChange={handleAnswerChange}
@@ -185,17 +157,17 @@ export default function ReadingPracticeClient({ question }: ReadingPracticeClien
                     </CardFooter>
                 </Card>
 
-                {/* Feedback Section */}
-                {feedback && (
-                    <FeedbackCard
-                        feedback={feedback}
-                        questionType={question.questionType.code}
-                        onRetry={() => {
-                            setFeedback(null);
-                            setAnswer(null);
-                        }}
-                    />
-                )}
+                <ReadingScoreModal
+                    isOpen={isModalOpen}
+                    onOpenChange={setIsModalOpen}
+                    feedback={feedback}
+                    onRetry={() => {
+                        setIsModalOpen(false)
+                        setFeedback(null)
+                        setAnswer(null)
+                    }}
+                    onNext={() => router.back()}
+                />
             </div>
         </div>
     )

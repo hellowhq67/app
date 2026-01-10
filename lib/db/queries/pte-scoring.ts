@@ -21,6 +21,7 @@ export async function savePteAttempt(params: {
     const {
         userId,
         questionId,
+        questionType,
         responseText,
         responseAudioUrl,
         responseData,

@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import {
     Mic,
     Square,
@@ -13,33 +15,26 @@ import {
     Volume2,
 } from "lucide-react";
 import { useBeep } from "@/hooks/useBeep";
-import { QuestionType, SpeakingFeedbackData } from "@/lib/types";
+import { toast } from "@/hooks/use-toast";
+import { QuestionType, SpeakingFeedbackData, SpeakingQuestion } from "@/lib/types";
 import { scoreReadAloudAttempt, scoreSpeakingAttempt } from "@/app/actions/pte";
-import { toast } from "sonner";
-import { Card, CardContent } from "@/components/ui/card";
-import { ScoreDisplay } from "./score-display";
-import { Progress } from "@/components/ui/progress";
-import Image from "next/image";
+import { ScoreDisplay } from "@/components/pte/speaking/score-display";
 
 interface SpeakingPracticeClientProps {
-    questionId: string;
-    questionType: string;
-    content: string;
-    audioUrl?: string;
-    imageUrl?: string;
-    timeLimit?: number; // Seconds
+    question: SpeakingQuestion;
     autoStart?: boolean;
 }
 
 export function SpeakingPracticeClient({
-    questionId,
-    questionType,
-    content,
-    audioUrl,
-    imageUrl,
-    timeLimit = 40,
+    question,
     autoStart = false,
 }: SpeakingPracticeClientProps) {
+    const questionId = question.id;
+    const questionType = question.questionType?.code || question.questionTypeId;
+    const content = question.content || "";
+    const audioUrl = question.audioUrl || question.speaking?.audioPromptUrl || undefined;
+    const imageUrl = question.imageUrl || undefined;
+    const timeLimit = question.questionType?.timeLimit || 40;
     // Determine specific timings based on question type
     const getTimings = () => {
         switch (questionType) {
@@ -97,7 +92,9 @@ export function SpeakingPracticeClient({
     useEffect(() => {
         if (status === "recording" && !isRecording && audioBlob) {
             setStatus("completed");
-            toast.info("Recording finished automatically");
+            toast({
+                title: "Recording finished automatically",
+            });
         }
     }, [isRecording, audioBlob, status]);
 
@@ -132,7 +129,11 @@ export function SpeakingPracticeClient({
             if (audioRef.current) {
                 audioRef.current.play().catch((e) => {
                     console.error("Audio play failed", e);
-                    toast.error("Auto-play blocked. Please click Start.");
+                    toast({
+                        title: "Auto-play blocked",
+                        description: "Please click Start.",
+                        variant: "destructive"
+                    });
                     setStatus("idle"); // Fallback to manual start
                 });
             }
@@ -231,13 +232,22 @@ export function SpeakingPracticeClient({
 
             if (result.success && result.feedback) {
                 setFeedback(result.feedback);
-                toast.success("Scoring complete!");
+                toast({
+                    title: "Scoring complete!",
+                });
             } else {
-                toast.error(result.error || "Failed to score attempt");
+                toast({
+                    title: "Scoring failed",
+                    description: result.error || "Failed to score attempt",
+                    variant: "destructive"
+                });
             }
         } catch (error) {
             console.error(error);
-            toast.error("Submission failed");
+            toast({
+                title: "Submission failed",
+                variant: "destructive"
+            });
         } finally {
             setIsSubmitting(false);
         }

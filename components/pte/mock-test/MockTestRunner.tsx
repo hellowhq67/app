@@ -57,7 +57,7 @@ export default function MockTestRunner({
             return;
         }
         const interval = setInterval(() => {
-            setTimeLeft((prev) => prev - 1);
+            setTimeLeft((prev: number) => prev - 1);
         }, 1000);
         return () => clearInterval(interval);
     }, [timeLeft]);
@@ -183,7 +183,7 @@ export default function MockTestRunner({
                             <SpeakingRecorder
                                 type={currentQuestion.questionType.name as any}
                                 timers={{ prepMs: 3000, recordMs: (currentQuestion.timeLimit || 40) * 1000 }} // Prep hardcoded for now or use question metadata
-                                onRecorded={(data) => setAudioBlob(data.blob)}
+                                onRecorded={(data: { blob: Blob }) => setAudioBlob(data.blob)}
                                 auto={{ active: true }} // Auto start in mock?
                             />
                         ) : (

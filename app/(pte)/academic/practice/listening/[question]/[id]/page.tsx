@@ -81,8 +81,8 @@ export default async function ListeningQuestionPage({ params }: { params: Promis
                 questionType={questionData.questionType?.code || questionData.questionTypeId}
                 content={questionData.content || ''}
                 audioUrl={questionData.audioUrl || undefined}
-                transcript={questionData.transcript || undefined}
-                options={questionData.options?.choices || []}
+                transcript={'listening' in questionData ? questionData.listening?.transcript || undefined : undefined}
+                options={'listening' in questionData ? questionData.listening?.options?.choices || [] : []}
                 timeLimit={600}
               />
             </div>

@@ -1,39 +1,29 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Production output optimization
   output: "standalone",
+
+  // React 19 Compiler (stable in Next.js 16)
   reactCompiler: true,
 
-  // Enable source maps for development and production error tracking
-  productionBrowserSourceMaps: true,
-
-  // Compress responses (improoves load times)
+  // Performance & Security
+  productionBrowserSourceMaps: false, // Disable in production for security
   compress: true,
-
-  // Power off x-powered-by header
   poweredByHeader: false,
 
-  // Add onDemandEntries configuration
+  // Memory optimization for development
   onDemandEntries: {
-    // period (in ms) where the server will keep pages in the buffer
     maxInactiveAge: 25 * 1000,
-    // number of pages that should be kept simultaneously without being disposed
     pagesBufferLength: 2,
   },
 
-  // Add generateBuildId configuration
-  generateBuildId: async () => {
-    // This could be anything, using the latest git hash
-    return process.env.GIT_HASH || "dev";
-  },
+  // Build ID for cache busting
+  generateBuildId: async () => process.env.GIT_HASH || `build-${Date.now()}`,
 
-  // Allow remote icons/assets used by PTE data
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "sgp1.digitaloceanspaces.com",
-      },
+      { protocol: "https", hostname: "sgp1.digitaloceanspaces.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
       { protocol: "https", hostname: "i.imgur.com" },
@@ -47,23 +37,21 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "vton1rkowdqbunkl.public.blob.vercel-storage.com",
       },
-      {
-        protocol: "https",
-        hostname: "cdn.sanity.io",
-      },
+      { protocol: "https", hostname: "cdn.sanity.io" },
     ],
   },
+
   serverExternalPackages: [
     "@acme/ui",
     "eslint",
     "ts-node",
     "postcss",
-
     "@huggingface/transformers",
     "typescript",
   ],
+
   experimental: {
-    // Optimize package imports
+    // Optimize package imports for faster builds
     optimizePackageImports: [
       "@radix-ui/react-icons",
       "@tabler/icons-react",
@@ -71,11 +59,24 @@ const nextConfig: NextConfig = {
       "recharts",
       "framer-motion",
     ],
+
+    // Next.js 16 caching improvements
+    staleTimes: {
+      dynamic: 30, // Cache dynamic pages for 30 seconds
+      static: 180, // Cache static pages for 3 minutes
+    },
   },
 
-  // Custom webpack config for optimizations
+  // Turbopack configuration (stable in Next.js 16)
+  // Uncomment to enable Turbopack for faster builds:
+  // turbopack: {
+  //   resolveAlias: {
+  //     // Add any necessary aliases
+  //   },
+  // },
+
+  transpilePackages: [], // keep empty if none
   webpack: (config, { isServer, webpack, dev }) => {
-    // Ignore problematic imports during build
     config.ignoreWarnings = [
       {
         module: /app\/api\/ai-assistant\/route\.ts/,
@@ -103,7 +104,6 @@ const nextConfig: NextConfig = {
       },
     ];
 
-    // Fallbacks for browser
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -122,9 +122,7 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Production optimizations
     if (!dev) {
-      // Enable tree shaking
       config.optimization = {
         ...config.optimization,
         usedExports: true,
@@ -133,7 +131,6 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Bundle analyzer (when ANALYZE=true)
     if (process.env.ANALYZE === "true") {
       const { BundleAnalyzerPlugin } = require("@next/bundle-analyzer")({
         enabled: true,
@@ -152,39 +149,33 @@ const nextConfig: NextConfig = {
     return config;
   },
 
-  // Security Headers
-  headers: async () => {
-    return [
-      {
-        source: "/(.*)",
-        headers: [
-          {
-            key: "X-DNS-Prefetch-Control",
-            value: "on",
-          },
-          {
-            key: "Strict-Transport-Security",
-            value: "max-age=63072000; includeSubDomains; preload",
-          },
-          {
-            key: "X-XSS-Protection",
-            value: "1; mode=block",
-          },
-          {
-            key: "X-Frame-Options",
-            value: "SAMEORIGIN",
-          },
-          {
-            key: "X-Content-Type-Options",
-            value: "nosniff",
-          },
-          {
-            key: "Referrer-Policy",
-            value: "origin-when-cross-origin",
-          },
-        ],
-      },
-    ];
+  // Security headers (production best practices 2026)
+  headers: async () => [
+    {
+      source: "/(.*)",
+      headers: [
+        { key: "X-DNS-Prefetch-Control", value: "on" },
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=63072000; includeSubDomains; preload",
+        },
+        { key: "X-XSS-Protection", value: "1; mode=block" },
+        { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        {
+          key: "Permissions-Policy",
+          value: "camera=(), microphone=(), geolocation=()",
+        },
+      ],
+    },
+  ],
+
+  // Logging configuration
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
   },
 };
 
