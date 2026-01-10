@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { PTELayoutClient } from '@/components/pte/pte-layout-client'
 
 export const metadata: Metadata = {
   title: "Pedagogist's PTE Academic Practice",
@@ -8,5 +7,5 @@ export const metadata: Metadata = {
 
 
 export default function PTELayout({ children }: { children: React.ReactNode }) {
-  return <PTELayoutClient>{children}</PTELayoutClient>
+  return <>{children}</>
 }

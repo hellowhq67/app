@@ -95,7 +95,7 @@ export type NewPteSession = typeof pteSessions.$inferInsert
 
 // Legacy exports for compatibility
 export const pteTests = pteSessions
-export const testAttempts = pteAttempts
+export const legacyTestAttempts = pteAttempts
 
 // Relations
 export const pteSessionsRelations = relations(pteSessions, ({ one, many }) => ({

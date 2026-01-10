@@ -1,98 +1,95 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calendar, Clock, Target, TrendingUp, User } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Calendar, Clock, Target, TrendingUp, ArrowUpDown, Filter, Eye } from "lucide-react";
+import { FeedbackCard } from "@/components/pte/feedback/FeedbackCard";
+import { AIFeedbackData } from "@/lib/types";
+
+type Section = 'speaking' | 'writing' | 'reading' | 'listening';
 
 interface PracticeAttempt {
   id: string;
+  questionTitle: string;
   questionType: string;
+  section: Section;
   score: number;
   maxScore: number;
   timeSpent: number;
   completedAt: string;
-  feedback?: string;
+  feedback?: AIFeedbackData;
 }
 
-export function PracticeAttemptsClient() {
-  const [attempts, setAttempts] = useState<PracticeAttempt[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+type SortOption = 'date-desc' | 'date-asc' | 'score-desc' | 'score-asc';
 
-  useEffect(() => {
-    // Simulate loading practice attempts
-    const mockAttempts: PracticeAttempt[] = [
-      {
-        id: "1",
-        questionType: "Read Aloud",
-        score: 85,
-        maxScore: 90,
-        timeSpent: 45,
-        completedAt: "2024-01-15T10:30:00Z",
-        feedback: "Good pronunciation and fluency",
-      },
-      {
-        id: "2",
-        questionType: "Repeat Sentence",
-        score: 78,
-        maxScore: 90,
-        timeSpent: 15,
-        completedAt: "2024-01-15T10:35:00Z",
-        feedback: "Focus on accuracy",
-      },
-      {
-        id: "3",
-        questionType: "Essay",
-        score: 82,
-        maxScore: 90,
-        timeSpent: 1200,
-        completedAt: "2024-01-15T11:00:00Z",
-        feedback: "Well-structured essay",
-      },
-    ];
+export function PracticeAttemptsClient({ initialAttempts }: { initialAttempts: PracticeAttempt[] }) {
+  const [sectionFilter, setSectionFilter] = useState<Section | 'all'>('all');
+  const [sortBy, setSortBy] = useState<SortOption>('date-desc');
+  const [selectedAttempt, setSelectedAttempt] = useState<PracticeAttempt | null>(null);
 
-    setTimeout(() => {
-      setAttempts(mockAttempts);
-      setIsLoading(false);
-    }, 1000);
-  }, []);
+  // Filter and sort attempts
+  const filteredAttempts = useMemo(() => {
+    let filtered = initialAttempts;
+
+    // Apply section filter
+    if (sectionFilter !== 'all') {
+      filtered = filtered.filter(a => a.section === sectionFilter);
+    }
+
+    // Apply sorting
+    return filtered.sort((a, b) => {
+      switch (sortBy) {
+        case 'date-desc':
+          return new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime();
+        case 'date-asc':
+          return new Date(a.completedAt).getTime() - new Date(b.completedAt).getTime();
+        case 'score-desc':
+          return b.score - a.score;
+        case 'score-asc':
+          return a.score - b.score;
+        default:
+          return 0;
+      }
+    });
+  }, [initialAttempts, sectionFilter, sortBy]);
 
   const averageScore =
-    attempts.length > 0
+    filteredAttempts.length > 0
       ? Math.round(
-          attempts.reduce(
-            (acc, attempt) => acc + (attempt.score / attempt.maxScore) * 100,
-            0
-          ) / attempts.length
-        )
+        filteredAttempts.reduce(
+          (acc, attempt) => acc + (attempt.score / attempt.maxScore) * 100,
+          0
+        ) / filteredAttempts.length
+      )
       : 0;
 
-  const totalTimeSpent = attempts.reduce(
+  const totalTimeSpent = filteredAttempts.reduce(
     (acc, attempt) => acc + attempt.timeSpent,
     0
   );
 
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <div className="h-4 w-24 bg-gray-200 rounded animate-pulse"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 w-16 bg-gray-200 rounded animate-pulse mb-2"></div>
-                <div className="h-3 w-20 bg-gray-200 rounded animate-pulse"></div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
+  const sectionColors: Record<Section, string> = {
+    speaking: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+    writing: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300',
+    reading: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+    listening: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+  };
 
   return (
     <div className="space-y-6">
@@ -106,8 +103,10 @@ export function PracticeAttemptsClient() {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{attempts.length}</div>
-            <p className="text-xs text-muted-foreground">Practice sessions</p>
+            <div className="text-2xl font-bold">{filteredAttempts.length}</div>
+            <p className="text-xs text-muted-foreground">
+              {sectionFilter === 'all' ? 'All sections' : `${sectionFilter} section`}
+            </p>
           </CardContent>
         </Card>
 
@@ -143,7 +142,7 @@ export function PracticeAttemptsClient() {
           <CardContent>
             <div className="text-2xl font-bold">
               {
-                attempts.filter((a) => {
+                filteredAttempts.filter((a) => {
                   const attemptDate = new Date(a.completedAt);
                   const weekAgo = new Date();
                   weekAgo.setDate(weekAgo.getDate() - 7);
@@ -156,56 +155,121 @@ export function PracticeAttemptsClient() {
         </Card>
       </div>
 
-      {/* Recent Attempts */}
+      {/* Filters and Sort */}
+      <div className="flex flex-wrap items-center gap-4">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Select value={sectionFilter} onValueChange={(v) => setSectionFilter(v as Section | 'all')}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Filter section" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Sections</SelectItem>
+              <SelectItem value="speaking">Speaking</SelectItem>
+              <SelectItem value="writing">Writing</SelectItem>
+              <SelectItem value="reading">Reading</SelectItem>
+              <SelectItem value="listening">Listening</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date-desc">Newest First</SelectItem>
+              <SelectItem value="date-asc">Oldest First</SelectItem>
+              <SelectItem value="score-desc">Highest Score</SelectItem>
+              <SelectItem value="score-asc">Lowest Score</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Attempts List */}
       <Card>
         <CardHeader>
-          <CardTitle>Recent Practice Attempts</CardTitle>
+          <CardTitle>Practice Attempts ({filteredAttempts.length})</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
-            {attempts.map((attempt) => (
-              <div
-                key={attempt.id}
-                className="flex items-center justify-between p-4 border rounded-lg"
-              >
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="font-medium">{attempt.questionType}</h3>
-                    <Badge variant="outline">
-                      {Math.round((attempt.score / attempt.maxScore) * 100)}%
-                    </Badge>
+          {filteredAttempts.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              No attempts found. Start practicing to see your progress here!
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredAttempts.map((attempt) => (
+                <div
+                  key={attempt.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-medium">{attempt.questionTitle}</h3>
+                      <Badge className={sectionColors[attempt.section]}>
+                        {attempt.section}
+                      </Badge>
+                      <Badge variant="outline">
+                        {Math.round((attempt.score / attempt.maxScore) * 100)}%
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">{attempt.questionType}</p>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {Math.round(attempt.timeSpent / 60)}m {attempt.timeSpent % 60}s
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(attempt.completedAt).toLocaleDateString()}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {Math.round(attempt.timeSpent / 60)}m{" "}
-                      {attempt.timeSpent % 60}s
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(attempt.completedAt).toLocaleDateString()}
-                    </span>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-lg font-bold">
+                        {attempt.score}/{attempt.maxScore}
+                      </div>
+                      <Progress
+                        value={(attempt.score / attempt.maxScore) * 100}
+                        className="w-20 h-2 mt-1"
+                      />
+                    </div>
+                    {attempt.feedback && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedAttempt(attempt)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
-                  {attempt.feedback && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {attempt.feedback}
-                    </p>
-                  )}
                 </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold">
-                    {attempt.score}/{attempt.maxScore}
-                  </div>
-                  <Progress
-                    value={(attempt.score / attempt.maxScore) * 100}
-                    className="w-20 h-2 mt-1"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Feedback Modal */}
+      <Dialog open={!!selectedAttempt} onOpenChange={() => setSelectedAttempt(null)}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{selectedAttempt?.questionTitle}</DialogTitle>
+          </DialogHeader>
+          {selectedAttempt?.feedback && (
+            <FeedbackCard
+              feedback={selectedAttempt.feedback}
+              questionType={selectedAttempt.questionType}
+              onClose={() => setSelectedAttempt(null)}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

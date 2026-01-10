@@ -1,6 +1,7 @@
 import { db } from './drizzle';
 import { pteCategories, pteQuestionTypes, pteQuestions, pteSpeakingQuestions, pteWritingQuestions, pteReadingQuestions, pteListeningQuestions } from './schema';
 import { nanoid } from 'nanoid';
+import { sql } from 'drizzle-orm';
 
 async function seedPteData() {
   try {
@@ -37,12 +38,22 @@ async function seedPteData() {
         displayOrder: 4,
         isActive: true,
       },
-    ]).returning();
+    ] as any).onConflictDoUpdate({
+      target: pteCategories.code,
+      set: {
+        name: sql`excluded.name`,
+        description: sql`excluded.description`,
+        displayOrder: sql`excluded.display_order`,
+        isActive: sql`excluded.is_active`,
+        updatedAt: new Date(),
+      }
+    }).returning();
 
     const categoryMap = new Map(categories.map(cat => [cat.code, cat.id]));
 
     // 2. Seed PTE Question Types
     console.log('📝 Seeding PTE question types...');
+    // @ts-ignore
     const questionTypes = await db.insert(pteQuestionTypes).values([
       // Speaking Types
       {
@@ -106,6 +117,90 @@ async function seedPteData() {
           difficulty: 'Medium',
           tips: ['Structure your description', 'Include all key elements', 'Use descriptive language'],
           commonMistakes: ['Missing important details', 'Poor organization', 'Limited vocabulary'],
+        },
+      },
+      {
+        code: 'retell_lecture',
+        name: 'Re-tell Lecture',
+        categoryId: categoryMap.get('speaking')!,
+        description: 'Listen to a lecture and retell it in your own words',
+        hasAiScoring: true,
+        maxScore: 90,
+        scoringCriteria: {
+          pronunciation: { weight: 0.2, maxScore: 18 },
+          fluency: { weight: 0.2, maxScore: 18 },
+          content: { weight: 0.6, maxScore: 54 },
+        },
+        timeLimit: 40,
+        displayOrder: 4,
+        instructions: 'Retell the lecture in your own words',
+        metadata: {
+          difficulty: 'Hard',
+          tips: ['Take notes', 'Identify main points', 'Use connectors'],
+          commonMistakes: ['Missing key points', 'Hesitation', 'Poor structure'],
+        },
+      },
+      {
+        code: 'answer_short_question',
+        name: 'Answer Short Question',
+        categoryId: categoryMap.get('speaking')!,
+        description: 'Answer a question with a single word or short phrase',
+        hasAiScoring: true,
+        maxScore: 90,
+        scoringCriteria: {
+          vocabulary: { weight: 1.0, maxScore: 90 },
+        },
+        timeLimit: 10,
+        displayOrder: 5,
+        instructions: 'Answer the question with a single word or short phrase',
+        metadata: {
+          difficulty: 'Easy',
+          tips: ['Listen specific info', 'Be concise'],
+          commonMistakes: ['Long answers', 'Misunderstanding question'],
+        },
+      },
+      {
+        code: 'respond_to_situation',
+        name: 'Respond to a Situation',
+        categoryId: categoryMap.get('speaking')!,
+        description: 'Respond appropriately to a given situation (Core)',
+        hasAiScoring: true,
+        maxScore: 90,
+        scoringCriteria: {
+          content: { weight: 0.4, maxScore: 36 },
+          fluency: { weight: 0.3, maxScore: 27 },
+          pronunciation: { weight: 0.3, maxScore: 27 },
+        },
+        timeLimit: 40,
+        displayOrder: 6,
+        instructions: 'Listen to the situation and respond appropriately',
+        isCore: true,
+        metadata: {
+          difficulty: 'Medium',
+          tips: ['Understand the context', 'Use appropriate tone', 'Be clear'],
+          commonMistakes: ['Inappropriate tone', 'Missing key information'],
+        },
+      },
+      {
+        code: 'summarize_group_discussion',
+        name: 'Summarize Group Discussion',
+        categoryId: categoryMap.get('speaking')!,
+        description: 'Listen to a discussion and summarize main points (Core)',
+        hasAiScoring: true,
+        maxScore: 90,
+        scoringCriteria: {
+          content: { weight: 0.4, maxScore: 36 },
+          fluency: { weight: 0.3, maxScore: 27 },
+          pronunciation: { weight: 0.3, maxScore: 27 },
+        },
+        timeLimit: 40,
+        displayOrder: 7,
+        instructions: 'Summarize the group discussion',
+        isCore: true,
+        metadata: {
+          difficulty: 'Hard',
+          tips: ['Identify speakers', 'Note key arguments', 'Synthesize'],
+          commonMistakes: ['Focusing on one speaker', 'Missing conclusion'],
         },
       },
       // Writing Types
@@ -232,13 +327,29 @@ async function seedPteData() {
           commonMistakes: ['Missing information', 'Selecting wrong options', 'Poor note-taking'],
         },
       },
-    ]).returning();
+    ]).onConflictDoUpdate({
+      target: pteQuestionTypes.code,
+      set: {
+        name: sql`excluded.name`,
+        categoryId: sql`excluded.category_id`,
+        description: sql`excluded.description`,
+        hasAiScoring: sql`excluded.has_ai_scoring`,
+        maxScore: sql`excluded.max_score`,
+        scoringCriteria: sql`excluded.scoring_criteria`,
+        timeLimit: sql`excluded.time_limit`,
+        displayOrder: sql`excluded.display_order`,
+        instructions: sql`excluded.instructions`,
+        metadata: sql`excluded.metadata`,
+        isActive: sql`excluded.is_active`,
+        updatedAt: new Date(),
+      }
+    }).returning();
 
     const questionTypeMap = new Map(questionTypes.map(qt => [qt.code, qt.id]));
 
     // 3. Seed Sample Questions
     console.log('🎯 Seeding sample questions...');
-    
+
     // Sample Read Aloud Question
     const [readAloudQuestion] = await db.insert(pteQuestions).values({
       questionTypeId: questionTypeMap.get('read_aloud')!,
@@ -259,6 +370,27 @@ async function seedPteData() {
       questionId: readAloudQuestion.id,
       expectedDuration: 35,
       sampleTranscript: 'Climate change is one of the most pressing challenges of our time. Rising global temperatures, melting ice caps, and extreme weather events are clear indicators that our planet is undergoing significant environmental changes. Scientists worldwide agree that immediate action is needed to reduce carbon emissions and transition to sustainable energy sources.',
+    });
+
+    // Sample Respond to Situation Question
+    const [respondQuestion] = await db.insert(pteQuestions).values({
+      questionTypeId: questionTypeMap.get('respond_to_situation')!,
+      title: 'Library Book Return',
+      content: 'You are at the library. You want to return a book but the library is technically closed, though there is a librarian still working at the desk. Ask if you can return the book.',
+      difficulty: 'Medium',
+      tags: ['situation', 'core', 'library'],
+      isActive: true,
+      isPremium: false,
+      metadata: {
+        source: 'PTE Core Sample',
+        author: 'PTE Content Team',
+      },
+    }).returning();
+
+    await db.insert(pteSpeakingQuestions).values({
+      questionId: respondQuestion.id,
+      expectedDuration: 40,
+      sampleTranscript: 'Excuse me, I know the library is technically closed, but since you are still here, would it be possible for me to return this book now?',
     });
 
     // Sample Essay Question

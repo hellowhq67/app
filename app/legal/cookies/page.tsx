@@ -114,7 +114,7 @@ export default function CookiePolicyPage() {
       <ul>
         <li><strong>Marketing Cookies:</strong> Adjust preferences in your account settings</li>
         <li><strong>Analytics:</strong> Use browser extensions like Privacy Badger or uBlock Origin</li>
-        <li><strong>Do Not Track:</strong> Enable "Do Not Track" in your browser settings</li>
+        <li><strong>Do Not Track:</strong> Enable &quot;Do Not Track&quot; in your browser settings</li>
       </ul>
 
       <h3>6.3 Impact of Disabling Cookies</h3>
@@ -170,7 +170,7 @@ export default function CookiePolicyPage() {
       <h2>8. Updates to This Policy</h2>
       <p>
         We may update this Cookie Policy from time to time. Any changes will be posted on this page with an updated
-        "Last Updated" date.
+        &quot;Last Updated&quot; date.
       </p>
 
       <h2>9. Contact Us</h2>

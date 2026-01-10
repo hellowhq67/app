@@ -1,7 +1,7 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-  title: "Accessibility Statement - Pedagogist's PTE",
+  title: "Accessibility Statement - Pedagogist&apos;s PTE",
   description: "Our commitment to digital accessibility",
 }
 
@@ -15,7 +15,7 @@ export default function AccessibilityPage() {
 
       <h2>1. Our Commitment</h2>
       <p>
-        Pedagogist's PTE is committed to ensuring digital accessibility for people with disabilities. We continually
+        Pedagogist&apos;s PTE is committed to ensuring digital accessibility for people with disabilities. We continually
         improve the user experience for everyone and apply relevant accessibility standards.
       </p>
 
@@ -27,7 +27,7 @@ export default function AccessibilityPage() {
 
       <h3>2.1 Partially Conformant</h3>
       <p>
-        Pedagogist's PTE is partially conformant with WCAG 2.1 Level AA. This means some parts of the content do not
+        Pedagogist&apos;s PTE is partially conformant with WCAG 2.1 Level AA. This means some parts of the content do not
         fully conform to the accessibility standard. We are actively working to achieve full conformance.
       </p>
 
@@ -94,7 +94,7 @@ export default function AccessibilityPage() {
 
       <h2>5. Assistive Technologies</h2>
       <p>
-        Pedagogist's PTE is designed to work with the following assistive technologies:
+        Pedagogist&apos;s PTE is designed to work with the following assistive technologies:
       </p>
       <ul>
         <li><strong>Screen Readers:</strong> JAWS, NVDA, VoiceOver, TalkBack</li>
@@ -164,16 +164,16 @@ export default function AccessibilityPage() {
 
       <h2>10. Feedback & Contact</h2>
       <p>
-        We welcome feedback on the accessibility of Pedagogist's PTE. Please let us know if you encounter accessibility
+        We welcome feedback on the accessibility of Pedagogist&apos;s PTE. Please let us know if you encounter accessibility
         barriers:
       </p>
       <ul>
         <li><strong>Email:</strong> <a href="mailto:accessibility@pedagogistpte.com">accessibility@pedagogistpte.com</a></li>
-        <li><strong>Subject:</strong> "Accessibility Feedback"</li>
+        <li><strong>Subject:</strong> &quot;Accessibility Feedback&quot;</li>
         <li><strong>Include:</strong>
           <ul>
             <li>Page/feature where you encountered the issue</li>
-            <li>Type of assistive technology you're using</li>
+            <li>Type of assistive technology you&apos;re using</li>
             <li>Description of the problem</li>
             <li>Suggested improvement (if applicable)</li>
           </ul>
@@ -215,7 +215,7 @@ export default function AccessibilityPage() {
       <h2>13. Updates to This Statement</h2>
       <p>
         We may update this Accessibility Statement from time to time to reflect changes in our accessibility practices
-        or legal requirements. The "Last Updated" date at the top indicates when the statement was last revised.
+        or legal requirements. The &quot;Last Updated&quot; date at the top indicates when the statement was last revised.
       </p>
 
       <div className="mt-8 rounded-lg border bg-muted p-6">

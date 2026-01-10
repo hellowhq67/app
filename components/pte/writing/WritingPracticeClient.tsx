@@ -6,15 +6,14 @@ import {
     Card,
     CardContent,
     CardFooter,
-    CardHeader,
-    CardTitle,
 } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, PenTool } from "lucide-react";
-import { QuestionType } from "@/lib/types";
+import { QuestionType, AIFeedbackData } from "@/lib/types";
 import { scoreWritingAttempt } from "@/app/actions/pte";
 import { CountdownTimer } from "@/components/pte/timers/CountdownTimer";
+import { FeedbackCard } from "@/components/pte/feedback/FeedbackCard";
 
 interface WritingPracticeClientProps {
     questionId: string;
@@ -31,7 +30,7 @@ export function WritingPracticeClient({
 }: WritingPracticeClientProps) {
     const { toast } = useToast();
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [feedback, setFeedback] = useState<any>(null);
+    const [feedback, setFeedback] = useState<AIFeedbackData | null>(null);
     const [textAnswer, setTextAnswer] = useState("");
     const [wordCount, setWordCount] = useState(0);
 
@@ -56,8 +55,9 @@ export function WritingPracticeClient({
 
         try {
             const result = await scoreWritingAttempt(
-                questionType as any,
+                content,
                 textAnswer,
+                wordCount,
                 questionId
             );
 
@@ -89,7 +89,16 @@ export function WritingPracticeClient({
                     <PenTool className="h-5 w-5 text-primary" />
                     <span className="font-medium">Word Count: {wordCount}</span>
                 </div>
-                <CountdownTimer initialSeconds={timeLimit} onComplete={() => { }} />
+                <CountdownTimer
+                    initialSeconds={timeLimit}
+                    onComplete={() => {
+                        toast({
+                            title: "Time's up!",
+                            description: "Submitting your answer automatically.",
+                        });
+                        handleSubmit();
+                    }}
+                />
             </div>
 
             {/* Input Area */}
@@ -128,55 +137,15 @@ export function WritingPracticeClient({
 
             {/* Feedback Display */}
             {feedback && (
-                <Card className="bg-green-50 dark:bg-green-900/10 border-green-100 dark:border-green-900/30">
-                    <CardHeader>
-                        <CardTitle className="flex items-center justify-between">
-                            <span>Analysis Results</span>
-                            <span className="text-2xl font-bold text-primary">Score: {feedback.overallScore}/90</span>
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-4">
-                                <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Detailed Scores</h4>
-                                <div className="grid grid-cols-2 gap-4">
-                                    {feedback.content && (
-                                        <div className="bg-background/50 p-3 rounded border">
-                                            <div className="text-xs text-muted-foreground">Content</div>
-                                            <div className="font-semibold">{feedback.content.score}</div>
-                                        </div>
-                                    )}
-                                    {feedback.grammar && (
-                                        <div className="bg-background/50 p-3 rounded border">
-                                            <div className="text-xs text-muted-foreground">Grammar</div>
-                                            <div className="font-semibold">{feedback.grammar.score}</div>
-                                        </div>
-                                    )}
-                                    {feedback.vocabulary && (
-                                        <div className="bg-background/50 p-3 rounded border">
-                                            <div className="text-xs text-muted-foreground">Vocabulary</div>
-                                            <div className="font-semibold">{feedback.vocabulary.score}</div>
-                                        </div>
-                                    )}
-                                    {feedback.spelling && (
-                                        <div className="bg-background/50 p-3 rounded border">
-                                            <div className="text-xs text-muted-foreground">Spelling</div>
-                                            <div className="font-semibold">{feedback.spelling.score}</div>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                <h4 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Feedback</h4>
-                                {/* Generic feedback display for now */}
-                                <pre className="text-xs bg-black/5 dark:bg-black/30 p-4 rounded overflow-auto max-h-[200px] whitespace-pre-wrap">
-                                    {JSON.stringify(feedback, null, 2)}
-                                </pre>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
+                <FeedbackCard
+                    feedback={feedback}
+                    questionType={questionType}
+                    onRetry={() => {
+                        setFeedback(null);
+                        setTextAnswer("");
+                        setWordCount(0);
+                    }}
+                />
             )}
         </div>
     );

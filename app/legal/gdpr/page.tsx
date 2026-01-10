@@ -59,7 +59,7 @@ export default function GDPRPage() {
 
       <h3>3.1 Right to Access</h3>
       <p>
-        You can request a copy of all personal data we hold about you. We'll provide this in a structured,
+        You can request a copy of all personal data we hold about you. We&apos;ll provide this in a structured,
         machine-readable format (JSON or CSV).
       </p>
 
@@ -68,9 +68,9 @@ export default function GDPRPage() {
         You can correct inaccurate or incomplete personal data through your account settings or by contacting us.
       </p>
 
-      <h3>3.3 Right to Erasure ("Right to be Forgotten")</h3>
+      <h3>3.3 Right to Erasure (&quot;Right to be Forgotten&quot;)</h3>
       <p>
-        You can request deletion of your personal data. We'll delete your data unless we have a legal obligation
+        You can request deletion of your personal data. We&apos;ll delete your data unless we have a legal obligation
         to retain it (e.g., financial records for 7 years).
       </p>
 
@@ -96,7 +96,7 @@ export default function GDPRPage() {
 
       <h3>3.8 Right to Lodge a Complaint</h3>
       <p>
-        You can file a complaint with your local data protection authority if you believe we've violated GDPR.
+        You can file a complaint with your local data protection authority if you believe we&apos;ve violated GDPR.
       </p>
 
       <h2>4. How to Exercise Your Rights</h2>
@@ -113,7 +113,7 @@ export default function GDPRPage() {
       <p>For requests that cannot be completed through self-service:</p>
       <ul>
         <li><strong>Email:</strong> <a href="mailto:gdpr@pedagogistpte.com">gdpr@pedagogistpte.com</a></li>
-        <li><strong>Subject Line:</strong> "GDPR Request - [Your Request Type]"</li>
+        <li><strong>Subject Line:</strong> &quot;GDPR Request - [Your Request Type]&quot;</li>
         <li><strong>Include:</strong> Your registered email and specific request details</li>
       </ul>
 
@@ -204,12 +204,12 @@ export default function GDPRPage() {
         In the event of a personal data breach that poses a risk to your rights and freedoms:
       </p>
       <ul>
-        <li>We'll notify the relevant supervisory authority within 72 hours</li>
-        <li>We'll notify affected users without undue delay</li>
+        <li>We&apos;ll notify the relevant supervisory authority within 72 hours</li>
+        <li>We&apos;ll notify affected users without undue delay</li>
         <li>Notification will include nature of breach, likely consequences, and mitigation measures</li>
       </ul>
 
-      <h2>9. Children's Data</h2>
+      <h2>9. Children&apos;s Data</h2>
       <p>
         We do not knowingly process data of children under 16 without parental consent, as required by GDPR Article 8.
       </p>
@@ -226,7 +226,7 @@ export default function GDPRPage() {
 
       <h2>11. Supervisory Authority</h2>
       <p>
-        If you're not satisfied with our response to your GDPR request, you can lodge a complaint with:
+        If you&apos;re not satisfied with our response to your GDPR request, you can lodge a complaint with:
       </p>
       <ul>
         <li>Your local data protection authority in the EEA</li>

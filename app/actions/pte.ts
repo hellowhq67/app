@@ -2,7 +2,7 @@
 
 import { scorePteAttemptV2 } from '@/lib/ai/scoring-agent';
 import { AIFeedbackData, QuestionType, SpeakingFeedbackData } from '@/lib/types';
-import { upload } from '@vercel/blob';
+import { put } from '@vercel/blob';
 import { countWords } from '@/lib/utils';
 import { savePteAttempt, trackAIUsage } from '@/lib/db/queries/pte-scoring';
 import { auth } from '@/lib/auth/auth';
@@ -126,7 +126,7 @@ export async function scoreReadAloudAttempt(
     await checkAndUseCredits(session.user.id);
 
     // 1. Upload audio to Vercel Blob storage
-    const blob = await upload(
+    const blob = await put(
       `pte/speaking/${questionId}/${Date.now()}-${audioFile.name}`,
       audioFile,
       {
@@ -193,7 +193,7 @@ export async function scoreSpeakingAttempt(
     await checkAndUseCredits(session.user.id);
 
     // 1. Upload audio to Vercel Blob
-    const blob = await upload(
+    const blob = await put(
       `pte/speaking/${type.toLowerCase().replace(/\s+/g, '-')}/${questionId}/${Date.now()}-${audioFile.name}`,
       audioFile,
       {

@@ -4,5 +4,6 @@
   "window.autoDetectColorScheme": true,
   "accessibility.signalOptions.debouncePositionChanges": true,
   "telemetry.editStats.details.enabled": true,
-  "files.autoSave": "afterDelay"
+  "files.autoSave": "afterDelay",
+  "claudeCode.useTerminal": true
 }

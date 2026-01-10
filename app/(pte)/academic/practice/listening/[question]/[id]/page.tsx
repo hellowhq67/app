@@ -10,14 +10,15 @@ import { ArrowLeft, Clock, BarChart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { ListeningPracticeClient } from '@/components/pte/listening/ListeningPracticeClient'
 
-export default async function ListeningQuestionPage({ params }: { params: { question: string, id: string } }) {
+export default async function ListeningQuestionPage({ params }: { params: Promise<{ question: string, id: string }> }) {
+  const { question, id } = await params
   // 1. Get Session
   const session = await auth.api.getSession({
     headers: await headers()
   })
 
   // 2. Fetch Data
-  const questionData = await getQuestionById(params.id)
+  const questionData = await getQuestionById(id)
   if (!questionData) {
     notFound()
   }
@@ -81,7 +82,7 @@ export default async function ListeningQuestionPage({ params }: { params: { ques
                 content={questionData.content || ''}
                 audioUrl={questionData.audioUrl || undefined}
                 transcript={questionData.transcript || undefined}
-                options={[]} // TODO: Fetch options from related table
+                options={questionData.options?.choices || []}
                 timeLimit={600}
               />
             </div>

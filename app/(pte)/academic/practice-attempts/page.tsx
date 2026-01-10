@@ -7,6 +7,10 @@ import {
 } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Suspense } from 'react'
+import { auth } from '@/lib/auth/auth'
+import { headers } from 'next/headers'
+import { getAllUserAttempts } from '@/lib/db/queries/pte-scoring'
+import { redirect } from 'next/navigation'
 
 export const metadata = {
   title: 'Practice Attempts - PTE Academic',
@@ -42,6 +46,34 @@ function Loading() {
 }
 
 export default async function PracticeAttemptsPage() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
+
+  if (!session?.user) {
+    redirect('/auth/login')
+  }
+
+  const attempts = await getAllUserAttempts(session.user.id)
+
+  // Transform to match client interface
+  const formattedAttempts = attempts.map(a => {
+    const question = a.question as any;
+    const categoryName = question?.questionType?.category?.name || 'Other';
+
+    return {
+      id: a.id,
+      questionTitle: question?.title || 'Unknown Question',
+      questionType: question?.questionType?.name || 'Unknown Type',
+      section: categoryName.toLowerCase() as 'speaking' | 'writing' | 'reading' | 'listening',
+      score: a.finalScore || a.aiScore || 0,
+      maxScore: 90,
+      timeSpent: a.timeTaken || 0,
+      completedAt: a.completedAt?.toISOString() || a.createdAt.toISOString(),
+      feedback: a.aiFeedback as any,
+    };
+  })
+
   return (
     <div className="bg-background min-h-screen">
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -59,7 +91,7 @@ export default async function PracticeAttemptsPage() {
           </div>
 
           <Suspense fallback={<Loading />}>
-            <PracticeAttemptsClient />
+            <PracticeAttemptsClient initialAttempts={formattedAttempts} />
           </Suspense>
         </div>
       </div>

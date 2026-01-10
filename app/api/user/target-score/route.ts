@@ -2,6 +2,7 @@ import {
   apiSuccess,
   apiError,
   handleApiError,
+  requireAuth,
 } from '@/lib/api'
 import { getUserProfile, upsertUserProfile } from '@/lib/db/queries'
 
@@ -10,7 +11,8 @@ import { getUserProfile, upsertUserProfile } from '@/lib/db/queries'
  */
 export async function GET(request: Request) {
   try {
-    const profile = await getUserProfile()
+    const { userId } = await requireAuth()
+    const profile = await getUserProfile(userId)
     return apiSuccess({ targetScore: profile?.targetScore || null })
   } catch (error) {
     return handleApiError(error, 'GET /api/user/target-score')
@@ -22,6 +24,7 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    const { userId } = await requireAuth()
     const { targetScore } = await request.json()
 
     if (
@@ -32,7 +35,7 @@ export async function POST(request: Request) {
       return apiError(400, 'Target score must be between 30 and 90', 'VALIDATION_ERROR')
     }
 
-    await upsertUserProfile({ targetScore: targetScore.toString() })
+    await upsertUserProfile(userId, { targetScore: targetScore.toString() })
 
     return apiSuccess({ success: true, targetScore })
   } catch (error) {

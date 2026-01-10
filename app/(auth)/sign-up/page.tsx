@@ -12,7 +12,7 @@ export default function SignUpPage() {
 					<div className="mr-2 flex h-8 w-8 items-center justify-center rounded bg-blue-600">
 						P
 					</div>
-					Pedagogist's PTE
+					Pedagogist&apos;s PTE
 				</div>
 				<div className="relative z-20 mt-auto">
 					<blockquote className="space-y-2">

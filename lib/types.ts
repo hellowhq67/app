@@ -144,6 +144,16 @@ export interface AIFeedbackData {
   suggestions: string[]
   strengths: string[]
   areasForImprovement: string[]
+  transcript?: string
+  // Enhanced scoring metrics from RAG pipeline
+  scoringMetrics?: {
+    lexicalScore: number      // 0-100 vocabulary/text quality
+    semanticScore: number     // 0-100 benchmark similarity
+    fluencyScore: number      // 0-100 fluency assessment
+    calculatedPteScore: number // 10-90 calculated PTE score
+    confidence: number        // 0-100 scoring confidence
+  }
+  wordCount?: number
 }
 
 

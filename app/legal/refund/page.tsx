@@ -15,7 +15,7 @@ export default function RefundPolicyPage() {
 
       <h2>1. 14-Day Money-Back Guarantee</h2>
       <p>
-        We offer a 14-day money-back guarantee for new subscribers. If you're not satisfied with our service within
+        We offer a 14-day money-back guarantee for new subscribers. If you&apos;re not satisfied with our service within
         the first 14 days of your initial subscription, you can request a full refund.
       </p>
 
@@ -97,7 +97,7 @@ export default function RefundPolicyPage() {
       <h2>8. Technical Issues</h2>
       <p>
         If you experience technical problems that prevent you from using the service, please contact our support team
-        before requesting a refund. We're committed to resolving issues and may extend your subscription if necessary.
+        before requesting a refund. We&apos;re committed to resolving issues and may extend your subscription if necessary.
       </p>
 
       <h2>9. Contact Us</h2>

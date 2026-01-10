@@ -92,62 +92,47 @@ const item = {
   show: { opacity: 1, y: 0 },
 };
 
-export function PTEDashboard() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [examDate, setExamDate] = useState<Date | null>(null);
+interface DashboardStats {
+  todayAttempts: number;
+  totalAttempts: number;
+  studyStreak: number;
+  targetScore: number;
+  overallScore: number;
+  sectionScores: {
+    speaking: number;
+    writing: number;
+    reading: number;
+    listening: number;
+  };
+  recentAttempts: Array<{
+    id: string;
+    score: number | null;
+    questionTitle: string;
+    date: Date;
+  }>;
+}
+
+interface DashboardProps {
+  user: any;
+  examDate: Date | null;
+  chartData: any[];
+  stats?: DashboardStats;
+}
+
+export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats }: DashboardProps) {
+  const [examDate, setExamDate] = useState<Date | null>(initialExamDate);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
   const [isExamDialogOpen, setIsExamDialogOpen] = useState(false);
-  const [chartData, setChartData] = useState<any[]>([]);
+  // const [chartData, setChartData] = useState<any[]>([]); // Passed as prop
   const { open: openVoiceAssistant } = useVoiceAssistant();
 
-  const fetchData = useCallback(async () => {
-    try {
-      const [userRes, examRes, statsRes] = await Promise.all([
-        fetch("/api/user"),
-        fetch("/api/user/exam-dates"),
-        fetch("/api/dashboard/feature-stats"),
-      ]);
-
-      const userData = await userRes.json();
-      if (userData && !userData.error) {
-        setUser(userData);
-      }
-
-      const examData = await examRes.json();
-      if (examData.examDates && examData.examDates.length > 0) {
-        const primary =
-          examData.examDates.find((d: any) => d.isPrimary) ||
-          examData.examDates[0];
-        if (primary) {
-          setExamDate(new Date(primary.examDate));
-        }
-      } else {
-        setExamDate(null);
-      }
-
-      const statsData = await statsRes.json();
-      if (Array.isArray(statsData)) {
-        const mappedChartData = statsData.map((item: any) => ({
-          name: item.name,
-          score: item.value,
-          color: item.name === "Speaking" ? "#3b82f6" : "#10b981", // Blue for Speaking, Green for Writing
-        }));
-        setChartData(mappedChartData);
-      }
-    } catch (error) {
-      console.error("Failed to fetch data", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+  // Removed internal fetching logic
 
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    fetchData();
-  }, [fetchData]);
+  }, []);
 
   useEffect(() => {
     if (!examDate) return;
@@ -173,9 +158,9 @@ export function PTEDashboard() {
     return () => clearInterval(timer);
   }, [examDate]);
 
-  if (isLoading) {
-    return <DashboardSkeleton />;
-  }
+  // if (isLoading) {
+  //   return <DashboardSkeleton />;
+  // }
 
   return (
     <motion.div
@@ -464,7 +449,7 @@ export function PTEDashboard() {
                   </DialogHeader>
                   <ExamDateScheduler
                     onUpdate={() => {
-                      fetchData();
+                      // router.refresh(); // To refetch server-side data if needed
                       setIsExamDialogOpen(false);
                     }}
                   />
@@ -525,7 +510,7 @@ export function PTEDashboard() {
                       </DialogHeader>
                       <ExamDateScheduler
                         onUpdate={() => {
-                          fetchData();
+                          // fetchData removed as it's dead code from refactor;
                           setIsExamDialogOpen(false);
                         }}
                       />
@@ -539,21 +524,21 @@ export function PTEDashboard() {
                 </h4>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-xl border bg-card p-3 shadow-sm">
-                    <div className="text-xl font-bold text-foreground">0</div>
+                    <div className="text-xl font-bold text-foreground">{stats?.todayAttempts || 0}</div>
                     <div className="text-[10px] text-muted-foreground">
                       Today
                     </div>
                   </div>
                   <div className="rounded-xl border bg-card p-3 shadow-sm">
-                    <div className="text-xl font-bold text-foreground">1</div>
+                    <div className="text-xl font-bold text-foreground">{stats?.totalAttempts || 0}</div>
                     <div className="text-[10px] text-muted-foreground">
                       Total
                     </div>
                   </div>
                   <div className="rounded-xl border bg-card p-3 shadow-sm">
-                    <div className="text-xl font-bold text-foreground">1</div>
+                    <div className="text-xl font-bold text-foreground">{stats?.studyStreak || 0}</div>
                     <div className="text-[10px] text-muted-foreground">
-                      Days
+                      Streak
                     </div>
                   </div>
                 </div>

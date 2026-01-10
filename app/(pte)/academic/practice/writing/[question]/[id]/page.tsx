@@ -10,14 +10,15 @@ import { ArrowLeft, Clock, BarChart } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { WritingPracticeClient } from '@/components/pte/writing/WritingPracticeClient'
 
-export default async function WritingQuestionPage({ params }: { params: { question: string, id: string } }) {
+export default async function WritingQuestionPage({ params }: { params: Promise<{ question: string, id: string }> }) {
+    const { question, id } = await params
     // 1. Get Session
     const session = await auth.api.getSession({
         headers: await headers()
     })
 
     // 2. Fetch Data
-    const questionData = await getQuestionById(params.id)
+    const questionData = await getQuestionById(id)
     if (!questionData) {
         notFound()
     }
@@ -35,7 +36,7 @@ export default async function WritingQuestionPage({ params }: { params: { questi
         <div className="container mx-auto p-6 max-w-5xl space-y-6">
             {/* Header / Nav */}
             <div className="flex items-center justify-between">
-                <Link href={`/pte/academic/practice/writing/${params.question}`}>
+                <Link href={`/academic/practice/writing/${question}`}>
                     <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground">
                         <ArrowLeft className="size-4" /> Back to list
                     </Button>

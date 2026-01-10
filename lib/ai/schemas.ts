@@ -22,6 +22,7 @@ export const AIFeedbackDataSchema = z.object({
     suggestions: z.array(z.string()).describe('List of actionable suggestions for improvement'),
     strengths: z.array(z.string()).describe('List of strengths identified in the response'),
     areasForImprovement: z.array(z.string()).describe('List of specific areas to improve'),
+    transcript: z.string().optional().describe('Transcribed text from audio'),
 }) satisfies z.ZodType<AIFeedbackData>
 
 

@@ -4,19 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useState, useRef, useEffect } from "react";
+import { WordMarking } from "@/lib/types";
 
 interface ScoreDisplayProps {
   score: ScoreResult;
   spokenText?: string;
   originalText?: string;
   audioUrl?: string;
+  wordMarking?: WordMarking[]; // Added prop for server-side analysis
   onClose?: () => void;
   isModal?: boolean;
 }
 
 interface WordAnalysis {
   word: string;
-  status: "good" | "average" | "poor" | "pause";
+  status: "good" | "average" | "poor" | "pause" | "omitted" | "inserted";
 }
 
 export function ScoreDisplay({ 
@@ -24,6 +26,7 @@ export function ScoreDisplay({
   spokenText = "", 
   originalText = "",
   audioUrl,
+  wordMarking, // Destructure new prop
   onClose,
   isModal = false
 }: ScoreDisplayProps) {
@@ -38,14 +41,23 @@ export function ScoreDisplay({
     return "text-red-500";
   };
 
-  // Generate word analysis from spoken text comparison
-  const analyzeWords = (): WordAnalysis[] => {
+  // Generate word analysis (Server Priority or Client Fallback)
+  const getWordAnalysis = (): WordAnalysis[] => {
+    // 1. Prefer Server-side Word Marking
+    if (wordMarking && wordMarking.length > 0) {
+      return wordMarking.map(wm => ({
+        word: wm.word,
+        status: wm.classification as any // Ensure type compatibility
+      }));
+    }
+
+    // 2. Fallback to Client-side comparison
     if (!spokenText) return [];
     
     const spokenWords = spokenText.split(/\s+/).filter(Boolean);
     const originalWords = originalText ? originalText.toLowerCase().split(/\s+/).filter(Boolean) : [];
     
-    return spokenWords.map((word, index) => {
+    return spokenWords.map((word) => {
       const cleanWord = word.toLowerCase().replace(/[.,!?;:'"]/g, "");
       
       // Check if word exists in original
@@ -69,7 +81,7 @@ export function ScoreDisplay({
         return { word, status: "average" as const };
       }
       
-      // Default to based on overall score
+      // Default based on overall score
       if (score.pronunciation >= 70) {
         return { word, status: "good" as const };
       } else if (score.pronunciation >= 50) {
@@ -79,13 +91,15 @@ export function ScoreDisplay({
     });
   };
 
-  const wordAnalysis = analyzeWords();
+  const wordAnalysis = getWordAnalysis();
 
   const getWordColor = (status: string) => {
     switch (status) {
       case "good": return "text-emerald-500";
       case "average": return "text-amber-500";
       case "poor": return "text-red-500";
+      case "omitted": return "text-gray-400 line-through decoration-red-500"; // Visual style for omitted
+      case "inserted": return "text-purple-500"; // Visual style for inserted
       case "pause": return "text-muted-foreground";
       default: return "text-foreground";
     }
