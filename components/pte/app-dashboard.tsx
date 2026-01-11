@@ -449,7 +449,7 @@ export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats
                   </DialogHeader>
                   <ExamDateScheduler
                     onUpdate={() => {
-                      // fetchData removed;
+                      // router.refresh(); // To refetch server-side data if needed
                       setIsExamDialogOpen(false);
                     }}
                   />

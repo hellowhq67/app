@@ -27,7 +27,7 @@ export default async function AnalyticsPage() {
   // Skill data
   const skillMap = new Map<string, { total: number; count: number }>()
   attempts.forEach(a => {
-    const question = a.question as any;
+    const question = a.question;
     // Use category name from DB relation
     let skill = question?.questionType?.category?.name || 'Other';
     skill = skill.charAt(0).toUpperCase() + skill.slice(1);
