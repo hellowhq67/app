@@ -34,12 +34,31 @@ export async function scorePteAttemptV2(
             text?: string;
             audioUrl?: string;
         };
-        idealAnswer?: string;
+        idealAnswer?: any;
         userId?: string;
         questionId?: string;
     }
 ): Promise<AIFeedbackData> {
     console.log(`[Scoring Agent] Starting universal scoring for ${type}`);
+
+    // 0. Deterministic Logic for Objective types
+    const { scoreDeterministically } = await import('@/lib/pte/scoring-engine/deterministic');
+
+    // We assume params.idealAnswer can be the complex object/JSON or string
+    // In `savePteAttempt` (which calls this), we pass `question.correctAnswer`
+    // However, `savePteAttempt` usually reads from DB.
+    // If we passed `idealAnswer` as string into params, we might miss the complex object.
+    // We should ensure params.idealAnswer can be any.
+
+    // TEMPORARY: If we don't have the full object, deterministic might fail for some types.
+    // But assuming idealAnswer IS the `correctAnswer` field from DB (which is JSONB).
+
+    const deterministicResult = scoreDeterministically(type, params.submission.text || params.submission, params.idealAnswer);
+    if (deterministicResult) {
+        console.log(`[Scoring Agent] Used Deterministic Scorer for ${type}`);
+        return deterministicResult;
+    }
+
 
     let userText = params.submission.text;
     let transcript: string | undefined;
@@ -115,7 +134,23 @@ export async function scorePteAttemptV2(
             temperature: 0.1,
         });
 
-        console.log('[Scoring Agent] Scoring complete.');
+        // Recalculate overallScore strictly as sum of traits to avoid LLM hallucinations on math
+        let rawSum = 0;
+        // All possible traits in schema
+        if (object.pronunciation?.score) rawSum += object.pronunciation.score;
+        if (object.fluency?.score) rawSum += object.fluency.score;
+        if (object.content?.score) rawSum += object.content.score;
+        if (object.form?.score) rawSum += object.form.score;
+        if (object.grammar?.score) rawSum += object.grammar.score;
+        if (object.vocabulary?.score) rawSum += object.vocabulary.score;
+        if (object.spelling?.score) rawSum += object.spelling.score;
+        if (object.structure?.score) rawSum += object.structure.score;
+        if (object.accuracy?.score) rawSum += object.accuracy.score;
+
+        // Override
+        object.overallScore = rawSum;
+
+        console.log(`[Scoring Agent] Scoring complete. Raw Sum: ${rawSum}`);
         return object;
     } catch (error) {
         console.error('[Scoring Agent] LLM generation/parsing failed:', error);

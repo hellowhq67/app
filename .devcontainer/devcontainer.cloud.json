@@ -1,0 +1,22 @@
+{
+  "name": "Next.js Cloud Dev",
+  "image": "asia-south1-docker.pkg.dev/YOUR_PROJECT_ID/pte/devcontainer:latest",
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "bradlc.vscode-tailwindcss",
+        "figma.figma-vscode-extension"
+      ]
+    }
+  },
+  "postCreateCommand": "pnpm install",
+  "shutdownAction": "stopContainer",
+  "remoteUser": "node"
+}

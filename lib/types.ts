@@ -47,6 +47,7 @@ export enum TestSection {
 
 export enum QuestionType {
   // Speaking
+  PERSONAL_INTRODUCTION = 'personal_introduction',
   READ_ALOUD = 'read_aloud',
   REPEAT_SENTENCE = 'repeat_sentence',
   DESCRIBE_IMAGE = 'describe_image',
@@ -58,6 +59,7 @@ export enum QuestionType {
   // Writing
   SUMMARIZE_WRITTEN_TEXT = 'summarize_written_text',
   WRITE_ESSAY = 'essay',
+  WRITE_EMAIL = 'email',
 
   // Reading
   READING_WRITING_BLANKS = 'reading_fill_blanks_dropdown',
@@ -125,6 +127,10 @@ export interface AIFeedbackData {
     feedback: string
   }
   accuracy?: {
+    score: number
+    feedback: string
+  }
+  form?: { // Added form for writing/summarizing
     score: number
     feedback: string
   }

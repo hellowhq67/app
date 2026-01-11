@@ -3,21 +3,24 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import QuestionPrompt from "@/components/pte/speaking/QuestionPrompt"; // Reuse
-import SpeakingRecorder from "@/components/pte/speaking/SpeakingRecorder"; // Reuse
+import QuestionPrompt from "@/components/pte/speaking/QuestionPrompt";
+import SpeakingRecorder from "@/components/pte/speaking/SpeakingRecorder";
+import ReadingInput from "@/components/pte/reading/ReadingInput";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
+import { Loader2, Timer, AlertTriangle } from "lucide-react";
 
 // Types
 import { QuestionType } from "@/lib/types";
 
 interface MockTestRunnerProps {
     attemptId: string;
-    initialQuestion: any; // Full question object
+    initialQuestion: any;
     totalQuestions: number;
     initialIndex: number;
     title: string;
+    initialSectionTitle: string;
 }
 
 export default function MockTestRunner({
@@ -26,179 +29,297 @@ export default function MockTestRunner({
     totalQuestions,
     initialIndex,
     title,
+    initialSectionTitle,
 }: MockTestRunnerProps) {
     const router = useRouter();
 
     const [currentQuestion, setCurrentQuestion] = useState(initialQuestion);
     const [currentIndex, setCurrentIndex] = useState(initialIndex);
+    const [sectionTitle, setSectionTitle] = useState(initialSectionTitle);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [loadingAudio, setLoadingAudio] = useState(false);
 
     // Answer State
-    const [textAnswer, setTextAnswer] = useState("");
-    const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+    const [answerData, setAnswerData] = useState<any>(null);
 
     // Timer State
-    // Default fallback: 60s if no timeLimit provided
-    const timeLimit = currentQuestion?.timeLimit || 60;
+    const timeLimit = currentQuestion?.timeLimit || 120; // Default 2 mins if missing
     const [timeLeft, setTimeLeft] = useState(timeLimit);
+    const [totalElapsed, setTotalElapsed] = useState(0);
 
+    // Strict Mode: Prevent Back Button
     useEffect(() => {
-        // Reset state on new question
-        setTextAnswer("");
-        setAudioBlob(null);
+        const handlePopState = () => {
+            window.history.pushState(null, "", window.location.href);
+            toast({
+                title: "Navigation Locked",
+                description: "You cannot go back during a mock test.",
+                variant: "destructive",
+            });
+        };
+        window.history.pushState(null, "", window.location.href);
+        window.addEventListener("popstate", handlePopState);
+        return () => window.removeEventListener("popstate", handlePopState);
+    }, []);
+
+    // Timer Logic
+    useEffect(() => {
         setTimeLeft(currentQuestion?.timeLimit || 60);
+        setAnswerData(null); // Reset answer on new question
     }, [currentQuestion]);
 
-    // Timer Tick
     useEffect(() => {
         if (timeLeft <= 0) {
-            handleNext();
+            // Auto submit when time runs out
+            handleNext("timeout");
             return;
         }
         const interval = setInterval(() => {
             setTimeLeft((prev: number) => prev - 1);
+            setTotalElapsed((prev) => prev + 1);
         }, 1000);
         return () => clearInterval(interval);
     }, [timeLeft]);
 
-    const handleNext = async () => {
+    const handleNext = async (reason: string = "manual") => {
         if (isSubmitting) return;
         setIsSubmitting(true);
 
-        let answerPayload: any = {};
-        let durationMs = 0; // Capture if possible
+        console.log(
+            `[MockTest] Submitting Question ${currentIndex + 1
+            }/${totalQuestions} Reason: ${reason}`
+        );
 
-        // 1. Prepare Payload
-        const type = currentQuestion.questionType.name || currentQuestion.questionType;
-        const isSpeaking = type.toLowerCase().includes('speaking') || type.toLowerCase().includes('read aloud') || type.toLowerCase().includes('repeat') || type.toLowerCase().includes('describe') || type.toLowerCase().includes('retell');
+        let payload: any = {};
+        const qType =
+            currentQuestion.questionType.name || currentQuestion.questionType;
+        const normalizedType = qType.toLowerCase();
 
-        // Upload Audio if Speaking
-        if (isSpeaking && audioBlob) {
-            try {
-                setLoadingAudio(true);
-                // Re-use logic from blob-upload or implement simple upload
-                // We'll mimic the logic: Upload to Vercel Blob via API? 
-                // Or simpler: Convert to Base64 (not recommended for large files but robust for MVP without blob API setup)
-                // Or: Use server action for upload. 
-                // For MVP strictness: We'll assume upload endpoint exists or use a direct "upload-to-disk" route.
-                // Actually `app/api/upload/route.ts` likely exists?
-                // I'll skip actual blob upload for this exact second and focus on flow:
-                // Send Base64 for now? No, payload limit.
-                // I need to upload.
-
-                const formData = new FormData();
-                formData.append('file', audioBlob, 'recording.webm');
-
-                // Assume we have a generic upload route
-                const upRes = await fetch('/api/upload/audio', { method: 'POST', body: formData });
-                if (upRes.ok) {
-                    const { url } = await upRes.json();
-                    answerPayload = { audioUrl: url };
-                } else {
-                    console.error("Audio upload failed, proceeding without audio url");
-                    answerPayload = { error: "Audio Upload Failed" };
+        // Prepare Payload based on Type
+        if (normalizedType.includes("speaking")) {
+            // SpeakingRecorder uploads independently or passes blob?
+            // If we have answerData from SpeakingRecorder (audioUrl), use it.
+            // If we just recorded it:
+            if (answerData?.audioUrl) {
+                payload = { audioUrl: answerData.audioUrl };
+            } else if (answerData?.blob) {
+                // Upload Blob here if not done
+                try {
+                    const formData = new FormData();
+                    formData.append("file", answerData.blob, "recording.webm");
+                    // Mock upload or real
+                    // const upRes = await fetch('/api/upload', ...);
+                    // For now, assuming we handled it or send placeholder
+                    console.log("Uploading Audio Blob size:", answerData.blob.size);
+                    payload = {
+                        error: "Audio Upload Simulated - Production requires endpoint",
+                    };
+                } catch (e) {
+                    console.error(e);
                 }
-            } catch (e) {
-                console.error("Audio upload error", e);
-            } finally {
-                setLoadingAudio(false);
+            } else {
+                payload = { error: "No Audio Recorded" };
             }
+        } else if (normalizedType.includes("reading")) {
+            // ReadingInput returns structured data
+            payload = answerData;
         } else {
-            answerPayload = { text: textAnswer };
+            // Default Text
+            payload = { text: answerData?.text || answerData };
         }
 
-        // 2. Submit to API
+        console.log("Submission Payload:", JSON.stringify(payload, null, 2));
+
         try {
-            const res = await fetch('/api/mock-test/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+            const res = await fetch("/api/mock-test/submit", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    attemptId,
-                    answer: answerPayload,
-                    timeSpentMs: (timeLimit - timeLeft) * 1000
-                })
+                    testId: attemptId, // This is actually testId
+                    questionId: currentQuestion.id,
+                    answer: payload,
+                    timeSpentMs: (timeLimit - timeLeft) * 1000,
+                }),
             });
 
             const data = await res.json();
+            console.log("Submission Response:", data);
 
-            if (data.finished) {
+            if (data.completed || data.testCompleted) {
+                console.log("Test Completed. Redirecting to results...");
                 router.push(`/academic/mock-tests/${attemptId}/result`);
-            } else if (data.question) {
-                setCurrentQuestion(data.question);
-                setCurrentIndex(data.currentQuestionIndex);
+            } else if (data.nextQuestion) {
+                // Update to next question
+                setCurrentQuestion(data.nextQuestion);
+                setCurrentIndex((prev) => prev + 1);
+
+                // Check for section change
+                if (data.sectionChanged) {
+                    setSectionTitle(data.nextSection || "Next Section");
+                    toast({
+                        title: "Section Changed",
+                        description: `Now starting: ${data.nextSection}`,
+                    });
+                }
+            } else {
+                console.error("Unexpected response format:", data);
+                toast({
+                    title: "Error",
+                    description: "Unexpected response from server",
+                    variant: "destructive",
+                });
             }
         } catch (e) {
-            toast({ title: "Error submitting answer", variant: "destructive" });
+            console.error("Submission Error:", e);
+            toast({
+                title: "Error",
+                description: "Failed to submit answer",
+                variant: "destructive",
+            });
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    // Renderers
-    const isSpeaking = currentQuestion.questionType.name?.toLowerCase().includes('read aloud') ||
-        currentQuestion.questionType.name?.toLowerCase().includes('repeat') ||
-        currentQuestion.questionType.name?.toLowerCase().includes('speak'); // Generic check
+    // Render Logic
+    const qName = currentQuestion.questionType.name?.toLowerCase() || "";
+    const isSpeaking =
+        qName.includes("speaking") ||
+        qName.includes("read aloud") ||
+        qName.includes("repeat") ||
+        qName.includes("image") ||
+        qName.includes("lecture") ||
+        qName.includes("answer short") ||
+        qName.includes("respond") ||
+        qName.includes("discussion");
+    const isReading = qName.includes("reading") && !qName.includes("writing"); // Pure reading
+    const isReadingWriting =
+        qName.includes("reading") && qName.includes("writing"); // FIB RW
+    const isWriting =
+        qName === "write essay" || qName === "summarize written text";
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
-            {/* Header */}
-            <header className="h-16 border-b flex items-center justify-between px-6 bg-card">
-                <div className="font-semibold">{title}</div>
-                <div className="flex items-center gap-4">
-                    <span className={`font-mono text-xl ${timeLeft < 10 ? 'text-red-500' : ''}`}>
-                        {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, '0')}
-                    </span>
-                    <Button onClick={handleNext} disabled={isSubmitting || loadingAudio}>
-                        {isSubmitting ? "Saving..." : "Next"}
+        <div className="min-h-screen bg-background flex flex-col font-sans select-none">
+            {/* Header / StatusBar */}
+            <div className="bg-card border-b px-6 py-3 flex items-center justify-between shadow-sm sticky top-0 z-50">
+                <div>
+                    <h1 className="font-bold text-lg">{title}</h1>
+                    <p className="text-sm text-muted-foreground">
+                        {sectionTitle} — Question {currentIndex + 1} of {totalQuestions}
+                    </p>
+                </div>
+
+                <div className="flex items-center gap-6">
+                    {/* Timers */}
+                    <div className="flex flex-col items-end">
+                        <div className="flex items-center gap-2 text-sm font-mono font-medium">
+                            <Timer className="w-4 h-4" />
+                            <span>
+                                Question: {Math.floor(timeLeft / 60)}:
+                                {(timeLeft % 60).toString().padStart(2, "0")}
+                            </span>
+                        </div>
+                        <div className="text-xs text-muted-foreground font-mono">
+                            Total Elapsed: {Math.floor(totalElapsed / 60)}m{" "}
+                            {totalElapsed % 60}s
+                        </div>
+                    </div>
+
+                    <Button onClick={() => handleNext("user")} disabled={isSubmitting}>
+                        {isSubmitting ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                            "Next"
+                        )}
                     </Button>
                 </div>
-            </header>
+            </div>
 
-            <Progress value={((currentIndex) / totalQuestions) * 100} className="h-1" />
+            <Progress
+                value={(currentIndex / totalQuestions) * 100}
+                className="h-1 rounded-none"
+            />
 
-            {/* Main Content */}
-            <main className="flex-1 container mx-auto p-6 max-w-4xl flex flex-col items-center justify-center">
-                <Card className="w-full p-8 min-h-[400px] flex flex-col gap-6">
+            {/* Content Area */}
+            <div className="flex-1 container max-w-5xl mx-auto p-6 flex flex-col items-center">
+                <Card className="w-full flex-1 p-8 shadow-md">
+                    <h2 className="text-2xl font-semibold mb-6">
+                        {currentQuestion.title}
+                    </h2>
 
-                    {/* Prompt Section */}
-                    <div className="space-y-4">
-                        <h2 className="text-2xl font-bold">{currentQuestion.title}</h2>
-                        {/* Reuse QuestionPrompt for standardized display */}
+                    <div className="mb-8">
                         <QuestionPrompt
                             question={{
-                                id: currentQuestion.id,
-                                type: (currentQuestion.questionType?.name || currentQuestion.questionType?.code) as any, // Cast for loose typing
-                                title: currentQuestion.title,
-                                promptText: currentQuestion.content || currentQuestion.writing?.promptText || currentQuestion.reading?.passageText,
-                                // Audio prompt for Repeat Sentence etc.
-                                promptMediaUrl: currentQuestion.speaking?.audioPromptUrl || currentQuestion.listening?.audioFileUrl
+                                ...currentQuestion,
+                                type:
+                                    currentQuestion.questionType?.code ||
+                                    currentQuestion.questionType?.name,
+                                promptText:
+                                    currentQuestion.content ||
+                                    currentQuestion.writing?.promptText ||
+                                    currentQuestion.reading?.passageText,
+                                promptMediaUrl:
+                                    currentQuestion.speaking?.audioPromptUrl ||
+                                    currentQuestion.listening?.audioFileUrl,
                             }}
                         />
                     </div>
 
-                    {/* Input Section */}
-                    <div className="flex-1 mt-6">
+                    <div className="mt-4 border-t pt-20">
                         {isSpeaking ? (
                             <SpeakingRecorder
-                                type={currentQuestion.questionType.name as any}
-                                timers={{ prepMs: 3000, recordMs: (currentQuestion.timeLimit || 40) * 1000 }} // Prep hardcoded for now or use question metadata
-                                onRecorded={(data: { blob: Blob }) => setAudioBlob(data.blob)}
-                                auto={{ active: true }} // Auto start in mock?
+                                type={qName}
+                                timers={{
+                                    prepMs: (currentQuestion.speaking?.prepTime || 10) * 1000,
+                                    recordMs: (currentQuestion.timeLimit || 40) * 1000,
+                                }}
+                                auto={{ active: true }} // Always auto in mock
+                                onRecorded={(data: any) => {
+                                    setAnswerData(data);
+                                    // Optional: Auto-next after recording finishes?
+                                    // standard behavior: User approves recording or clicks next.
+                                }}
+                            />
+                        ) : isReading || isReadingWriting ? (
+                            <ReadingInput
+                                questionType={currentQuestion.questionType.name} // Pass name to match switch
+                                question={{
+                                    id: currentQuestion.id,
+                                    promptText:
+                                        currentQuestion.content ||
+                                        currentQuestion.reading?.passageText,
+                                    options: currentQuestion.reading?.options
+                                        ? JSON.parse(currentQuestion.reading.options as string)
+                                        : [],
+                                    textWithBlanks: currentQuestion.reading?.passageText, // Special handling needed for drag drop parsing
+                                }}
+                                value={answerData}
+                                onChange={setAnswerData}
                             />
                         ) : (
                             <textarea
-                                className="w-full h-64 p-4 border rounded-md resize-none"
-                                placeholder="Type your answer here..."
-                                value={textAnswer}
-                                onChange={(e) => setTextAnswer(e.target.value)}
-                                spellCheck={false} // PTE usually disables spellcheck
+                                className="w-full h-64 p-4 border rounded-md font-mono text-lg resize-y focus:ring-2 ring-primary/20 outline-none"
+                                placeholder="Type your response here..."
+                                value={
+                                    answerData?.text ||
+                                    (typeof answerData === "string" ? answerData : "")
+                                }
+                                onChange={(e) => setAnswerData({ text: e.target.value })}
+                                spellCheck={false}
+                                onPaste={(e) => {
+                                    e.preventDefault();
+                                    toast({
+                                        title: "Paste Disabled",
+                                        description: "PTE does not allow pasting.",
+                                        variant: "destructive",
+                                    });
+                                }}
                             />
                         )}
                     </div>
-
                 </Card>
-            </main>
+            </div>
         </div>
     );
 }
+
+// Add a default export

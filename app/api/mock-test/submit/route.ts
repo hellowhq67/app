@@ -1,172 +1,138 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { mockTests, testAttempts, testAnswers, pteQuestions } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { scorePteAttemptV2 } from "@/lib/ai/scoring-agent";
-import { QuestionType } from "@/lib/types";
-import { ratelimit } from "@/lib/ratelimit";
-import { headers } from "next/headers";
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import {
+    pteMockTests,
+    pteMockTestQuestions,
+    pteQuestions
+} from '@/lib/db/schema';
+import { eq, and, asc, sql } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { QuestionType } from '@/lib/types';
+import { scoreAndSaveAttempt } from '@/lib/pte/scoring-dispatcher';
+import { runMockTestScoringPipeline } from '@/lib/pte/scoring-engine/pipeline';
 
-// Helper (Duplicate for now, ideal to refactor)
-async function fetchQuestionData(questionId: string) {
-    const baseQ = await db.query.pteQuestions.findFirst({
-        where: eq(pteQuestions.id, questionId),
-        with: {
-            questionType: true,
-            speaking: true,
-            writing: true,
-            reading: true,
-            listening: true
-        }
-    });
-    return baseQ;
-}
 
 export async function POST(req: Request) {
     try {
-        const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
-        const { success } = await ratelimit.limit(ip);
-        // We can be lenient on submit? Or standard.
-        // If they spam submit, block.
-        if (!success) return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        const { attemptId, answer, timeSpentMs } = await req.json();
+        const { testId, questionId, answer, timeSpentMs } = await req.json();
 
-        if (!attemptId || !answer) {
-            return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
+        // 1. Validate Attempt
+        const mockQuestion = await db.query.pteMockTestQuestions.findFirst({
+            where: and(
+                eq(pteMockTestQuestions.mockTestId, testId),
+                eq(pteMockTestQuestions.questionId, questionId)
+            )
+        });
+
+        if (!mockQuestion) {
+            return NextResponse.json({ error: 'Question not assigned to this test' }, { status: 404 });
         }
 
-        const attempt = await db.query.testAttempts.findFirst({
-            where: eq(testAttempts.id, attemptId),
+        const question = await db.query.pteQuestions.findFirst({
+            where: eq(pteQuestions.id, questionId),
             with: {
-                // We need the template to know the next question
-                // But Drizzle relations setup for `mockTests` might not be explicit in `testAttempts` query yet without defining relations.
-                // We'll fetch attempt first, then fetch template.
+                questionType: true,
+                speaking: true,
+                writing: true,
+                reading: true,
+                listening: true
             }
         });
 
-        if (!attempt) {
-            return NextResponse.json({ error: "Attempt not found" }, { status: 404 });
+        if (!question || !question.questionType) {
+            return NextResponse.json({ error: 'Question details not found' }, { status: 404 });
         }
 
-        if (attempt.status === 'completed') {
-            return NextResponse.json({ finished: true });
-        }
+        const typeCode = question.questionType.name || question.questionType.code;
+        const type = typeCode as QuestionType;
 
-        const template = await db.query.mockTests.findFirst({
-            where: eq(mockTests.id, attempt.mockTestId)
+        // 2. Score
+        const { attemptId, feedback } = await scoreAndSaveAttempt(
+            session.user.id,
+            question,
+            answer,
+            type
+        );
+
+        // 3. Update Progress
+        await db.update(pteMockTestQuestions).set({
+            attemptId,
+            isCompleted: true,
+            completedAt: new Date(),
+            score: feedback?.overallScore || 0
+        }).where(eq(pteMockTestQuestions.id, mockQuestion.id));
+
+        await db.update(pteMockTests).set({
+            completedQuestions: sql`completed_questions + 1`
+            // We defer score aggregation to end or periodic
+        }).where(eq(pteMockTests.id, testId));
+
+        // 4. Find Next Question
+        const nextMockQ = await db.query.pteMockTestQuestions.findFirst({
+            where: and(
+                eq(pteMockTestQuestions.mockTestId, testId),
+                eq(pteMockTestQuestions.isCompleted, false)
+            ),
+            orderBy: asc(pteMockTestQuestions.questionOrder)
         });
 
-        if (!template) return NextResponse.json({ error: "Template missing" }, { status: 500 });
 
-        const questionsList = template.questions as any[];
-        const currentIndex = attempt.currentQuestionIndex || 0;
-        const currentQItem = questionsList[currentIndex];
 
-        if (!currentQItem) {
-            // Already done?
-            return NextResponse.json({ finished: true });
+        if (!nextMockQ) {
+            // Test Complete - Run Scoring Pipeline
+            await runMockTestScoringPipeline(testId);
+
+            // Note: pipeline updates status to 'completed' and overallScore.
+            // We just return finished.
+
+            return NextResponse.json({ completed: true, testCompleted: true });
         }
 
-        const questionId = currentQItem.questionId;
-        const fullQuestion = await fetchQuestionData(questionId);
+        // 5. Check Section Transition
+        let sectionChanged = false;
+        let nextSection = nextMockQ.sectionName;
 
-        if (!fullQuestion) {
-            console.error(`Question ${questionId} not found in DB`);
-            // Skip/Error? We'll error for now.
-            return NextResponse.json({ error: "Question Data Missing" }, { status: 500 });
+        if (nextMockQ.sectionName !== mockQuestion.sectionName) {
+            // Detect section change
+            // Wait, what if questions of same section are interleaved? (Unlikely in PTE standard)
+            // Assume sequential.
+            sectionChanged = true;
+
+            // Update Test Status
+            await db.update(pteMockTests).set({
+                currentSection: nextSection,
+                sectionStartedAt: new Date(),
+                // Reset time limit?
+                // sectionTimeLeft = ... (Lookup durations)
+            }).where(eq(pteMockTests.id, testId));
         }
 
-        // --- SCORING ---
-        // Map DB Type name to Enum
-        const typeName = fullQuestion.questionType.name; // e.g. "Read Aloud"
-        // We assume the DB name matches the Enum string value. 
-        // Need to be careful. The Enum has 'Read Aloud', DB might have 'read-aloud' code or 'Read Aloud' name.
-        // Let's assume name matches or we map it.
-        // Ideally we use the 'code' from pte_question_types but schema doesn't show code on fetch unless requested.
-        // Assuming fetchQuestionData includes questionType fields.
+        // Fetch Next details
+        const nextQuestion = await db.query.pteQuestions.findFirst({
+            where: eq(pteQuestions.id, nextMockQ.questionId),
+            with: {
+                questionType: true,
+                speaking: true,
+                writing: true,
+                reading: true,
+                listening: true
+            }
+        });
 
-        // Prepare strict params
-        const qType = Object.values(QuestionType).find(t => t === typeName) || Object.values(QuestionType).find(t => t.toLowerCase() === typeName.toLowerCase()) as QuestionType;
-
-        if (qType) {
-            // Determine Ideal Answer / Content
-            let content = fullQuestion.content || "";
-            let ideal = fullQuestion.sampleAnswer || ""; // Base fallback
-
-            // Override based on specific type fields
-            if (fullQuestion.speaking?.sampleTranscript) ideal = fullQuestion.speaking.sampleTranscript;
-            if (fullQuestion.writing?.promptText) content = fullQuestion.writing.promptText;
-            if (fullQuestion.reading?.passageText) content = fullQuestion.reading.passageText;
-
-            // ASYNC SCORING (We await for now to simplify data consistency, but in prod we might background it)
-            const scoreResult = await scorePteAttemptV2(qType, {
-                questionContent: content,
-                submission: answer, // { text?, audioUrl? }
-                idealAnswer: ideal,
-            });
-
-            // SAVE ANSWER
-            await db.insert(testAnswers).values({
-                attemptId,
-                questionId,
-                questionType: typeName,
-                answer,
-                aiScore: scoreResult as any, // Store full feedback JSON
-                timeSpentMs
-            });
-
-        } else {
-            console.warn("Could not map question type for scoring:", typeName);
-            // Save without score
-            await db.insert(testAnswers).values({
-                attemptId,
-                questionId,
-                questionType: typeName,
-                answer,
-                timeSpentMs
-            });
-        }
-
-
-        // --- ADVANCE ---
-        const nextIndex = currentIndex + 1;
-
-        if (nextIndex >= questionsList.length) {
-            // FINISHED
-            await db.update(testAttempts)
-                .set({
-                    status: 'completed',
-                    completedAt: new Date(),
-                    currentQuestionIndex: nextIndex
-                })
-                .where(eq(testAttempts.id, attemptId));
-
-            return NextResponse.json({ finished: true });
-        } else {
-            // UPDATE INDEX
-            await db.update(testAttempts)
-                .set({ currentQuestionIndex: nextIndex })
-                .where(eq(testAttempts.id, attemptId));
-
-            // FETCH NEXT QUESTION
-            const nextQId = questionsList[nextIndex].questionId;
-            const nextQData = await fetchQuestionData(nextQId);
-
-            return NextResponse.json({
-                finished: false,
-                currentQuestionIndex: nextIndex,
-                question: {
-                    ...nextQData,
-                    correctAnswer: undefined,
-                    sampleAnswer: undefined,
-                    scoringRubric: undefined
-                }
-            });
-        }
+        return NextResponse.json({
+            completed: false,
+            sectionChanged,
+            nextSection,
+            nextQuestion: nextQuestion,
+            currentQuestionIndex: nextMockQ.questionOrder
+        });
 
     } catch (error) {
-        console.error("[MockTest Submit] Error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        console.error('Error submitting mock test:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }

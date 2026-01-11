@@ -26,7 +26,7 @@ export async function savePteAttempt(params: {
         responseAudioUrl,
         responseData,
         timeTaken,
-        aiFeedback,
+        aiFeedback = {} as AIFeedbackData, // Default to empty object to prevent crash
     } = params;
 
     // Calculate attempt number for this user and question

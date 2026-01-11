@@ -13,3 +13,4 @@ export * from "./billing";
 export * from "./questions";
 export * from "./user-settings";
 export * from "./mock-tests";
+export * from "./pte-sectional-tests";

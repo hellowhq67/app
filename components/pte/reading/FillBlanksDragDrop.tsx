@@ -1,122 +1,206 @@
-import React, { useState, useEffect } from 'react'
-import { cn } from '@/lib/utils'
-
-// Since we don't have dnd-kit installed and want to keep deps low,
-// we'll implement a simple click-to-fill or native drag-drop if possible.
-// Actually, for better accessibility and simplicity without massive boilerplates,
-// a "Click slot -> Click word" or "Drag word -> Drop on slot" hybrid is good.
-// Let's do a simple "Click word in bank to move to first empty slot, Click filled slot to return word to bank" approach first,
-// which is very fast to interact with.
+import React, { useState } from 'react';
+import { cn } from '@/lib/utils';
+import { DndContext, DragOverlay, useDraggable, useDroppable, DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 
 interface FillBlanksDragDropProps {
-  text: string
-  options: string[] | undefined
-  value: { [key: string]: string } | null // Map of slot index -> word
-  onChange: (val: { [key: string]: string }) => void
+  text: string;
+  options: string[] | undefined;
+  value: { [key: string]: string } | null;
+  onChange: (val: { [key: string]: string }) => void;
+}
+
+function DraggableWord({ word, id, isDragging }: { word: string; id: string; isDragging?: boolean }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: id,
+    data: { word }
+  });
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined;
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...listeners}
+      {...attributes}
+      className={cn(
+        "bg-background hover:bg-accent border shadow-sm px-3 py-1.5 rounded-md text-sm font-medium cursor-grab active:cursor-grabbing inline-block m-1",
+        isDragging && "opacity-50"
+      )}
+    >
+      {word}
+    </div>
+  );
+}
+
+function DroppableSlot({ id, children, isOver }: { id: string; children?: React.ReactNode; isOver?: boolean }) {
+  const { setNodeRef } = useDroppable({
+    id: id,
+  });
+
+  return (
+    <span
+      ref={setNodeRef}
+      className={cn(
+        "inline-flex items-center justify-center min-w-[80px] h-8 mx-1 px-2 border-b-2 transition-colors",
+        isOver
+          ? "bg-primary/20 border-primary"
+          : children
+            ? "bg-primary/10 border-primary border-solid"
+            : "bg-muted/50 border-muted-foreground/30 border-dashed"
+      )}
+    >
+      {children || <span className="text-transparent">gap</span>}
+    </span>
+  );
 }
 
 export default function FillBlanksDragDrop({ text, options = [], value, onChange }: FillBlanksDragDropProps) {
-  // Current state of assignments
-  // value is { "0": "word", "1": "word" }
-  const assignments = value || {}
+  const assignments = value || {};
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [activeWord, setActiveWord] = useState<string | null>(null);
 
-  // Parse text to find blanks. Usually represented as underscores _____ or [gap] or similar.
-  // We need a robust parser.
-  // Assumption: The text comes with some placeholder.
-  // Standardizing on `_` (underscores) for detection.
+  const parts = text.split(/(_+)/g);
+  let slotIndex = 0;
 
-  // Let's assume the text is split-able by standard regex for now.
-  // Or maybe it's pre-segmented?
-  // If text contains "____", we replace with indexed slots.
+  // Compute used words to filter bank
+  const usedWords = Object.values(assignments);
+  const availableOptions = options.map((opt, idx) => ({ word: opt, id: `bank-${opt}-${idx}` })).filter(opt => !usedWords.includes(opt.word));
 
-  const parts = text.split(/(_+)/g)
-  let slotIndex = 0
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+    setActiveWord(event.active.data.current?.word as string);
+  };
 
-  // Computed available options (all options minus used ones)
-  // Note: PTE specific - sometimes options can be used multiple times? Usually distinct pool.
-  // We'll assume distinct pool - once used, it's removed from bank.
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+    setActiveWord(null);
 
-  const usedWords = Object.values(assignments)
-  const availableOptions = options.filter(opt => !usedWords.includes(opt))
+    if (!over) {
+      // Dropped nowhere? If it was in a slot, maybe clear it?
+      // If it came from a slot (id starts with 'slot-'), and dropped in 'bank-area' (if we made one) or just outside,
+      // strictly speaking, dropping outside usually returns to bank.
+      if (active.id.toString().startsWith('assigned-')) {
+        const slotKey = active.id.toString().replace('assigned-', '').replace(/-.*/, ''); // Extract slot index hackily or loop
+        // Better: search assignments
+        const slotIdx = Object.keys(assignments).find(key => {
+          // Reconstruct the id logic used in render: `assigned-${currentIdx}-${filledWord}`
+          // This assumes unique words or simple logic. Let's simplify.
+          return `assigned-${key}-${assignments[key]}` === active.id;
+        });
 
-  const handleSlotClick = (index: number) => {
-    // If slot has a value, return it to pool
-    const currentVal = assignments[index]
-    if (currentVal) {
-      const newAssignments = { ...assignments }
-      delete newAssignments[index]
-      onChange(newAssignments)
+        if (slotIdx) {
+          const newAssignments = { ...assignments };
+          delete newAssignments[slotIdx];
+          onChange(newAssignments);
+        }
+      }
+      return;
     }
-  }
 
-  const handleOptionClick = (word: string) => {
-    // Find first empty slot
-    const totalSlots = (text.match(/(_+)/g) || []).length
-    let firstEmpty = -1
-    for (let i = 0; i < totalSlots; i++) {
-      if (!assignments[i]) {
-        firstEmpty = i
-        break
+    const overId = over.id as string;
+    const activeWord = active.data.current?.word;
+
+    if (!activeWord) return;
+
+    if (overId.startsWith('slot-')) {
+      const targetSlotIndex = overId.replace('slot-', '');
+
+      // If item came from another slot, remove from old slot
+      let newAssignments = { ...assignments };
+
+      // Remove from old slot if it was there
+      const oldSlotKey = Object.keys(newAssignments).find(key =>
+        `assigned-${key}-${newAssignments[key]}` === active.id
+      );
+      if (oldSlotKey) {
+        delete newAssignments[oldSlotKey];
+      }
+
+      // Assign to new slot
+      newAssignments[targetSlotIndex] = activeWord;
+      onChange(newAssignments);
+    }
+    // If dropped back to bank (we can make bank droppable or just 'not a slot')
+    else if (overId === 'bank-container') {
+      // Remove from slot if it was there
+      const oldSlotKey = Object.keys(assignments).find(key =>
+        `assigned-${key}-${assignments[key]}` === active.id
+      );
+      if (oldSlotKey) {
+        const newAssignments = { ...assignments };
+        delete newAssignments[oldSlotKey];
+        onChange(newAssignments);
       }
     }
-
-    if (firstEmpty !== -1) {
-      onChange({
-        ...assignments,
-        [firstEmpty]: word
-      })
-    }
-  }
-
-  // Allow replacing a specific slot if we drag-dropped (complex to impement raw).
-  // Stick to Click-to-Fill logic for now, it's very efficient.
+  };
 
   return (
-    <div className="space-y-6">
-      <div className="leading-loose text-lg font-medium p-4 border rounded-lg bg-card/50">
-        {parts.map((part, i) => {
-          if (part.match(/(_+)/)) {
-            const currentIdx = slotIndex++
-            const filledWord = assignments[currentIdx]
+    <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <div className="space-y-6 select-none">
 
-            return (
-              <span
-                key={i}
-                onClick={() => handleSlotClick(currentIdx)}
-                className={cn(
-                  "inline-flex items-center justify-center min-w-[80px] h-8 mx-1 px-2 border-b-2 transition-colors cursor-pointer select-none",
-                  filledWord 
-                    ? "bg-primary/10 border-primary text-primary border-solid" 
-                    : "bg-muted/50 border-muted-foreground/30 border-dashed hover:bg-muted"
-                )}
-              >
-                {filledWord || <span className="text-transparent">gap</span>}
-              </span>
-            )
-          }
-          return <span key={i}>{part}</span>
-        })}
-      </div>
+        {/* Text Area */}
+        <div className="leading-loose text-lg font-medium p-6 border rounded-lg bg-card/50 shadow-sm">
+          {parts.map((part, i) => {
+            if (part.match(/(_+)/)) {
+              const currentIdx = slotIndex++;
+              const filledWord = assignments[currentIdx.toString()];
 
-      <div className="bg-muted p-4 rounded-lg">
-        <p className="text-xs text-muted-foreground uppercase font-bold mb-3 tracking-wider">
-          Word Bank (Click to fill)
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {availableOptions.map((opt, i) => (
-            <button
-              key={`${opt}-${i}`}
-              onClick={() => handleOptionClick(opt)}
-              className="bg-background hover:bg-accent border shadow-sm px-3 py-1.5 rounded-md text-sm font-medium transition-all active:scale-95"
-            >
-              {opt}
-            </button>
-          ))}
-          {availableOptions.length === 0 && (
-            <span className="text-sm text-muted-foreground italic">All words placed</span>
-          )}
+              return (
+                <DroppableSlot key={`slot-${currentIdx}`} id={`slot-${currentIdx}`}>
+                  {filledWord ? (
+                    <DraggableWord
+                      word={filledWord}
+                      id={`assigned-${currentIdx}-${filledWord}`}
+                    />
+                  ) : null}
+                </DroppableSlot>
+              );
+            }
+            return <span key={i}>{part}</span>;
+          })}
         </div>
+
+        {/* Word Bank */}
+        <div className="bg-muted p-6 rounded-lg min-h-[120px]">
+          <p className="text-xs text-muted-foreground uppercase font-bold mb-3 tracking-wider">
+            Drag words to fill gaps
+          </p>
+          <DroppableBank id="bank-container" className="flex flex-wrap gap-2">
+            {availableOptions.map((opt) => (
+              <DraggableWord key={opt.id} word={opt.word} id={opt.id} />
+            ))}
+            {availableOptions.length === 0 && Object.keys(assignments).length === options.length && (
+              <span className="text-sm text-green-600 font-medium">All words placed</span>
+            )}
+            {availableOptions.length === 0 && Object.keys(assignments).length < options.length && (
+              <span className="text-sm text-muted-foreground italic">Drag words back here to remove them</span>
+            )}
+          </DroppableBank>
+        </div>
+
       </div>
+
+      <DragOverlay>
+        {activeId ? (
+          <div className="bg-primary text-primary-foreground shadow-xl px-3 py-1.5 rounded-md text-sm font-bold opacity-90 scale-105 rotate-2 cursor-grabbing pointer-events-none border border-white/20">
+            {activeWord}
+          </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
+
+// Helper for bank being droppable
+function DroppableBank({ id, children, className }: { id: string; children: React.ReactNode; className?: string }) {
+  const { setNodeRef, isOver } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className={cn(className, isOver && "bg-muted-foreground/10 rounded-lg transition-colors")}>
+      {children}
     </div>
-  )
+  );
 }

@@ -141,6 +141,11 @@ export const pteMockTests = pgTable(
         readingScore: integer('reading_score'),
         listeningScore: integer('listening_score'),
 
+        // Section tracking
+        currentSection: text('current_section'), // 'speaking_writing', 'reading', 'listening'
+        sectionStartedAt: timestamp('section_started_at'),
+        sectionTimeLeft: integer('section_time_left'), // in seconds
+
         // Detailed scores
         scores: jsonb('scores').$type<{
             enabling_skills?: {

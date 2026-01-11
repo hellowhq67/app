@@ -3,7 +3,7 @@ import { AIFeedbackData, SpeakingFeedbackData } from '@/lib/types'
 
 // Define the Zod schema for the feedback data based on the type definition
 export const AIFeedbackDataSchema = z.object({
-    overallScore: z.number().describe('Overall score from 0-90'),
+    overallScore: z.number().describe('Sum of raw trait points (e.g., 12/15)'),
     pronunciation: z
         .object({ score: z.number(), feedback: z.string() })
         .optional(),
@@ -14,6 +14,7 @@ export const AIFeedbackDataSchema = z.object({
     spelling: z.object({ score: z.number(), feedback: z.string() }).optional(),
     structure: z.object({ score: z.number(), feedback: z.string() }).optional(),
     accuracy: z.object({ score: z.number(), feedback: z.string() }).optional(),
+    form: z.object({ score: z.number(), feedback: z.string() }).optional(),
     wordMarking: z.array(z.object({
         word: z.string(),
         classification: z.enum(['good', 'average', 'poor', 'pause', 'omitted', 'inserted', 'filler']),

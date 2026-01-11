@@ -95,3 +95,27 @@ Sanity CMS at `/studio` for:
 @/hooks/* -> ./hooks/*
 @/app/* -> ./app/*
 ```
+
+## CI/CD Pipeline
+
+The project uses GitHub Actions for automated CI/CD. See `.github/CI-CD-SETUP.md` for detailed setup instructions.
+
+### Workflows
+- **ci.yml** - Main CI/CD pipeline
+  - Linting and type checking
+  - Running tests
+  - Building application
+  - Database migration validation
+  - Artifact uploads
+
+### Required GitHub Secrets
+All environment variables must be configured as GitHub Secrets for CI/CD to work properly. See `.github/CI-CD-SETUP.md` for the complete list.
+
+### Pre-commit Checklist
+Before pushing code, ensure:
+```bash
+pnpm lint          # No linting errors
+pnpm type-check    # No type errors
+pnpm test          # All tests pass
+pnpm build         # Build succeeds
+```

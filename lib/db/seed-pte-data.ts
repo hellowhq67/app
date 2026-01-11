@@ -253,6 +253,33 @@ async function seedPteData() {
           commonMistakes: ['Poor organization', 'Weak arguments', 'Grammar and spelling errors'],
         },
       },
+
+      {
+        code: 'email',
+        name: 'Write Email',
+        categoryId: categoryMap.get('writing')!,
+        description: 'Write an email based on a scenario',
+        hasAiScoring: true,
+        maxScore: 90,
+        scoringCriteria: {
+          content: { weight: 0.3, maxScore: 27 },
+          form: { weight: 0.2, maxScore: 18 },
+          conventions: { weight: 0.2, maxScore: 18 },
+          grammar: { weight: 0.15, maxScore: 13.5 },
+          vocabulary: { weight: 0.15, maxScore: 13.5 },
+        },
+        timeLimit: 540, // 9 minutes
+        wordCountMin: 50,
+        wordCountMax: 120,
+        displayOrder: 3,
+        instructions: 'Write an email of 100 words based on the situation',
+        isCore: true,
+        metadata: {
+          difficulty: 'Medium',
+          tips: ['Use appropriate tone', 'Address all prompts', 'Check greeting/sign-off'],
+          commonMistakes: ['To informal/formal', 'Missing key info'],
+        },
+      },
       // Reading Types
       {
         code: 'reading_fill_blanks_dropdown',

@@ -1,92 +1,95 @@
-import { NextResponse } from "next/server";
-import { db } from "@/lib/db";
-import { mockTests, testAttempts, pteQuestions, pteSpeakingQuestions, pteWritingQuestions, pteReadingQuestions, pteListeningQuestions, pteQuestionTypes } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
-import { auth } from "@/lib/auth"; // Assuming auth setup
-import { headers } from "next/headers";
-import { strictRatelimit } from "@/lib/ratelimit";
-
-// Helper to fetch full question details
-// This mirrors the logic we likely need in the submit/next route too, so ideally it should be a shared lib function.
-// For now, I'll inline basic fetching or call a hypothetical lib function if I created one. 
-// I'll define it locally for speed, then refactor.
-
-async function fetchQuestionData(questionId: string) {
-    const baseQ = await db.query.pteQuestions.findFirst({
-        where: eq(pteQuestions.id, questionId),
-        with: {
-            questionType: true,
-            speaking: true,
-            writing: true,
-            reading: true,
-            listening: true
-        }
-    });
-    return baseQ;
-}
+import { NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import {
+    pteMockTests,
+    pteMockTestQuestions,
+    pteQuestions,
+    pteQuestionTypes
+} from '@/lib/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
+import { headers } from 'next/headers';
+import { FULL_MOCK_TEST_TEMPLATE } from '@/lib/pte/mock-test-templates';
 
 export async function POST(req: Request) {
     try {
-        const ip = (await headers()).get("x-forwarded-for") || "127.0.0.1";
-        const { success } = await strictRatelimit.limit(ip);
-        if (!success) return NextResponse.json({ error: "Rate limit exceeded. Please wait." }, { status: 429 });
+        const session = await auth.api.getSession({ headers: await headers() });
+        if (!session?.user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        // Mock Auth check (Replace with actual session check)
-        // const session = await auth();
-        // if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        // const userId = session.user.id;
+        // 1. Prepare Question List
+        const sections = [
+            { key: 'speaking', sectionName: 'Part 1: Speaking & Writing', configs: FULL_MOCK_TEST_TEMPLATE.sections.speaking },
+            { key: 'writing', sectionName: 'Part 1: Speaking & Writing', configs: FULL_MOCK_TEST_TEMPLATE.sections.writing },
+            { key: 'reading', sectionName: 'Part 2: Reading', configs: FULL_MOCK_TEST_TEMPLATE.sections.reading },
+            { key: 'listening', sectionName: 'Part 3: Listening', configs: FULL_MOCK_TEST_TEMPLATE.sections.listening },
+        ];
 
-        // TEMPORARY: Hardcode user for dev if auth not fully integrated in this context
-        const userId = "user_2rjE3x8...placeholder";
+        const finalQuestions: { id: string; sectionName: string }[] = [];
 
-        const { mockTestId } = await req.json();
+        // Helper to get type ID - use name field instead of code
+        const getTypeId = async (typeStr: string) => {
+            // Try finding by name first (which matches QuestionType enum values)
+            const type = await db.query.pteQuestionTypes.findFirst({
+                where: sql`LOWER(${pteQuestionTypes.name}) = LOWER(${typeStr})`
+            });
+            return type?.id;
+        };
 
-        if (!mockTestId) {
-            return NextResponse.json({ error: "Mock Test ID required" }, { status: 400 });
+        for (const section of sections) {
+            for (const config of section.configs) {
+                const typeId = await getTypeId(config.type);
+                if (!typeId) {
+                    console.warn(`Type ${config.type} not found in database`);
+                    continue;
+                }
+
+                const count = Math.floor(Math.random() * (config.maxCount - config.minCount + 1)) + config.minCount;
+
+                const questions = await db.select({ id: pteQuestions.id })
+                    .from(pteQuestions)
+                    .where(and(
+                        eq(pteQuestions.questionTypeId, typeId),
+                        eq(pteQuestions.isActive, true)
+                    ))
+                    .orderBy(sql`RANDOM()`)
+                    .limit(count);
+
+                questions.forEach(q => {
+                    finalQuestions.push({ id: q.id, sectionName: section.sectionName });
+                });
+            }
         }
 
-        const template = await db.query.mockTests.findFirst({
-            where: eq(mockTests.id, mockTestId)
-        });
-
-        if (!template) {
-            return NextResponse.json({ error: "Mock Test not found" }, { status: 404 });
+        if (finalQuestions.length === 0) {
+            return NextResponse.json({ error: 'Failed to generate test questions' }, { status: 500 });
         }
 
-        const questionsList = template.questions as any[];
-        if (!questionsList || questionsList.length === 0) {
-            return NextResponse.json({ error: "Test template has no questions" }, { status: 500 });
-        }
-
-        // Create Attempt
-        const [attempt] = await db.insert(testAttempts).values({
-            userId,
-            mockTestId,
-            status: "in_progress",
-            currentQuestionIndex: 0,
-            startedAt: new Date(),
+        // 2. Create Test
+        const [test] = await db.insert(pteMockTests).values({
+            userId: session.user.id,
+            testName: FULL_MOCK_TEST_TEMPLATE.name,
+            totalQuestions: finalQuestions.length,
+            status: 'in_progress',
+            currentSection: 'Part 1: Speaking & Writing',
+            sectionStartedAt: new Date(),
+            sectionTimeLeft: 5400
         }).returning();
 
-        // Fetch First Question
-        const firstQId = questionsList[0].questionId;
-        const questionParams = await fetchQuestionData(firstQId);
+        // 3. Insert Questions link
+        const questionLinks = finalQuestions.map((q, idx) => ({
+            mockTestId: test.id,
+            questionId: q.id,
+            questionOrder: idx + 1,
+            sectionName: q.sectionName,
+            maxScore: 10, // Placeholder max score
+        }));
 
-        return NextResponse.json({
-            attemptId: attempt.id,
-            totalQuestions: questionsList.length,
-            title: template.title,
-            currentQuestionIndex: 0,
-            question: {
-                ...questionParams,
-                // Hide sensitive data (correct answers) from client!
-                correctAnswer: undefined,
-                sampleAnswer: undefined,
-                scoringRubric: undefined
-            }
-        });
+        await db.insert(pteMockTestQuestions).values(questionLinks);
+
+        return NextResponse.json({ testId: test.id });
 
     } catch (error) {
-        console.error("[MockTest Start] Error:", error);
-        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+        console.error('Error starting mock test:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
