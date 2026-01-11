@@ -1,35 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "pnpm build",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "framework": "nextjs",
-
-  "regions": ["iad1", "sfo1", "cdg1"],
-
-  "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 30,
-      "memory": 1024
-    },
-    "app/api/pte/scoring/**/*.ts": {
-      "maxDuration": 60,
-      "memory": 3008
-    },
-    "app/api/mock-test/**/*.ts": {
-      "maxDuration": 60,
-      "memory": 1024
-    }
-  },
-
-  "crons": [],
-
-  "build": {
-    "env": {
-      "ENABLE_EXPERIMENTAL_COREPACK": "1",
-      "NODE_VERSION": "20.17.0",
-      "PNPM_VERSION": "10.26.1"
-    }
-  },
 
   "rewrites": [
     {
@@ -57,9 +27,5 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" }
       ]
     }
-  ],
-
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
