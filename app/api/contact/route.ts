@@ -3,7 +3,7 @@ import { Resend } from "resend"
 import { apiSuccess, apiError, handleApiError } from "@/lib/api"
 import { z } from 'zod/v3';
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resendApiKey = process.env.RESEND_API_KEY;
 
 const ContactSchema = z.object({
   name: z.string().min(1),
@@ -23,6 +23,13 @@ export async function POST(request: NextRequest) {
     }
 
     const { name, email, subject, category, message } = parsed.data
+
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY is missing");
+      return apiError(500, "Email service not configured", "INTERNAL_SERVER_ERROR");
+    }
+
+    const resend = new Resend(resendApiKey);
 
     // Send email using Resend
     const emailResult = await resend.emails.send({

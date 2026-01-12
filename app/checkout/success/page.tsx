@@ -16,6 +16,7 @@ export default function CheckoutSuccessPage() {
 
   const provider = searchParams.get('provider')
   const sessionId = searchParams.get('session_id')
+  const tranId = searchParams.get('tran_id')
 
   useEffect(() => {
     // In a real implementation, you might want to verify the payment status
@@ -33,12 +34,12 @@ export default function CheckoutSuccessPage() {
       }
     }
 
-    if (provider === 'polar' && sessionId) {
+    if ((provider === 'polar' && sessionId) || (provider === 'sslcommerz' && tranId)) {
       checkSubscriptionStatus()
     } else {
       setIsLoading(false)
     }
-  }, [provider, sessionId])
+  }, [provider, sessionId, tranId])
 
   if (isLoading) {
     return (
@@ -102,8 +103,13 @@ export default function CheckoutSuccessPage() {
                 Welcome to PTE Practice Platform!
               </CardTitle>
               <CardDescription>
-                Your subscription has been activated successfully. You now have access to all premium features.
+                Your subscription has been activated successfully via {provider === 'sslcommerz' ? 'SSL Commerz' : 'Polar.sh'}. You now have access to all premium features.
               </CardDescription>
+              {tranId && (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Transaction ID: {tranId}
+                </p>
+              )}
             </CardHeader>
 
             <CardContent className="space-y-6">

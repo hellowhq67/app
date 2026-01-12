@@ -2,17 +2,36 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import QuestionPrompt from "@/components/pte/speaking/QuestionPrompt";
-import SpeakingRecorder from "@/components/pte/speaking/SpeakingRecorder";
-import { Card } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { toast } from "@/hooks/use-toast";
-import { QuestionType } from "@/lib/types";
+import { Mic, Pencil, BookOpen, Headphones } from "lucide-react";
+import ModernSectionalTestUI from "./ModernSectionalTestUI";
 
-// Import inputs for other types if available or use generic generic text area
-// For now, we'll keep the logic similar to MockTestRunner which uses SpeakingRecorder or Textarea
-// We might want to expand this to use specific inputs for Reading/Listening later
+const SECTIONS_META: any = {
+    speaking: {
+        name: 'Speaking', icon: Mic, color: '#6366f1',
+        gradient: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)',
+        bgGlow: 'radial-gradient(ellipse at top, rgba(99, 102, 241, 0.15) 0%, transparent 50%)',
+        totalTime: 30,
+    },
+    writing: {
+        name: 'Writing', icon: Pencil, color: '#10b981',
+        gradient: 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+        bgGlow: 'radial-gradient(ellipse at top, rgba(16, 185, 129, 0.15) 0%, transparent 50%)',
+        totalTime: 40,
+    },
+    reading: {
+        name: 'Reading', icon: BookOpen, color: '#f59e0b',
+        gradient: 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)',
+        bgGlow: 'radial-gradient(ellipse at top, rgba(245, 158, 11, 0.15) 0%, transparent 50%)',
+        totalTime: 30,
+    },
+    listening: {
+        name: 'Listening', icon: Headphones, color: '#ec4899',
+        gradient: 'linear-gradient(135deg, #ec4899 0%, #f472b6 100%)',
+        bgGlow: 'radial-gradient(ellipse at top, rgba(236, 72, 153, 0.15) 0%, transparent 50%)',
+        totalTime: 45,
+    },
+};
 
 interface SectionalTestRunnerProps {
     testId: string;
@@ -36,33 +55,73 @@ export default function SectionalTestRunner({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loadingAudio, setLoadingAudio] = useState(false);
 
+    // Modern UI State
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isRecording, setIsRecording] = useState(false);
+    const [showGrid, setShowGrid] = useState(false);
+    const [isPaused, setIsPaused] = useState(false);
+    const [mobileMenu, setMobileMenu] = useState(false);
+    const [wordCount, setWordCount] = useState(0);
+    const [audioProgress, setAudioProgress] = useState(0);
+    const [waveHeights, setWaveHeights] = useState(Array(25).fill(20));
+
     // Answer State
-    const [textAnswer, setTextAnswer] = useState("");
+    const [answer, setAnswer] = useState<any>("");
     const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
 
     // Timer State
-    // Default to question time limit or 60s
-    const timeLimit = currentQuestion?.timeLimit || 60;
-    const [timeLeft, setTimeLeft] = useState(timeLimit);
+    const [timerSeconds, setTimerSeconds] = useState(30 * 60);
+
+    // Determine section type from title or question
+    const sectionType = sectionTitle.toLowerCase().includes('speaking') ? 'speaking' :
+        sectionTitle.toLowerCase().includes('writing') ? 'writing' :
+            sectionTitle.toLowerCase().includes('reading') ? 'reading' : 'listening';
 
     useEffect(() => {
         // Reset state on new question
-        setTextAnswer("");
         setAudioBlob(null);
-        setTimeLeft(currentQuestion?.timeLimit || 60);
+        setIsRecording(false);
+        setIsPlaying(false);
+        setAudioProgress(0);
+
+        // Initialize answer based on question type
+        const type = (currentQuestion.questionType?.name || "").toLowerCase();
+        if (type.includes('reorder')) {
+            setAnswer(currentQuestion.reading?.options?.paragraphs?.map((p: string, i: number) => ({ id: `p${i}`, text: p })) || []);
+        } else if (type.includes('multiple')) {
+            setAnswer(type.includes('multiple') ? [] : null);
+        } else if (type.includes('fill_blanks')) {
+            setAnswer({});
+        } else {
+            setAnswer("");
+        }
     }, [currentQuestion]);
 
-    // Timer Tick
     useEffect(() => {
-        if (timeLeft <= 0) {
-            handleNext();
-            return;
-        }
-        const interval = setInterval(() => {
-            setTimeLeft((prev: number) => prev - 1);
-        }, 1000);
+        if (isPaused || timerSeconds <= 0) return;
+        const interval = setInterval(() => setTimerSeconds(s => s - 1), 1000);
         return () => clearInterval(interval);
-    }, [timeLeft]);
+    }, [isPaused, timerSeconds]);
+
+    useEffect(() => {
+        if (!isRecording) return;
+        const interval = setInterval(() => setWaveHeights(Array(25).fill(0).map(() => 20 + Math.random() * 80)), 100);
+        return () => clearInterval(interval);
+    }, [isRecording]);
+
+    useEffect(() => {
+        if (!isPlaying) return;
+        const interval = setInterval(() => setAudioProgress(p => p >= 100 ? 0 : p + 0.5), 50);
+        return () => clearInterval(interval);
+    }, [isPlaying]);
+
+    useEffect(() => {
+        if (typeof answer === 'string') {
+            setWordCount(answer.trim().split(/\s+/).filter(w => w).length);
+        } else {
+            setWordCount(0);
+        }
+    }, [answer]);
 
     const handleNext = async () => {
         if (isSubmitting) return;
@@ -70,23 +129,16 @@ export default function SectionalTestRunner({
 
         let answerPayload: any = {};
 
-        // 1. Prepare Payload
-        const type = currentQuestion.questionType.name || currentQuestion.questionType;
-        const isSpeaking =
-            type.toLowerCase().includes("speaking") ||
-            type.toLowerCase().includes("read aloud") ||
-            type.toLowerCase().includes("repeat") ||
-            type.toLowerCase().includes("describe") ||
-            type.toLowerCase().includes("retell");
+        const type = (currentQuestion.questionType.name || "").toLowerCase();
+        const isSpeaking = type.includes("speaking") || type.includes("read aloud") || type.includes("repeat") || type.includes("describe") || type.includes("retell");
 
-        // Upload Audio if Speaking
+        // Prepare Payload
         if (isSpeaking && audioBlob) {
             try {
                 setLoadingAudio(true);
                 const formData = new FormData();
                 formData.append("file", audioBlob, "recording.webm");
 
-                // Use the existing audio upload route
                 const upRes = await fetch("/api/upload/audio", {
                     method: "POST",
                     body: formData,
@@ -95,7 +147,6 @@ export default function SectionalTestRunner({
                     const { url } = await upRes.json();
                     answerPayload = { audioUrl: url };
                 } else {
-                    console.error("Audio upload failed, proceeding without audio url");
                     answerPayload = { error: "Audio Upload Failed" };
                 }
             } catch (e) {
@@ -104,24 +155,35 @@ export default function SectionalTestRunner({
                 setLoadingAudio(false);
             }
         } else {
-            answerPayload = { text: textAnswer };
+            // Format answer for different types
+            if (type.includes('reorder')) {
+                answerPayload = { orderedParagraphs: (answer || []).map((a: any) => a.text) };
+            } else if (type.includes('multiple')) {
+                if (Array.isArray(answer)) {
+                    answerPayload = { selectedOptions: answer };
+                } else {
+                    answerPayload = { selectedOption: answer };
+                }
+            } else if (type.includes('fill_blanks')) {
+                answerPayload = { filledBlanks: answer };
+            } else {
+                answerPayload = { text: answer };
+            }
         }
 
-        // 2. Submit to API
         try {
             const res = await fetch("/api/sectional-test/submit", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     testId,
-                    answer: answerPayload,
-                    timeSpentMs: (timeLimit - timeLeft) * 1000,
                     questionId: currentQuestion.id,
+                    answer: answerPayload,
+                    timeSpentMs: 0, // Could track this more accurately if needed
                 }),
             });
 
             const data = await res.json();
-
             if (data.finished) {
                 router.push(`/academic/sectional-test/${testId}/result`);
             } else if (data.question) {
@@ -130,84 +192,47 @@ export default function SectionalTestRunner({
             }
         } catch (e) {
             toast({ title: "Error submitting answer", variant: "destructive" });
-            console.error(e);
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    const type = currentQuestion.questionType.name || currentQuestion.questionType;
-    const isSpeaking =
-        type.toLowerCase().includes("speaking") ||
-        type.toLowerCase().includes("read aloud") ||
-        type.toLowerCase().includes("repeat") ||
-        type.toLowerCase().includes("describe") ||
-        type.toLowerCase().includes("retell");
+    // Map DB question to UI question format
+    const uiQuestion = {
+        type: currentQuestion.questionType.name,
+        content: currentQuestion.content || currentQuestion.reading?.passageText || currentQuestion.writing?.promptText || currentQuestion.listening?.questionText,
+        instructions: currentQuestion.questionType.description,
+        imageUrl: currentQuestion.imageUrl || currentQuestion.speaking?.imageUrl,
+        options: currentQuestion.reading?.options?.choices?.map((c: string, i: number) => ({ id: `opt${i}`, text: c })),
+        blanks: currentQuestion.reading?.options?.blanks,
+    };
 
     return (
-        <div className="min-h-screen bg-background flex flex-col">
-            {/* Header */}
-            <header className="h-16 border-b flex items-center justify-between px-6 bg-card">
-                <div className="font-semibold">{sectionTitle}</div>
-                <div className="flex items-center gap-4">
-                    <span className={`font-mono text-xl ${timeLeft < 10 ? "text-red-500" : ""}`}>
-                        {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
-                    </span>
-                    <Button onClick={handleNext} disabled={isSubmitting || loadingAudio}>
-                        {isSubmitting ? "Saving..." : "Next"}
-                    </Button>
-                </div>
-            </header>
-
-            <Progress value={(currentIndex / totalQuestions) * 100} className="h-1" />
-
-            {/* Main Content */}
-            <main className="flex-1 container mx-auto p-6 max-w-4xl flex flex-col items-center justify-center">
-                <Card className="w-full p-8 min-h-[400px] flex flex-col gap-6">
-                    {/* Prompt Section */}
-                    <div className="space-y-4">
-                        <h2 className="text-2xl font-bold">{currentQuestion.title}</h2>
-                        <QuestionPrompt
-                            question={{
-                                id: currentQuestion.id,
-                                type: (currentQuestion.questionType?.name ||
-                                    currentQuestion.questionType?.code) as any,
-                                title: currentQuestion.title,
-                                promptText:
-                                    currentQuestion.content ||
-                                    currentQuestion.writing?.promptText ||
-                                    currentQuestion.reading?.passageText,
-                                promptMediaUrl:
-                                    currentQuestion.speaking?.audioPromptUrl ||
-                                    currentQuestion.listening?.audioFileUrl,
-                            }}
-                        />
-                    </div>
-
-                    {/* Input Section */}
-                    <div className="flex-1 mt-6">
-                        {isSpeaking ? (
-                            <SpeakingRecorder
-                                type={currentQuestion.questionType.name as any}
-                                timers={{
-                                    prepMs: 3000,
-                                    recordMs: (currentQuestion.timeLimit || 40) * 1000,
-                                }}
-                                onRecorded={(data: { blob: Blob }) => setAudioBlob(data.blob)}
-                                auto={{ active: true }}
-                            />
-                        ) : (
-                            <textarea
-                                className="w-full h-64 p-4 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-                                placeholder="Type your answer here..."
-                                value={textAnswer}
-                                onChange={(e) => setTextAnswer(e.target.value)}
-                                spellCheck={false}
-                            />
-                        )}
-                    </div>
-                </Card>
-            </main>
-        </div>
+        <ModernSectionalTestUI
+            sectionData={SECTIONS_META[sectionType]}
+            currentQuestion={uiQuestion}
+            currentIndex={currentIndex}
+            totalQuestions={totalQuestions}
+            timerSeconds={timerSeconds}
+            onNext={handleNext}
+            onPrev={() => { }} // Not typically supported in exam mode
+            onNav={() => { }} // Read-only in exam mode
+            isSubmitting={isSubmitting}
+            isRecording={isRecording}
+            setIsRecording={setIsRecording}
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
+            isPaused={isPaused}
+            setIsPaused={setIsPaused}
+            textAnswer={answer}
+            setTextAnswer={setAnswer}
+            audioProgress={audioProgress}
+            waveHeights={waveHeights}
+            wordCount={wordCount}
+            showGrid={showGrid}
+            setShowGrid={setShowGrid}
+            mobileMenu={mobileMenu}
+            setMobileMenu={setMobileMenu}
+        />
     );
 }

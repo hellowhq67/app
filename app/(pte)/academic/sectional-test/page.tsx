@@ -88,9 +88,9 @@ export default function SectionalTestDashboard() {
     return (
         <div className="container mx-auto py-10 space-y-8">
             <div>
-                <h1 className="text-3xl font-bold tracking-tight">Sectional Tests</h1>
+                <h1 className="text-3xl font-bold tracking-tight">PedagogistsPTE Sectional Mastery</h1>
                 <p className="text-muted-foreground mt-2">
-                    Focus on specific skills with targeted sectional practice tests.
+                    Focus on specific skills with targeted sectional practice tests designed by PedagogistsPTE.
                 </p>
             </div>
 

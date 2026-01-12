@@ -73,7 +73,7 @@ const navMain = [
   },
   {
     title: "Sectional Tests",
-    url: "/academic/sectional-tests",
+    url: "/academic/sectional-test",
     icon: Frame,
   },
   {
@@ -109,10 +109,10 @@ export function PTEAppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/pte/dashboard">
+              <Link href="/dashboard">
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Pedagogist</span>
-                  <span className="truncate text-xs">AI Learning Platform</span>
+                  <span className="truncate font-semibold">PedagogistsPTE</span>
+                  <span className="truncate text-xs">PTE Academic SASS</span>
                 </div>
               </Link>
             </SidebarMenuButton>

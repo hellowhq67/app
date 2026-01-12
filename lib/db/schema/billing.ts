@@ -70,6 +70,10 @@ export const subscriptions = pgTable('subscriptions', {
     currency: text('currency').notNull().default('USD'),
     interval: text('interval').notNull().default('month'), // 'month', 'year'
 
+    // External provider IDs
+    sslCommerzTranId: text('sslcommerz_tran_id').unique(),
+    sslCommerzSessionId: text('sslcommerz_session_id').unique(),
+
     // Metadata
     metadata: jsonb('metadata'),
 
@@ -129,6 +133,7 @@ export const invoices = pgTable('invoices', {
     // External provider IDs
     polarInvoiceId: text('polar_invoice_id').unique(),
     stripeInvoiceId: text('stripe_invoice_id').unique(),
+    sslCommerzTranId: text('sslcommerz_tran_id').unique(),
 
     // Invoice details
     invoiceNumber: text('invoice_number').unique(),
@@ -191,6 +196,7 @@ export const transactions = pgTable('transactions', {
     // External provider IDs
     polarTransactionId: text('polar_transaction_id'),
     stripeTransactionId: text('stripe_transaction_id'),
+    sslCommerzTranId: text('sslcommerz_tran_id'),
 
     // Metadata
     metadata: jsonb('metadata'),
@@ -223,6 +229,7 @@ export const creditPurchases = pgTable('credit_purchases', {
     // External provider IDs
     polarCheckoutId: text('polar_checkout_id'),
     stripeCheckoutId: text('stripe_checkout_id'),
+    sslCommerzTranId: text('sslcommerz_tran_id'),
 
     // Status
     status: text('status').notNull().default('pending'), // 'pending', 'completed', 'failed'

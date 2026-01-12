@@ -267,18 +267,24 @@ export function getRemainingAiCredits(
 export const TIER_PRICING = {
   [SubscriptionTier.FREE]: {
     price: 0,
+    bdtPrice: 0,
     period: "forever",
     displayPrice: "Free",
+    displayBdtPrice: "Free",
   },
   [SubscriptionTier.PRO]: {
     price: 29,
+    bdtPrice: 3500,
     period: "month",
     displayPrice: "$29/month",
+    displayBdtPrice: "৳3500/month",
   },
   [SubscriptionTier.PREMIUM]: {
     price: 49,
+    bdtPrice: 6000,
     period: "month",
     displayPrice: "$49/month",
+    displayBdtPrice: "৳6000/month",
   },
 };
 
