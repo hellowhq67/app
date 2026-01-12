@@ -17,8 +17,12 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  baseURL: process.env.BETTER_AUTH_URL || "https://pedagogistspte-v-0-2-e9i71msj4-hellowhq67s-projects.vercel.app/",
-  trustedOrigins: ["https://pedagogistspte-v-0-2-e9i71msj4-hellowhq67s-projects.vercel.app/"],
+  baseURL: process.env.BETTER_AUTH_URL || "https://pedagogistspte.com",
+  trustedOrigins: [
+    "https://pedagogistspte.com",
+    "https://pedagogistspte-v-0-2-git-main-hellowhq67s-projects.vercel.app",
+    "http://localhost:3000" // Keep for local development
+  ],
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
