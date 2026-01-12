@@ -21,7 +21,7 @@ export const auth = betterAuth({
   trustedOrigins: [
     "https://pedagogistspte.com",
     "https://pedagogistspte-v-0-2-git-main-hellowhq67s-projects.vercel.app",
-    "http://localhost:3000" // Keep for local development
+    ...(process.env.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
   ],
   socialProviders: {
     google: {
