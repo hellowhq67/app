@@ -6,8 +6,7 @@ import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ||
-   'https://www.pedagogistspte.com/' process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_APP_URL||process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||'https://www.pedagogistspte.com/'
    // Dev fallback
   ),
   title: 'PedagogistsPTE',
