@@ -7,14 +7,14 @@ import { Toaster } from 'sonner'
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
-    'http://localhost:3000' // Dev fallback
+   'https://www.pedagogistspte.com/' process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
+   // Dev fallback
   ),
   title: 'PedagogistsPTE',
   description:
     'Advanced PTE Academic preparation platform with AI-powered practice and scoring.',
   openGraph: {
-    title: 'PedagogistsPTE',
+    title: 'Pedagogist'sPTE',
     description: 'Master PTE with AI Excellence',
     images: [{ url: '/og-image.png' }],
   },
