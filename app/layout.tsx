@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description:
     'Advanced PTE Academic preparation platform with AI-powered practice and scoring.',
   openGraph: {
-    title: 'Pedagogist'sPTE',
+    title: 'Pedagogists PTE',
     description: 'Master PTE with AI Excellence',
     images: [{ url: '/og-image.png' }],
   },
