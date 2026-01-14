@@ -298,16 +298,56 @@ export const getPromptForQuestionType = (
           Score 1 point for each correct match/pair/blank/word.
           overallScore is the total points.
          `
-    // CORE
+    // CORE Speaking Types
     case QuestionType.RESPOND_TO_A_SITUATION:
-    case QuestionType.SUMMARIZE_GROUP_DISCUSSION:
+      if (!promptTopic || !userTranscript) {
+        throw new Error('Missing parameters for RESPOND_TO_A_SITUATION prompt.')
+      }
       return `
-         Score this PTE Core Speaking item.
-         Transcript: "${userTranscript}"
-         
-         Score Content, Pronunciation, Fluency (0-5 each).
-         overallScore is the sum of scores.
-        `
+        You are a strict PTE Core examiner. Score "Respond to a Situation".
+
+        **Situation**: "${promptTopic}"
+        **Transcript**: "${userTranscript}"
+
+        **Instructions**:
+        1. Score Appropriateness (0-3), Content (0-5), Pronunciation (0-5), Fluency (0-5).
+        2. overallScore MUST be the sum of these scores (Max 18). Do NOT scale to 90.
+
+        **Criteria**:
+        - Appropriateness: 3=Fully appropriate register/tone for the situation, 2=Mostly appropriate, 1=Somewhat appropriate, 0=Inappropriate.
+        - Content: 5=All relevant points addressed, 3=Most points covered, 1=Few points, 0=Off-topic.
+        - ${PTE_SCORING_CRITERIA_SPEAKING.PRONUNCIATION}
+        - ${PTE_SCORING_CRITERIA_SPEAKING.FLUENCY}
+
+        **Key Considerations**:
+        - Is the response appropriate for the context (formal/informal)?
+        - Does it address the specific situation?
+        - Is the tone suitable for the audience?
+      `
+    case QuestionType.SUMMARIZE_GROUP_DISCUSSION:
+      if (!audioTranscript || !userTranscript) {
+        throw new Error('Missing parameters for SUMMARIZE_GROUP_DISCUSSION prompt.')
+      }
+      return `
+        You are a strict PTE Core examiner. Score "Summarize Group Discussion".
+
+        **Discussion Transcript**: "${audioTranscript}"
+        **User Summary**: "${userTranscript}"
+
+        **Instructions**:
+        1. Score Content (0-5), Pronunciation (0-5), Fluency (0-5).
+        2. overallScore MUST be the sum of these scores (Max 15). Do NOT scale to 90.
+
+        **Criteria**:
+        - Content: 5=All main points and perspectives summarized, 3=Most points covered, 1=Significant omissions, 0=Inaccurate/irrelevant.
+        - ${PTE_SCORING_CRITERIA_SPEAKING.PRONUNCIATION}
+        - ${PTE_SCORING_CRITERIA_SPEAKING.FLUENCY}
+
+        **Key Considerations**:
+        - Are the main viewpoints from the discussion captured?
+        - Is there a balance between different speakers' perspectives?
+        - Is the summary coherent and organized?
+      `
 
     default:
       throw new Error(`Scoring prompt for question type "${type}" is not implemented.`)

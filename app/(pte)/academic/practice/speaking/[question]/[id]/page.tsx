@@ -6,10 +6,18 @@ import { AccessGate } from "@/components/pte/AccessGate";
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Clock, BarChart } from "lucide-react";
+import { ArrowLeft, Clock, BarChart, ChevronRight, Home } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { SpeakingPracticeClient } from "@/components/pte/speaking/speaking-client";
 import { SpeakingQuestion } from "@/lib/types";
+
+// Format question type for display
+function formatQuestionType(type: string): string {
+    return type
+        .split("_")
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}
 
 export default async function QuestionPage({
     params,
@@ -37,9 +45,35 @@ export default async function QuestionPage({
         }
     }
 
+    const questionTypeName = formatQuestionType(question);
+
     return (
         <div className="container mx-auto p-6 max-w-5xl space-y-6">
-            {/* Header / Nav */}
+            {/* Breadcrumb Navigation */}
+            <nav className="flex items-center gap-1 text-sm text-muted-foreground flex-wrap">
+                <Link href="/academic" className="hover:text-foreground transition-colors flex items-center gap-1">
+                    <Home className="size-3.5" />
+                    Dashboard
+                </Link>
+                <ChevronRight className="size-3" />
+                <Link href="/academic/practice" className="hover:text-foreground transition-colors">
+                    Practice
+                </Link>
+                <ChevronRight className="size-3" />
+                <Link href="/academic/practice/speaking" className="hover:text-foreground transition-colors">
+                    Speaking
+                </Link>
+                <ChevronRight className="size-3" />
+                <Link href={`/academic/practice/speaking/${question}`} className="hover:text-foreground transition-colors">
+                    {questionTypeName}
+                </Link>
+                <ChevronRight className="size-3" />
+                <span className="text-foreground font-medium truncate max-w-[200px]">
+                    {questionData.title || `Question #${id.slice(-6)}`}
+                </span>
+            </nav>
+
+            {/* Header with Back Button and Premium Badge */}
             <div className="flex items-center justify-between">
                 <Link href={`/academic/practice/speaking/${question}`}>
                     <Button

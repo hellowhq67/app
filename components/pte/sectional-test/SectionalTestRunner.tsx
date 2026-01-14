@@ -1,8 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
+import { useAudioRecorder } from "@/hooks/useAudioRecorder";
+import { useBeep } from "@/hooks/useBeep";
 import { Mic, Pencil, BookOpen, Headphones } from "lucide-react";
 import ModernSectionalTestUI from "./ModernSectionalTestUI";
 
@@ -55,9 +57,23 @@ export default function SectionalTestRunner({
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [loadingAudio, setLoadingAudio] = useState(false);
 
+    // Real Audio Recording Hook
+    const {
+        isRecording: recorderIsRecording,
+        recordingTime,
+        audioBlob: recorderAudioBlob,
+        audioUrl: recordedAudioUrl,
+        startRecording: startMicRecording,
+        stopRecording: stopMicRecording,
+        resetRecording,
+        error: recorderError,
+    } = useAudioRecorder(60); // Max 60 seconds
+
+    const { playBeep } = useBeep();
+    const audioRef = useRef<HTMLAudioElement>(null);
+
     // Modern UI State
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isRecording, setIsRecording] = useState(false);
     const [showGrid, setShowGrid] = useState(false);
     const [isPaused, setIsPaused] = useState(false);
     const [mobileMenu, setMobileMenu] = useState(false);
@@ -67,7 +83,7 @@ export default function SectionalTestRunner({
 
     // Answer State
     const [answer, setAnswer] = useState<any>("");
-    const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+    // Note: audioBlob comes from useAudioRecorder hook now
 
     // Timer State
     const [timerSeconds, setTimerSeconds] = useState(30 * 60);
@@ -77,10 +93,26 @@ export default function SectionalTestRunner({
         sectionTitle.toLowerCase().includes('writing') ? 'writing' :
             sectionTitle.toLowerCase().includes('reading') ? 'reading' : 'listening';
 
+    // Handle recording toggle
+    const handleRecordingToggle = useCallback(async () => {
+        if (recorderIsRecording) {
+            stopMicRecording();
+        } else {
+            playBeep();
+            await startMicRecording();
+        }
+    }, [recorderIsRecording, startMicRecording, stopMicRecording, playBeep]);
+
+    // Show recording error toast
+    useEffect(() => {
+        if (recorderError) {
+            toast({ title: "Microphone Error", description: recorderError, variant: "destructive" });
+        }
+    }, [recorderError]);
+
     useEffect(() => {
         // Reset state on new question
-        setAudioBlob(null);
-        setIsRecording(false);
+        resetRecording();
         setIsPlaying(false);
         setAudioProgress(0);
 
@@ -95,7 +127,7 @@ export default function SectionalTestRunner({
         } else {
             setAnswer("");
         }
-    }, [currentQuestion]);
+    }, [currentQuestion, resetRecording]);
 
     useEffect(() => {
         if (isPaused || timerSeconds <= 0) return;
@@ -104,10 +136,10 @@ export default function SectionalTestRunner({
     }, [isPaused, timerSeconds]);
 
     useEffect(() => {
-        if (!isRecording) return;
+        if (!recorderIsRecording) return;
         const interval = setInterval(() => setWaveHeights(Array(25).fill(0).map(() => 20 + Math.random() * 80)), 100);
         return () => clearInterval(interval);
-    }, [isRecording]);
+    }, [recorderIsRecording]);
 
     useEffect(() => {
         if (!isPlaying) return;
@@ -133,11 +165,11 @@ export default function SectionalTestRunner({
         const isSpeaking = type.includes("speaking") || type.includes("read aloud") || type.includes("repeat") || type.includes("describe") || type.includes("retell");
 
         // Prepare Payload
-        if (isSpeaking && audioBlob) {
+        if (isSpeaking && recorderAudioBlob) {
             try {
                 setLoadingAudio(true);
                 const formData = new FormData();
-                formData.append("file", audioBlob, "recording.webm");
+                formData.append("file", recorderAudioBlob, "recording.webm");
 
                 const upRes = await fetch("/api/upload/audio", {
                     method: "POST",
@@ -218,8 +250,8 @@ export default function SectionalTestRunner({
             onPrev={() => { }} // Not typically supported in exam mode
             onNav={() => { }} // Read-only in exam mode
             isSubmitting={isSubmitting}
-            isRecording={isRecording}
-            setIsRecording={setIsRecording}
+            isRecording={recorderIsRecording}
+            setIsRecording={handleRecordingToggle}
             isPlaying={isPlaying}
             setIsPlaying={setIsPlaying}
             isPaused={isPaused}

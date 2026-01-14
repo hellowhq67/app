@@ -3,6 +3,7 @@ import { CheckCircle, AlertCircle, Lightbulb, X, Share2, Play, Pause, Volume2 } 
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState, useRef, useEffect } from "react";
 import { WordMarking } from "@/lib/types";
 
@@ -11,7 +12,7 @@ interface ScoreDisplayProps {
   spokenText?: string;
   originalText?: string;
   audioUrl?: string;
-  wordMarking?: WordMarking[]; // Added prop for server-side analysis
+  wordMarking?: WordMarking[];
   onClose?: () => void;
   isModal?: boolean;
 }
@@ -21,18 +22,64 @@ interface WordAnalysis {
   status: "good" | "average" | "poor" | "pause" | "omitted" | "inserted";
 }
 
-export function ScoreDisplay({ 
-  score, 
-  spokenText = "", 
+// Score bar component for visual feedback
+const ScoreBar = ({ label, score, maxScore = 90, color }: { label: string; score: number; maxScore?: number; color: string }) => {
+  const percentage = Math.min((score / maxScore) * 100, 100);
+  return (
+    <div className="space-y-1.5">
+      <div className="flex justify-between text-sm">
+        <span className="font-medium">{label}</span>
+        <span className={color}>{score}<span className="text-muted-foreground">/{maxScore}</span></span>
+      </div>
+      <div className="h-2.5 bg-muted/50 rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all duration-500 ${percentage >= 70 ? 'bg-emerald-500' : percentage >= 50 ? 'bg-amber-500' : 'bg-red-500'
+            }`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+    </div>
+  );
+};
+
+// Circular score indicator
+const CircularScore = ({ score, maxScore = 90 }: { score: number; maxScore?: number }) => {
+  const percentage = Math.min((score / maxScore) * 100, 100);
+  const circumference = 2 * Math.PI * 45;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+  const color = percentage >= 70 ? '#10b981' : percentage >= 50 ? '#f59e0b' : '#ef4444';
+
+  return (
+    <div className="relative w-28 h-28 mx-auto">
+      <svg className="transform -rotate-90" width="112" height="112">
+        <circle cx="56" cy="56" r="45" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted/30" />
+        <circle
+          cx="56" cy="56" r="45" fill="none" stroke={color} strokeWidth="8"
+          strokeDasharray={circumference} strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round" className="transition-all duration-700"
+        />
+      </svg>
+      <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <span className="text-3xl font-bold" style={{ color }}>{score}</span>
+        <span className="text-xs text-muted-foreground">/ {maxScore}</span>
+      </div>
+    </div>
+  );
+};
+
+export function ScoreDisplay({
+  score,
+  spokenText = "",
   originalText = "",
   audioUrl,
-  wordMarking, // Destructure new prop
+  wordMarking,
   onClose,
   isModal = false
 }: ScoreDisplayProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [activeTab, setActiveTab] = useState<"pronunciation" | "stress">("pronunciation");
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const getScoreColor = (s: number) => {
@@ -43,45 +90,39 @@ export function ScoreDisplay({
 
   // Generate word analysis (Server Priority or Client Fallback)
   const getWordAnalysis = (): WordAnalysis[] => {
-    // 1. Prefer Server-side Word Marking
     if (wordMarking && wordMarking.length > 0) {
       return wordMarking.map(wm => ({
         word: wm.word,
-        status: wm.classification as any // Ensure type compatibility
+        status: wm.classification as any
       }));
     }
 
-    // 2. Fallback to Client-side comparison
     if (!spokenText) return [];
-    
+
     const spokenWords = spokenText.split(/\s+/).filter(Boolean);
     const originalWords = originalText ? originalText.toLowerCase().split(/\s+/).filter(Boolean) : [];
-    
+
     return spokenWords.map((word) => {
       const cleanWord = word.toLowerCase().replace(/[.,!?;:'"]/g, "");
-      
-      // Check if word exists in original
+
       if (originalWords.includes(cleanWord)) {
         return { word, status: "good" as const };
       }
-      
-      // Check for filler words or hesitations
+
       if (["um", "uh", "er", "ah", "like", "you know"].includes(cleanWord)) {
         return { word, status: "poor" as const };
       }
-      
-      // Check for partial matches (close words)
-      const hasPartialMatch = originalWords.some(orig => 
+
+      const hasPartialMatch = originalWords.some(orig =>
         orig.includes(cleanWord) || cleanWord.includes(orig) ||
-        (orig.length > 3 && cleanWord.length > 3 && 
+        (orig.length > 3 && cleanWord.length > 3 &&
           (orig.slice(0, 3) === cleanWord.slice(0, 3)))
       );
-      
+
       if (hasPartialMatch) {
         return { word, status: "average" as const };
       }
-      
-      // Default based on overall score
+
       if (score.pronunciation >= 70) {
         return { word, status: "good" as const };
       } else if (score.pronunciation >= 50) {
@@ -95,17 +136,16 @@ export function ScoreDisplay({
 
   const getWordColor = (status: string) => {
     switch (status) {
-      case "good": return "text-emerald-500";
+      case "good": return "text-blue-500"; // APEUni uses blue for good
       case "average": return "text-amber-500";
       case "poor": return "text-red-500";
-      case "omitted": return "text-gray-400 line-through decoration-red-500"; // Visual style for omitted
-      case "inserted": return "text-purple-500"; // Visual style for inserted
+      case "omitted": return "text-gray-400 line-through decoration-red-500";
+      case "inserted": return "text-purple-500";
       case "pause": return "text-muted-foreground";
       default: return "text-foreground";
     }
   };
 
-  // Audio player controls
   const togglePlay = () => {
     if (audioRef.current) {
       if (isPlaying) {
@@ -144,144 +184,148 @@ export function ScoreDisplay({
 
   const getSuggestion = (component: string, scoreValue: number) => {
     if (component === "Content") {
-      if (scoreValue >= 70) return "Good overall accuracy; content well captured with main meaning preserved.";
-      if (scoreValue >= 50) return "Minor substitutions/omissions noted; main meaning preserved but some details missed.";
-      return "Significant content gaps; key information missing or incorrect.";
+      if (scoreValue >= 70) return "Content well captured with main meaning preserved.";
+      if (scoreValue >= 50) return "Minor omissions; main meaning preserved.";
+      return "Significant content gaps; key information missing.";
     }
     if (component === "Pronunciation") {
-      if (scoreValue >= 70) return "Generally clear and intelligible with natural speech patterns.";
-      if (scoreValue >= 50) return "Occasional mis-articulations; some hesitation but overall understandable.";
-      return "Frequent pronunciation errors affecting comprehension.";
+      if (scoreValue >= 70) return "Clear and intelligible with natural speech.";
+      if (scoreValue >= 50) return "Some mis-articulations but understandable.";
+      return "Frequent pronunciation errors.";
     }
     if (component === "Fluency") {
-      if (scoreValue >= 70) return "Smooth delivery with natural pacing and rhythm.";
-      if (scoreValue >= 50) return "Some hesitations and fillers; pacing uneven at points but readable.";
-      return "Major disruptions in speech flow; frequent pauses affecting communication.";
+      if (scoreValue >= 70) return "Smooth delivery with natural pacing.";
+      if (scoreValue >= 50) return "Some hesitations; uneven pacing.";
+      return "Frequent pauses affecting communication.";
     }
     return "";
   };
 
   const scoreContent = (
     <div className="space-y-6 animate-score-reveal">
-      {/* Component Scores Table */}
-      <div className="border rounded-lg overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-muted/50">
-              <TableHead className="font-semibold">Component</TableHead>
-              <TableHead className="font-semibold text-center w-24">Score</TableHead>
-              <TableHead className="font-semibold">Suggestion</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">Content</TableCell>
-              <TableCell className="text-center">
-                <span className={getScoreColor(score.content)}>{score.content}</span>/90
-              </TableCell>
-              <TableCell className="text-sm text-muted-foreground">
-                {getSuggestion("Content", score.content)}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">Pronunciation</TableCell>
-              <TableCell className="text-center">
-                <span className={getScoreColor(score.pronunciation)}>{score.pronunciation}</span>/90
-              </TableCell>
-              <TableCell className="text-sm text-muted-foreground">
-                {getSuggestion("Pronunciation", score.pronunciation)}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">Fluency</TableCell>
-              <TableCell className="text-center">
-                <span className={getScoreColor(score.fluency)}>{score.fluency}</span>/90
-              </TableCell>
-              <TableCell className="text-sm text-muted-foreground">
-                {getSuggestion("Fluency", score.fluency)}
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+      {/* Header with Overall Score */}
+      <div className="flex items-start gap-6 p-4 bg-gradient-to-r from-muted/50 to-transparent rounded-xl">
+        <CircularScore score={score.overallScore} maxScore={90} />
+        <div className="flex-1 space-y-3">
+          <div className="text-sm text-muted-foreground">Score Breakdown</div>
+          <ScoreBar label="Content" score={score.content} color={getScoreColor(score.content)} />
+          <ScoreBar label="Pronunciation" score={score.pronunciation} color={getScoreColor(score.pronunciation)} />
+          <ScoreBar label="Fluency" score={score.fluency} color={getScoreColor(score.fluency)} />
+        </div>
       </div>
 
-      {/* Max/Your Score */}
-      <div className="flex items-center gap-4 text-sm border-t pt-4">
-        <span className="text-muted-foreground">Max Score: <span className="font-semibold text-foreground">90</span></span>
-        <span className="text-muted-foreground">Your Score: <span className={`font-bold text-xl ${getScoreColor(score.overallScore)}`}>{score.overallScore}</span></span>
+      {/* Skills Analysis */}
+      <div className="grid grid-cols-3 gap-3 text-center text-sm">
+        <div className="p-3 rounded-lg bg-muted/30">
+          <div className={`text-2xl font-bold ${getScoreColor(score.pronunciation)}`}>{score.pronunciation}</div>
+          <div className="text-muted-foreground">Pronunciation</div>
+        </div>
+        <div className="p-3 rounded-lg bg-muted/30">
+          <div className={`text-2xl font-bold ${getScoreColor(score.fluency)}`}>{score.fluency}</div>
+          <div className="text-muted-foreground">Oral Fluency</div>
+        </div>
+        <div className="p-3 rounded-lg bg-muted/30">
+          <div className={`text-2xl font-bold ${getScoreColor(score.content)}`}>{score.content}</div>
+          <div className="text-muted-foreground">Reading</div>
+        </div>
       </div>
 
       {/* Audio Player */}
       {audioUrl && (
         <div className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="h-10 w-10 rounded-full"
             onClick={togglePlay}
           >
             {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
           </Button>
-          
+
           <span className="text-sm text-muted-foreground min-w-[100px]">
             {formatTime(currentTime)} / {formatTime(duration || 0)}
           </span>
-          
+
           <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-            <div 
+            <div
               className="h-full bg-foreground transition-all duration-100"
               style={{ width: `${duration ? (currentTime / duration) * 100 : 0}%` }}
             />
           </div>
-          
+
           <Volume2 className="h-4 w-4 text-muted-foreground" />
-          
+
           <audio ref={audioRef} src={audioUrl} className="hidden" />
         </div>
       )}
 
-      {/* AI Speech Recognition */}
+      {/* Word-by-Word Analysis with Tabs */}
       {wordAnalysis.length > 0 && (
-        <div className="space-y-4 p-4 border rounded-lg bg-card">
-          <div className="flex items-center justify-between">
-            <span className="font-semibold">AI Speech Recognition:</span>
-            <div className="flex items-center gap-4 text-sm">
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-                Good
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                Average
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-500" />
-                Poor
-              </span>
-              <span className="text-muted-foreground">/ Pause</span>
-            </div>
-          </div>
-          
-          <div className="p-4 bg-muted/30 rounded-lg">
-            <p className="leading-loose text-lg">
-              {wordAnalysis.map((item, i) => (
-                <span key={i}>
-                  <span 
-                    className={`${getWordColor(item.status)} cursor-pointer hover:underline transition-colors`}
-                    title={`${item.status.charAt(0).toUpperCase() + item.status.slice(1)} pronunciation`}
-                  >
-                    {item.word}
-                  </span>
-                  {item.status === "pause" ? " / " : " "}
+        <div className="border rounded-lg bg-card overflow-hidden">
+          <Tabs defaultValue="pronunciation" className="w-full">
+            <TabsList className="w-full justify-start rounded-none border-b bg-muted/30 h-auto p-0">
+              <TabsTrigger 
+                value="pronunciation" 
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+              >
+                Pronunciation Accuracy
+              </TabsTrigger>
+              <TabsTrigger 
+                value="stress"
+                className="rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:bg-transparent px-6 py-3"
+              >
+                Stress
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="pronunciation" className="p-4 space-y-4 mt-0">
+              {/* Legend */}
+              <div className="flex items-center gap-6 text-sm">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-blue-500" />
+                  Good
                 </span>
-              ))}
-            </p>
-          </div>
-          
-          <p className="text-sm text-muted-foreground text-center flex items-center justify-center gap-2">
-            <Lightbulb className="h-4 w-4 text-amber-500" />
-            Click on the colored text to view detailed score analysis
-          </p>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-amber-500" />
+                  Average
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-red-500" />
+                  Bad
+                </span>
+              </div>
+
+              {/* Word Analysis Display */}
+              <div className="p-4 bg-muted/20 rounded-lg border">
+                <p className="leading-relaxed text-lg tracking-wide">
+                  {wordAnalysis.map((item, i) => (
+                    <span key={i}>
+                      <span
+                        className={`${getWordColor(item.status)} cursor-pointer hover:bg-muted/50 px-0.5 rounded transition-all`}
+                        title={`${item.status.charAt(0).toUpperCase() + item.status.slice(1)} pronunciation`}
+                      >
+                        {item.word}
+                      </span>
+                      {item.status === "pause" ? " / " : " "}
+                    </span>
+                  ))}
+                </p>
+              </div>
+
+              <p className="text-sm text-muted-foreground text-center flex items-center justify-center gap-2">
+                <Lightbulb className="h-4 w-4 text-amber-500" />
+                Hover over words to see pronunciation feedback
+              </p>
+            </TabsContent>
+
+            <TabsContent value="stress" className="p-4 space-y-4 mt-0">
+              {/* Stress Analysis - Simplified view */}
+              <div className="text-center py-8 text-muted-foreground">
+                <p className="text-sm">Stress analysis requires advanced audio processing.</p>
+                <p className="text-xs mt-2">Coming soon with syllable-level stress patterns.</p>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
       )}
 
@@ -324,9 +368,9 @@ export function ScoreDisplay({
           <DialogHeader className="flex flex-row items-center justify-between">
             <DialogTitle className="text-xl font-semibold">Score Details</DialogTitle>
           </DialogHeader>
-          
+
           {scoreContent}
-          
+
           <div className="flex justify-between mt-6 pt-4 border-t">
             <Button variant="secondary" onClick={onClose}>
               Close
