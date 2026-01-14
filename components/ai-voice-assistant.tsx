@@ -1,10 +1,7 @@
 import React from 'react'
 import { GeminiRealtimeAgent } from '@/components/ui/gemini-voice-agent'
 import { cn } from '@/lib/utils'
-
-interface AIVoiceAssistantProps {
-  className?: string
-}
+import { AIVoiceAssistantProps } from '@/lib/types/voiceAssitant'
 
 export function AIVoiceAssistant({ className }: AIVoiceAssistantProps) {
   return (

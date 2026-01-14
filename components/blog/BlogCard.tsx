@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { BlogPost } from "@/lib/blog";
+import { BlogPost } from "@/lib/types/blogTypes";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CalendarIcon, UserIcon } from "lucide-react";
@@ -25,6 +25,13 @@ export function BlogCard({ post }: BlogCardProps) {
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
                         />
+                    )}
+                    {post.isPaid && (
+                        <div className="absolute top-2 right-2">
+                            <Badge variant="default" className="bg-amber-500 hover:bg-amber-600 text-white border-none shadow-sm">
+                                Premium
+                            </Badge>
+                        </div>
                     )}
                 </div>
                 <CardHeader>

@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 
 interface UseAudioRecorderReturn {
   isRecording: boolean;
@@ -29,11 +29,16 @@ export function useAudioRecorder(maxDuration: number = 60): UseAudioRecorderRetu
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  const stopRecordingRef = useRef<() => void>(() => { });
+
   const startTimer = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current);
+
     timerRef.current = setInterval(() => {
       setRecordingTime((prev) => {
         if (prev >= maxDuration) {
-          stopRecording();
+          // Use the ref to call the latest stopRecording function
+          stopRecordingRef.current();
           return prev;
         }
         return prev + 1;
@@ -52,7 +57,7 @@ export function useAudioRecorder(maxDuration: number = 60): UseAudioRecorderRetu
     try {
       setError(null);
       chunksRef.current = [];
-      
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           sampleRate: 16000,
@@ -65,10 +70,10 @@ export function useAudioRecorder(maxDuration: number = 60): UseAudioRecorderRetu
 
       streamRef.current = stream;
       setAudioStream(stream);
-      
+
       const mediaRecorder = new MediaRecorder(stream, {
-        mimeType: MediaRecorder.isTypeSupported("audio/webm") 
-          ? "audio/webm" 
+        mimeType: MediaRecorder.isTypeSupported("audio/webm")
+          ? "audio/webm"
           : "audio/mp4",
       });
 
@@ -81,12 +86,12 @@ export function useAudioRecorder(maxDuration: number = 60): UseAudioRecorderRetu
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { 
-          type: mediaRecorder.mimeType 
+        const blob = new Blob(chunksRef.current, {
+          type: mediaRecorder.mimeType
         });
         setAudioBlob(blob);
         setAudioUrl(URL.createObjectURL(blob));
-        
+
         // Clean up stream
         if (streamRef.current) {
           streamRef.current.getTracks().forEach(track => track.stop());
@@ -114,6 +119,10 @@ export function useAudioRecorder(maxDuration: number = 60): UseAudioRecorderRetu
       stopTimer();
     }
   }, [isRecording, stopTimer]);
+
+  useEffect(() => {
+    stopRecordingRef.current = stopRecording;
+  }, [stopRecording]);
 
   const pauseRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording && !isPaused) {

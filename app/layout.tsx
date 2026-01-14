@@ -1,20 +1,20 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { Suspense } from 'react'
-import { NonceWrapper } from '@/components/nonce-wrapper'
+import { SpeedInsights } from '@vercel/speed-insights/next'
+import { RootProvider } from '@/components/providers/root-provider'
 import { Toaster } from 'sonner'
 
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ||
-    process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||
-    'http://localhost:3000' // Dev fallback
+    process.env.NEXT_PUBLIC_APP_URL||process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||'https://www.pedagogistspte.com/'
+   // Dev fallback
   ),
   title: 'PedagogistsPTE',
   description:
     'Advanced PTE Academic preparation platform with AI-powered practice and scoring.',
   openGraph: {
-    title: 'PedagogistsPTE',
+    title: 'Pedagogists PTE',
     description: 'Master PTE with AI Excellence',
     images: [{ url: '/og-image.png' }],
   },
@@ -46,10 +46,11 @@ export default function RootLayout({
     <html lang="en" className={fontVariable} suppressHydrationWarning>
       <body className={`min-h-[100dvh] ${fontClassName} antialiased`} suppressHydrationWarning>
         <Suspense fallback={null}>
-          <NonceWrapper>
+          <RootProvider>
             {children}
             <Toaster />
-          </NonceWrapper>
+            <SpeedInsights />
+          </RootProvider>
         </Suspense>
       </body>
     </html>

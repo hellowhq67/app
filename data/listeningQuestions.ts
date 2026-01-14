@@ -1,12 +1,14 @@
+import { PTE_QUESTION_TYPES } from "@/constants/pte-constants";
+
 export type ListeningTestType = 
-  | "highlight-correct-summary"
-  | "mc-single-listening"
-  | "mc-multiple-listening"
-  | "fill-blanks-listening"
-  | "highlight-incorrect-words"
-  | "write-from-dictation"
-  | "select-missing-word"
-  | "summarize-spoken-text";
+  | typeof PTE_QUESTION_TYPES.HIGHLIGHT_CORRECT_SUMMARY
+  | typeof PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_LISTENING
+  | typeof PTE_QUESTION_TYPES.MC_MULTIPLE_ANSWERS_LISTENING
+  | typeof PTE_QUESTION_TYPES.FILL_IN_BLANKS_LISTENING
+  | typeof PTE_QUESTION_TYPES.HIGHLIGHT_INCORRECT_WORDS
+  | typeof PTE_QUESTION_TYPES.WRITE_FROM_DICTATION
+  | typeof PTE_QUESTION_TYPES.SELECT_MISSING_WORD
+  | typeof PTE_QUESTION_TYPES.SUMMARIZE_SPOKEN_TEXT;
 
 export interface ListeningQuestion {
   id: string;
@@ -33,7 +35,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   // Highlight Correct Summary
   {
     id: "highlight-summary-1",
-    type: "highlight-correct-summary",
+    type: PTE_QUESTION_TYPES.HIGHLIGHT_CORRECT_SUMMARY,
     title: "Renewable Energy Lecture",
     instruction: "You will hear a recording. Click on the paragraph that best relates to the recording.",
     difficulty: "medium",
@@ -52,7 +54,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   },
   {
     id: "highlight-summary-2",
-    type: "highlight-correct-summary",
+    type: PTE_QUESTION_TYPES.HIGHLIGHT_CORRECT_SUMMARY,
     title: "Urban Agriculture",
     instruction: "You will hear a recording. Click on the paragraph that best relates to the recording.",
     difficulty: "easy",
@@ -73,7 +75,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   // MC Single Answer (Listening)
   {
     id: "mc-single-listen-1",
-    type: "mc-single-listening",
+    type: PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_LISTENING,
     title: "Economic Trends",
     instruction: "Listen to the recording and answer the multiple-choice question by selecting the best response.",
     difficulty: "medium",
@@ -93,7 +95,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   },
   {
     id: "mc-single-listen-2",
-    type: "mc-single-listening",
+    type: PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_LISTENING,
     title: "Marine Conservation",
     instruction: "Listen to the recording and answer the multiple-choice question by selecting the best response.",
     difficulty: "hard",
@@ -115,7 +117,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   // MC Multiple Answers (Listening)
   {
     id: "mc-multiple-listen-1",
-    type: "mc-multiple-listening",
+    type: PTE_QUESTION_TYPES.MC_MULTIPLE_ANSWERS_LISTENING,
     title: "Educational Technology",
     instruction: "Listen to the recording and answer the question by selecting ALL the correct responses. More than one response is correct.",
     difficulty: "medium",
@@ -138,7 +140,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   // Fill in the Blanks (Listening)
   {
     id: "fill-listen-1",
-    type: "fill-blanks-listening",
+    type: PTE_QUESTION_TYPES.FILL_IN_BLANKS_LISTENING,
     title: "Climate Science",
     instruction: "You will hear a recording. Type the missing words in the blanks. Write only one word in each blank.",
     difficulty: "hard",
@@ -160,7 +162,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   // Highlight Incorrect Words
   {
     id: "highlight-incorrect-1",
-    type: "highlight-incorrect-words",
+    type: PTE_QUESTION_TYPES.HIGHLIGHT_INCORRECT_WORDS,
     title: "The Water Cycle",
     instruction: "You will hear a recording. Below is a transcript of the recording. Some words in the transcript differ from what the speaker said. Click on the words that are different.",
     difficulty: "medium",
@@ -179,7 +181,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   },
   {
     id: "highlight-incorrect-2",
-    type: "highlight-incorrect-words",
+    type: PTE_QUESTION_TYPES.HIGHLIGHT_INCORRECT_WORDS,
     title: "Photosynthesis",
     instruction: "You will hear a recording. Below is a transcript of the recording. Some words in the transcript differ from what the speaker said. Click on the words that are different.",
     difficulty: "easy",
@@ -199,7 +201,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   // Write from Dictation
   {
     id: "dictation-1",
-    type: "write-from-dictation",
+    type: PTE_QUESTION_TYPES.WRITE_FROM_DICTATION,
     title: "Academic Statement 1",
     instruction: "You will hear a sentence. Type the sentence in the text box below. Write the response as you hear it.",
     difficulty: "easy",
@@ -212,7 +214,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   },
   {
     id: "dictation-2",
-    type: "write-from-dictation",
+    type: PTE_QUESTION_TYPES.WRITE_FROM_DICTATION,
     title: "Academic Statement 2",
     instruction: "You will hear a sentence. Type the sentence in the text box below. Write the response as you hear it.",
     difficulty: "medium",
@@ -225,7 +227,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   },
   {
     id: "dictation-3",
-    type: "write-from-dictation",
+    type: PTE_QUESTION_TYPES.WRITE_FROM_DICTATION,
     title: "Academic Statement 3",
     instruction: "You will hear a sentence. Type the sentence in the text box below. Write the response as you hear it.",
     difficulty: "hard",
@@ -240,7 +242,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   // Select Missing Word
   {
     id: "missing-word-1",
-    type: "select-missing-word",
+    type: PTE_QUESTION_TYPES.SELECT_MISSING_WORD,
     title: "Environmental Science",
     instruction: "You will hear a recording about environmental science. At the end of the recording, the last word or group of words has been replaced by a beep. Select the correct option to complete the recording.",
     difficulty: "medium",
@@ -262,7 +264,7 @@ export const listeningQuestions: ListeningQuestion[] = [
   // Summarize Spoken Text
   {
     id: "summarize-spoken-1",
-    type: "summarize-spoken-text",
+    type: PTE_QUESTION_TYPES.SUMMARIZE_SPOKEN_TEXT,
     title: "Biodiversity Conservation",
     instruction: "You will hear a short lecture. Write a summary for a fellow student who was not present at the lecture. You should write 50-70 words.",
     difficulty: "hard",
@@ -284,42 +286,42 @@ export function getListeningQuestionsByType(type: ListeningTestType): ListeningQ
 
 export function getListeningTestTypeInfo(type: ListeningTestType): { name: string; description: string; icon: string } {
   const info: Record<ListeningTestType, { name: string; description: string; icon: string }> = {
-    "highlight-correct-summary": {
+    [PTE_QUESTION_TYPES.HIGHLIGHT_CORRECT_SUMMARY]: {
       name: "Highlight Correct Summary",
       description: "Select the paragraph that best summarizes the recording",
       icon: "📌"
     },
-    "mc-single-listening": {
+    [PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_LISTENING]: {
       name: "MC Single Answer",
       description: "Listen and select the single best answer",
       icon: "🔘"
     },
-    "mc-multiple-listening": {
+    [PTE_QUESTION_TYPES.MC_MULTIPLE_ANSWERS_LISTENING]: {
       name: "MC Multiple Answers",
       description: "Listen and select all correct answers",
       icon: "☑️"
     },
-    "fill-blanks-listening": {
+    [PTE_QUESTION_TYPES.FILL_IN_BLANKS_LISTENING]: {
       name: "Fill in Blanks",
       description: "Type the missing words you hear",
       icon: "✍️"
     },
-    "highlight-incorrect-words": {
+    [PTE_QUESTION_TYPES.HIGHLIGHT_INCORRECT_WORDS]: {
       name: "Highlight Incorrect Words",
       description: "Identify words that differ from the recording",
       icon: "🔍"
     },
-    "write-from-dictation": {
+    [PTE_QUESTION_TYPES.WRITE_FROM_DICTATION]: {
       name: "Write from Dictation",
       description: "Type exactly what you hear",
       icon: "📝"
     },
-    "select-missing-word": {
+    [PTE_QUESTION_TYPES.SELECT_MISSING_WORD]: {
       name: "Select Missing Word",
       description: "Choose the word that completes the recording",
       icon: "🎯"
     },
-    "summarize-spoken-text": {
+    [PTE_QUESTION_TYPES.SUMMARIZE_SPOKEN_TEXT]: {
       name: "Summarize Spoken Text",
       description: "Write a summary of what you heard",
       icon: "📄"

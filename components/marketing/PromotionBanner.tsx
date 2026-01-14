@@ -13,6 +13,13 @@ export function PromotionBanner({ duration = 10000 }: PromotionBannerProps) {
     const [isVisible, setIsVisible] = useState(true);
     const [isClosing, setIsClosing] = useState(false);
 
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(() => {
+            setIsVisible(false);
+        }, 500); // Wait for exit animation
+    };
+
     useEffect(() => {
         const timer = setTimeout(() => {
             handleClose();
@@ -20,13 +27,6 @@ export function PromotionBanner({ duration = 10000 }: PromotionBannerProps) {
 
         return () => clearTimeout(timer);
     }, [duration]);
-
-    const handleClose = () => {
-        setIsClosing(true);
-        setTimeout(() => {
-            setIsVisible(false);
-        }, 500); // Wait for exit animation
-    };
 
     if (!isVisible) return null;
 

@@ -1,0 +1,60 @@
+# Cloud Build configuration for PTE Academic Platform
+# This builds the devcontainer and pushes to Artifact Registry
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+  substitutionOption: 'ALLOW_LOOSE'
+
+# Build devcontainer image
+steps:
+  # Step 1: Build the devcontainer image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-devcontainer'
+    args:
+      - 'build'
+      - '-t'
+      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/pte/devcontainer:latest'
+      - '-t'
+      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/pte/devcontainer:$SHORT_SHA'
+      - '-f'
+      - '.devcontainer/Dockerfile.dev'
+      - '.'
+    timeout: '1800s'
+
+  # Step 2: Push images to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-devcontainer'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'asia-south1-docker.pkg.dev/$PROJECT_ID/pte/devcontainer'
+    waitFor: ['build-devcontainer']
+
+  # Step 3: Install dependencies and run tests (optional)
+  - name: 'asia-south1-docker.pkg.dev/$PROJECT_ID/pte/devcontainer:latest'
+    id: 'run-tests'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        cd /workspace
+        pnpm install --frozen-lockfile
+        pnpm type-check
+        pnpm lint
+        pnpm test
+    waitFor: ['push-devcontainer']
+    env:
+      - 'NODE_ENV=test'
+
+# Images to push to Artifact Registry
+images:
+  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/pte/devcontainer:latest'
+  - 'asia-south1-docker.pkg.dev/$PROJECT_ID/pte/devcontainer:$SHORT_SHA'
+
+# Substitutions (can be overridden)
+substitutions:
+  _REGION: 'asia-south1'
+
+# Timeout for entire build
+timeout: '3600s'

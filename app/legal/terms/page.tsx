@@ -15,7 +15,7 @@ export default function TermsOfServicePage() {
 
       <h2>1. Acceptance of Terms</h2>
       <p>
-        By accessing or using Pedagogist's PTE ("the Platform"), you agree to be bound by these Terms of Service ("Terms").
+        By accessing or using Pedagogist&apos;s PTE (&quot;the Platform&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;).
         If you do not agree to these Terms, please do not use our Platform.
       </p>
 
@@ -152,7 +152,7 @@ export default function TermsOfServicePage() {
 
       <h2>8. Disclaimer of Warranties</h2>
       <p>
-        THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
+        THE PLATFORM IS PROVIDED &quot;AS IS&quot; AND &quot;AS AVAILABLE&quot; WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED,
         INCLUDING BUT NOT LIMITED TO:
       </p>
       <ul>
@@ -164,7 +164,7 @@ export default function TermsOfServicePage() {
 
       <h2>9. Limitation of Liability</h2>
       <p>
-        TO THE MAXIMUM EXTENT PERMITTED BY LAW, PEDAGOGIST'S PTE SHALL NOT BE LIABLE FOR:
+        TO THE MAXIMUM EXTENT PERMITTED BY LAW, PEDAGOGIST&apos;S PTE SHALL NOT BE LIABLE FOR:
       </p>
       <ul>
         <li>Any indirect, incidental, special, consequential, or punitive damages</li>
@@ -209,7 +209,7 @@ export default function TermsOfServicePage() {
       <ul>
         <li>Posting a notice on the Platform</li>
         <li>Sending an email to your registered email address</li>
-        <li>Updating the "Last Updated" date at the top of this page</li>
+        <li>Updating the &quot;Last Updated&quot; date at the top of this page</li>
       </ul>
       <p>
         Your continued use of the Platform after changes constitute acceptance of the revised Terms.

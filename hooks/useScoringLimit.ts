@@ -1,77 +1,52 @@
+'use client';
+
 import { useState, useEffect } from "react";
+import { getMockTestAccess, incrementMockTestUsage } from "@/app/actions/mock-test-limits";
 
 export function useScoringLimit() {
-  const [remainingAttempts, setRemainingAttempts] = useState(5);
+  const [remainingAttempts, setRemainingAttempts] = useState(5); // Default, updates after fetch
   const [canScore, setCanScore] = useState(true);
+  const [tier, setTier] = useState('free');
 
   useEffect(() => {
-    // Load today's usage from localStorage
-    const today = new Date().toDateString();
-    const savedUsage = localStorage.getItem("dailyScoringUsage");
-    
-    if (savedUsage) {
-      const usage = JSON.parse(savedUsage);
-      if (usage.date === today) {
-        setRemainingAttempts(Math.max(0, 5 - usage.count));
-        setCanScore(usage.count < 5);
-      } else {
-        // Reset for new day
-        localStorage.setItem("dailyScoringUsage", JSON.stringify({ date: today, count: 0 }));
-        setRemainingAttempts(5);
-        setCanScore(true);
+    async function fetchLimit() {
+      try {
+        const access = await getMockTestAccess();
+        setRemainingAttempts(access.remainingAttempts);
+        setCanScore(access.canScore);
+        setTier(access.tier);
+      } catch (error) {
+        console.error("Failed to fetch scoring limit:", error);
       }
-    } else {
-      // Initialize if not exists
-      localStorage.setItem("dailyScoringUsage", JSON.stringify({ date: today, count: 0 }));
-      setRemainingAttempts(5);
-      setCanScore(true);
     }
+    fetchLimit();
   }, []);
 
   const incrementUsage = async (): Promise<boolean> => {
-    const today = new Date().toDateString();
-    const savedUsage = localStorage.getItem("dailyScoringUsage");
+    // Optimistic update
+    if (remainingAttempts <= 0 && tier === 'free') return false; // Enforce locally if possible
+
+    const success = await incrementMockTestUsage();
     
-    let currentUsage = { date: today, count: 0 };
-    
-    if (savedUsage) {
-      const parsed = JSON.parse(savedUsage);
-      if (parsed.date === today) {
-        currentUsage = parsed;
+    if (success) {
+      setRemainingAttempts(prev => Math.max(0, prev - 1));
+      if (remainingAttempts - 1 <= 0 && tier !== 'pro' && tier !== 'premium') {
+        setCanScore(false);
       }
+    } else {
+      // Revert/Sync if failed
+      const access = await getMockTestAccess();
+      setRemainingAttempts(access.remainingAttempts);
+      setCanScore(access.canScore);
     }
     
-    if (currentUsage.count >= 5) {
-      return false; // Limit reached
-    }
-    
-    currentUsage.count += 1;
-    localStorage.setItem("dailyScoringUsage", JSON.stringify(currentUsage));
-    
-    setRemainingAttempts(Math.max(0, 5 - currentUsage.count));
-    setCanScore(currentUsage.count < 5);
-    
-    // In a real app, you would also update this on your server
-    try {
-      await fetch("/api/user/scoring-usage", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ date: today, count: currentUsage.count }),
-      });
-    } catch (error) {
-      console.error("Failed to update scoring usage on server:", error);
-    }
-    
-    return true;
+    return success;
   };
 
   const resetUsage = () => {
-    const today = new Date().toDateString();
-    localStorage.setItem("dailyScoringUsage", JSON.stringify({ date: today, count: 0 }));
-    setRemainingAttempts(5);
-    setCanScore(true);
+    // No-op or call server? Server handles daily reset.
+    // Maybe force re-fetch
+    window.location.reload();
   };
 
   return {

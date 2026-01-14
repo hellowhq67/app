@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Loader2, TrendingUp } from "lucide-react";
 import Link from "next/link";
-import { BlogPost } from "@/lib/blog";
+import { BlogPost } from "@/lib/types/blogTypes";
 import { BlogPreview } from "./BlogPreview";
 
 interface SearchResult extends BlogPost {

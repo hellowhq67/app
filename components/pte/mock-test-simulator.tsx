@@ -23,30 +23,7 @@ import {
 } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-export interface MockTestQuestion {
-  id: string
-  title: string
-  content: string
-  type: string
-  duration: number
-}
-
-export interface MockTestSection {
-  name: string
-  questions: MockTestQuestion[]
-}
-
-export interface MockTest {
-  id: string
-  title: string
-  duration: number
-  sections: MockTestSection[]
-  status?: string
-}
-
-interface MockTestSimulatorProps {
-  mockTest: MockTest
-}
+import { MockTest, MockTestSimulatorProps } from '@/lib/types/moktestType'
 
 export default function MockTestSimulator({
   mockTest,

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { BlogPost } from "@/lib/blog";
+import { BlogPost } from "@/lib/types/blogTypes";
 import { Timeline } from "@/components/ui/timeline";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface BlogFeedProps {
     posts: BlogPost[];
@@ -46,6 +47,13 @@ export function BlogFeed({ posts }: BlogFeedProps) {
                         />
                     ) : (
                         <div className="w-full h-full bg-gradient-to-br from-primary/10 to-primary/5" />
+                    )}
+                    {post.isPaid && (
+                        <div className="absolute top-2 right-2">
+                            <Badge variant="default" className="bg-amber-500 hover:bg-amber-600 text-white border-none shadow-sm">
+                                Premium
+                            </Badge>
+                        </div>
                     )}
                 </div>
                 <h3 className="text-2xl font-bold mb-2">{post.title}</h3>

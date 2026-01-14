@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import type { ListeningQuestionType } from '@/app/api/listening/schemas'
+import type { ListeningQuestionType } from '@/lib/api/schemas'
 import AttemptController from '@/components/pte/attempt/AttemptController'
 import AudioPlayer from '@/components/pte/listening/AudioPlayer'
 import ListeningInput from '@/components/pte/listening/ListeningInput'

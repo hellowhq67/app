@@ -90,6 +90,7 @@ export const useAppStore = create<AppStore>()(
                 name: userProfile.name,
                 email: userProfile.email,
                 avatar: userProfile.image || '/avatars/default.png',
+                subscriptionTier: userProfile.subscriptionTier || 'free',
                 rateLimit: {
                   dailyQuestionsUsed: userProfile.aiCreditsUsed || 0,
                   dailyQuestionsLimit: userProfile.dailyAiCredits || 10,

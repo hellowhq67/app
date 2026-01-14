@@ -1,6 +1,8 @@
 // Mock implementation of scoring logic for PTE Practice
 // Replacing Supabase Edge Function calls with local mocks
 
+import { PTE_QUESTION_TYPES } from "@/constants/pte-constants";
+
 export interface ScoreResult {
   overallScore: number;
   content: number;
@@ -15,15 +17,15 @@ export interface ScoreResult {
 }
 
 export type TestType =
-  | "read-aloud"
-  | "repeat-sentence"
-  | "describe-image"
-  | "retell-lecture"
-  | "answer-short-question"
-  | "summarize-spoken-text"
-  | "read-and-retell"
-  | "summarize-group-discussion"
-  | "respond-to-situation";
+  | typeof PTE_QUESTION_TYPES.READ_ALOUD
+  | typeof PTE_QUESTION_TYPES.REPEAT_SENTENCE
+  | typeof PTE_QUESTION_TYPES.DESCRIBE_IMAGE
+  | typeof PTE_QUESTION_TYPES.RETELL_LECTURE
+  | typeof PTE_QUESTION_TYPES.ANSWER_SHORT_QUESTION
+  | typeof PTE_QUESTION_TYPES.SUMMARIZE_SPOKEN_TEXT
+  // "read-and-retell" // Not in standard constants, removing to align types
+  | typeof PTE_QUESTION_TYPES.SUMMARIZE_GROUP_DISCUSSION
+  | typeof PTE_QUESTION_TYPES.RESPOND_TO_SITUATION;
 
 interface ScoringParams {
   testType: TestType;
@@ -40,11 +42,6 @@ export async function transcribeAudio(audioBlob: Blob): Promise<string> {
   return new Promise((resolve) => {
     setTimeout(() => {
       // In a real scenario, we would send the blob to a transcription service
-      // Here we just return a placeholder or try to use Web Speech API if available in browser (but we are server side here mostly or client side)
-      // Since this is called from client, we can't easily mock "what was said" without actual transcription.
-      // However, for the purpose of "using mock data", we can return a text that closely matches the "originalText" if provided, or random text.
-      // But `transcribeAudio` only takes blob.
-      // We will return a generic text for now, or maybe the user wants us to simulate a "good" attempt.
       resolve("The library is an excellent place to study. It provides a quiet environment where students can focus on their work.");
     }, 1500);
   });

@@ -1,6 +1,11 @@
 {
-  "name": "Next.js",
-  "image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+  "name": "Next.js (dev)",
+  "build": {
+    "dockerfile": "Dockerfile.dev",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
   "features": {
     "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
@@ -9,9 +14,11 @@
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "bradlc.vscode-tailwindcss"
+        "bradlc.vscode-tailwindcss",
+        "figma.figma-vscode-extension"
       ]
     }
   },
-  "postCreateCommand": "npm install -g pnpm && pnpm install"
+  "postCreateCommand": "npm install -g pnpm && pnpm install",
+  "shutdownAction": "stopContainer"
 }

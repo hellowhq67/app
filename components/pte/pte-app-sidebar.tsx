@@ -3,26 +3,18 @@
 import * as React from "react";
 import Link from "next/link";
 import {
-  AudioWaveform,
   BookOpen,
   Bot,
-  Command,
   Frame,
-  GalleryVerticalEnd,
-  Map,
   PieChart,
-  Settings2,
   SquareTerminal,
   Home,
   Trophy,
   History,
-  MessageSquare,
   Headphones,
   Mic,
   PenTool,
-  BadgeCheck,
   Settings,
-  User,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -39,165 +31,69 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 
-// This is sample data.
+// Navigation structure
 const navMain = [
   {
     title: "Dashboard",
-    url: "/pte/dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
     title: "Practice Hub",
-    url: "/practice",
+    url: "/academic/practice",
+    icon: SquareTerminal,
     isActive: true,
     items: [
       {
         title: "Speaking",
-        url: "/practice/speaking",
-        items: [
-          {
-            title: "Read Aloud",
-            url: "/practice/speaking/read_aloud",
-          },
-          {
-            title: "Repeat Sentence",
-            url: "/practice/speaking/repeat_sentence",
-          },
-          {
-            title: "Describe Image",
-            url: "/practice/speaking/describe_image",
-          },
-          {
-            title: "Re-tell Lecture",
-            url: "/practice/speaking/retell_lecture",
-          },
-          {
-            title: "Answer Short Question",
-            url: "/practice/speaking/answer_short_question",
-          },
-          {
-            title: "Respond to Situation",
-            url: "/practice/speaking/respond_to_situation",
-          },
-          {
-            title: "Summarize Discussion",
-            url: "/practice/speaking/summarize_group_discussion",
-          },
-        ],
+        url: "/academic/practice/speaking",
+        icon: Mic,
       },
       {
         title: "Writing",
-        url: "/practice/writing",
-        items: [
-          {
-            title: "Summarize Written Text",
-            url: "/practice/writing/summarize_written_text",
-          },
-          {
-            title: "Write Essay",
-            url: "/practice/writing/write_essay",
-          },
-        ],
+        url: "/academic/practice/writing",
+        icon: PenTool,
       },
       {
         title: "Reading",
-        url: "/practice/reading",
-        items: [
-          {
-            title: "MC Single Answer",
-            url: "/practice/reading/reading_mc_single",
-          },
-          {
-            title: "MC Multiple Answers",
-            url: "/practice/reading/reading_mc_multiple",
-          },
-          {
-            title: "Re-order Paragraphs",
-            url: "/practice/reading/reorder_paragraphs",
-          },
-          {
-            title: "Fill in the Blanks (Dropdown)",
-            url: "/practice/reading/reading_fill_blanks_dropdown",
-          },
-          {
-            title: "Fill in the Blanks (Drag)",
-            url: "/practice/reading/reading_fill_blanks_drag",
-          },
-        ],
+        url: "/academic/practice/reading",
+        icon: BookOpen,
       },
       {
         title: "Listening",
-        url: "/practice/listening",
-        items: [
-          {
-            title: "Summarize Spoken Text",
-            url: "/practice/listening/summarize_spoken_text",
-          },
-          {
-            title: "MC Single Answer",
-            url: "/practice/listening/listening_mc_single",
-          },
-          {
-            title: "MC Multiple Answers",
-            url: "/practice/listening/listening_mc_multiple",
-          },
-          {
-            title: "Fill in the Blanks",
-            url: "/practice/listening/listening_fill_blanks",
-          },
-          {
-            title: "Highlight Correct Summary",
-            url: "/practice/listening/highlight_correct_summary",
-          },
-          {
-            title: "Select Missing Word",
-            url: "/practice/listening/select_missing_word",
-          },
-          {
-            title: "Highlight Incorrect Words",
-            url: "/practice/listening/highlight_incorrect_words",
-          },
-          {
-            title: "Write from Dictation",
-            url: "/practice/listening/write_from_dictation",
-          },
-        ],
+        url: "/academic/practice/listening",
+        icon: Headphones,
       },
     ],
   },
   {
     title: "Mock Tests",
-    url: "/pte/mock-tests",
+    url: "/academic/mock-tests",
     icon: Trophy,
   },
   {
-    title: "History",
-    url: "/pte/history",
+    title: "Sectional Tests",
+    url: "/academic/sectional-test",
+    icon: Frame,
+  },
+  {
+    title: "Practice History",
+    url: "/academic/practice-attempts",
     icon: History,
   },
   {
-    title: "Community",
-    url: "/pte/community",
-    icon: MessageSquare,
+    title: "Analytics",
+    url: "/academic/analytics",
+    icon: PieChart,
   },
   {
-    title: "AI Voice Assistant",
-    url: "/pte/ai-voice",
+    title: "AI Tutor",
+    url: "/ai-tutor",
     icon: Bot,
   },
   {
-    title: "Profile",
-    url: "/pte/profile",
-    icon: User,
-  },
-  {
-    title: "Billing",
-    url: "/pte/billing",
-    icon: BadgeCheck,
-  },
-  {
     title: "Settings",
-    url: "/pte/settings",
+    url: "/settings",
     icon: Settings,
   },
 ];
@@ -213,10 +109,10 @@ export function PTEAppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/pte/dashboard">
+              <Link href="/dashboard">
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Pedagogist</span>
-                  <span className="truncate text-xs">AI Learning Platform</span>
+                  <span className="truncate font-semibold">PedagogistsPTE</span>
+                  <span className="truncate text-xs">PTE Academic SASS</span>
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -224,14 +120,22 @@ export function PTEAppSidebar({
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMainPTE items={navMain.map((item: any) => ({
-          ...item,
-          isActive: item.url === pathname || (item.items?.some((sub: any) => sub.url === pathname) ?? false) || pathname?.startsWith(item.url + '/'),
-          items: item.items?.map((sub: any) => ({
-            ...sub,
-            isActive: sub.url === pathname || (sub.items?.some((child: any) => child.url === pathname) ?? false)
-          }))
-        }))} />
+        <NavMainPTE
+          items={navMain.map((item: any) => ({
+            ...item,
+            isActive:
+              item.url === pathname ||
+              (item.items?.some((sub: any) => sub.url === pathname) ?? false) ||
+              pathname?.startsWith(item.url + "/"),
+            items: item.items?.map((sub: any) => ({
+              ...sub,
+              isActive:
+                sub.url === pathname ||
+                (sub.items?.some((child: any) => child.url === pathname) ??
+                  false),
+            })),
+          }))}
+        />
       </SidebarContent>
       <SidebarFooter>
         <NavUser />

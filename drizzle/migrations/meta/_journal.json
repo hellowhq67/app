@@ -43,6 +43,13 @@
       "when": 1767157200857,
       "tag": "0005_strong_inertia",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1767650966283,
+      "tag": "0006_mute_lucky_pierre",
+      "breakpoints": true
     }
   ]
 }

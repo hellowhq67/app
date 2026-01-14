@@ -104,7 +104,7 @@ export async function updateSubscription(
             .update(users)
             .set({
                 subscriptionTier: updates.tier as any,
-                subscriptionStatus: updates.status || 'active',
+                subscriptionStatus: (updates.status as any) || 'active',
                 subscriptionExpiresAt: updates.currentPeriodEnd,
             })
             .where(eq(users.id, updated.userId));

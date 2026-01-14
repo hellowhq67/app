@@ -1,6 +1,6 @@
 "use client";
 
-import { BlogPost } from "@/lib/blog";
+import { BlogPost } from "@/lib/types/blogTypes";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";

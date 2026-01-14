@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { ModeToggle } from '@/components/mode-toggle'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { authClient, useAuth } from '@/lib/auth/client'
 
@@ -175,7 +175,7 @@ const Navbar = memo(function Navbar() {
                             Contact
                         </Link>
                     </nav>
-                    <ThemeToggle />
+                    <ModeToggle />
                     <Suspense fallback={<div className="h-9" />}>
                         <UserMenu />
                     </Suspense>

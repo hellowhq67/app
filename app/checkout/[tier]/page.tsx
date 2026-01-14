@@ -15,12 +15,13 @@ interface CheckoutPageProps {
   }>
 }
 
-export default async function CheckoutPage({
+export default function CheckoutPage({
   params,
 }: CheckoutPageProps) {
-  const { tier } = await params
+  const { tier } = use(params)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
+  const [currency, setCurrency] = useState<'USD' | 'BDT'>('USD')
   const tierParam = tier as SubscriptionTier
 
   if (!['pro', 'premium'].includes(tierParam)) {
@@ -37,10 +38,10 @@ export default async function CheckoutPage({
     )
   }
 
-  const pricing = TIER_PRICING[tier]
-  const features = TIER_FEATURES_DISPLAY[tier]
+  const pricing = TIER_PRICING[tierParam]
+  const features = TIER_FEATURES_DISPLAY[tierParam]
 
-  const handleCheckout = async (provider: 'stripe' | 'polar') => {
+  const handleCheckout = async (provider: 'stripe' | 'polar' | 'sslcommerz') => {
     setIsLoading(true)
     setSelectedProvider(provider)
 
@@ -62,9 +63,26 @@ export default async function CheckoutPage({
 
         const { url } = await response.json()
         window.location.href = url // Redirect to Polar.sh checkout
+      } else if (provider === 'sslcommerz') {
+        // Call SSL Commerz checkout API
+        const response = await fetch('/api/checkout/sslcommerz', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ tier, currency }),
+        })
+
+        if (!response.ok) {
+          const error = await response.json()
+          throw new Error(error.error || 'Failed to create checkout session')
+        }
+
+        const { url } = await response.json()
+        window.location.href = url // Redirect to SSL Commerz checkout
       } else {
         // TODO: Implement Stripe checkout
-        alert('Stripe checkout not yet implemented. Please use Polar.sh for now.')
+        alert('Stripe checkout not yet implemented. Please use Polar.sh or SSL Commerz.')
         setIsLoading(false)
         setSelectedProvider(null)
       }
@@ -89,8 +107,32 @@ export default async function CheckoutPage({
               Complete Your {tier.charAt(0).toUpperCase() + tier.slice(1)} Subscription
             </h1>
             <p className="text-muted-foreground">
-              Choose your preferred payment method below
+              Choose your currency and payment method below
             </p>
+          </div>
+
+          {/* Currency Selector */}
+          <div className="flex gap-2 justify-center mb-8">
+            <Button
+              variant={currency === 'USD' ? 'default' : 'outline'}
+              onClick={() => {
+                setCurrency('USD')
+                setSelectedProvider(null)
+              }}
+              disabled={isLoading}
+            >
+              USD $ (International)
+            </Button>
+            <Button
+              variant={currency === 'BDT' ? 'default' : 'outline'}
+              onClick={() => {
+                setCurrency('BDT')
+                setSelectedProvider(null)
+              }}
+              disabled={isLoading}
+            >
+              BDT ৳ (Bangladesh)
+            </Button>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -113,9 +155,12 @@ export default async function CheckoutPage({
               <CardContent>
                 <div className="text-center mb-6">
                   <div className="text-4xl font-bold">
-                    ${pricing.price}
+                    {currency === 'USD' ? `$${pricing.price}` : `৳${pricing.bdtPrice}`}
                     <span className="text-lg text-muted-foreground">/{pricing.period}</span>
                   </div>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {currency === 'USD' ? 'US Dollar' : 'Bangladeshi Taka'}
+                  </p>
                 </div>
 
                 <ul className="space-y-2">
@@ -133,75 +178,100 @@ export default async function CheckoutPage({
             <div className="space-y-4">
               <h3 className="text-lg font-semibold mb-4">Choose Payment Method</h3>
 
-              {/* Polar.sh Option */}
-              <Card
-                className={`cursor-pointer transition-all hover:shadow-md ${
-                  selectedProvider === 'polar' ? 'ring-2 ring-primary' : ''
-                }`}
-                onClick={() => !isLoading && setSelectedProvider('polar')}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                        <CreditCard className="h-5 w-5 text-white" />
+              {/* Show Polar.sh for USD */}
+              {currency === 'USD' && (
+                <Card
+                  className={`cursor-pointer transition-all hover:shadow-md ${
+                    selectedProvider === 'polar' ? 'ring-2 ring-primary' : ''
+                  }`}
+                  onClick={() => !isLoading && setSelectedProvider('polar')}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                          <CreditCard className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold">Polar.sh</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Modern payments infrastructure
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-semibold">Polar.sh</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Modern payments infrastructure
-                        </p>
+                      <div className={`w-4 h-4 rounded-full border-2 ${
+                        selectedProvider === 'polar'
+                          ? 'border-primary bg-primary'
+                          : 'border-muted-foreground'
+                      }`}>
+                        {selectedProvider === 'polar' && (
+                          <div className="w-full h-full rounded-full bg-white scale-50" />
+                        )}
                       </div>
                     </div>
-                    <div className={`w-4 h-4 rounded-full border-2 ${
-                      selectedProvider === 'polar'
-                        ? 'border-primary bg-primary'
-                        : 'border-muted-foreground'
-                    }`}>
-                      {selectedProvider === 'polar' && (
-                        <div className="w-full h-full rounded-full bg-white scale-50" />
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
 
-              {/* Stripe Option */}
-              <Card
-                className={`cursor-pointer transition-all hover:shadow-md opacity-50 ${
-                  selectedProvider === 'stripe' ? 'ring-2 ring-primary' : ''
-                }`}
-                onClick={() => !isLoading && setSelectedProvider('stripe')}
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                        <CreditCard className="h-5 w-5 text-white" />
+              {/* Show SSL Commerz for BDT */}
+              {currency === 'BDT' && (
+                <Card
+                  className={`cursor-pointer transition-all hover:shadow-md ${
+                    selectedProvider === 'sslcommerz' ? 'ring-2 ring-primary' : ''
+                  }`}
+                  onClick={() => !isLoading && setSelectedProvider('sslcommerz')}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
+                          <CreditCard className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold">SSL Commerz</h4>
+                          <p className="text-sm text-muted-foreground">
+                            bKash, Nagad, Cards & more
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-semibold">Stripe</h4>
-                        <p className="text-sm text-muted-foreground">
-                          Coming soon
-                        </p>
+                      <div className={`w-4 h-4 rounded-full border-2 ${
+                        selectedProvider === 'sslcommerz'
+                          ? 'border-primary bg-primary'
+                          : 'border-muted-foreground'
+                      }`}>
+                        {selectedProvider === 'sslcommerz' && (
+                          <div className="w-full h-full rounded-full bg-white scale-50" />
+                        )}
                       </div>
                     </div>
-                    <div className={`w-4 h-4 rounded-full border-2 ${
-                      selectedProvider === 'stripe'
-                        ? 'border-primary bg-primary'
-                        : 'border-muted-foreground'
-                    }`}>
-                      {selectedProvider === 'stripe' && (
-                        <div className="w-full h-full rounded-full bg-white scale-50" />
-                      )}
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Stripe Option (Coming Soon) */}
+              {currency === 'USD' && (
+                <Card className="cursor-not-allowed transition-all opacity-50">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
+                          <CreditCard className="h-5 w-5 text-white" />
+                        </div>
+                        <div>
+                          <h4 className="font-semibold">Stripe</h4>
+                          <p className="text-sm text-muted-foreground">
+                            Coming soon
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              )}
 
               {/* Checkout Button */}
               <Button
-                onClick={() => selectedProvider && handleCheckout(selectedProvider as 'stripe' | 'polar')}
+                onClick={() => selectedProvider && handleCheckout(selectedProvider as 'stripe' | 'polar' | 'sslcommerz')}
                 disabled={!selectedProvider || isLoading}
                 className="w-full"
                 size="lg"
@@ -211,8 +281,16 @@ export default async function CheckoutPage({
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Creating checkout...
                   </>
+                ) : selectedProvider ? (
+                  `Subscribe with ${
+                    selectedProvider === 'polar'
+                      ? 'Polar.sh'
+                      : selectedProvider === 'sslcommerz'
+                      ? 'SSL Commerz'
+                      : 'Stripe'
+                  }`
                 ) : (
-                  `Subscribe with ${selectedProvider === 'polar' ? 'Polar.sh' : 'Stripe'}`
+                  'Select a payment method'
                 )}
               </Button>
 

@@ -1,17 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-
-export interface BlogPost {
-    slug: string;
-    title: string;
-    description: string;
-    author: string;
-    date: string;
-    tags: string[];
-    image: string;
-    seoKeywords: string[];
-    content: string;
-}
+import { BlogPost } from '@/lib/types/blogTypes';
 
 const postsDirectory = path.join(process.cwd(), 'data/blogs');
 

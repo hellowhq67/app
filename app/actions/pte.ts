@@ -1,8 +1,9 @@
 'use server'
 
 import { scorePteAttemptV2 } from '@/lib/ai/scoring-agent';
+import { scoreDeterministic } from '@/lib/ai/deterministic-scoring';
 import { AIFeedbackData, QuestionType, SpeakingFeedbackData } from '@/lib/types';
-import { upload } from '@vercel/blob';
+import { put } from '@vercel/blob';
 import { countWords } from '@/lib/utils';
 import { savePteAttempt, trackAIUsage } from '@/lib/db/queries/pte-scoring';
 import { auth } from '@/lib/auth/auth';
@@ -126,7 +127,7 @@ export async function scoreReadAloudAttempt(
     await checkAndUseCredits(session.user.id);
 
     // 1. Upload audio to Vercel Blob storage
-    const blob = await upload(
+    const blob = await put(
       `pte/speaking/${questionId}/${Date.now()}-${audioFile.name}`,
       audioFile,
       {
@@ -193,7 +194,7 @@ export async function scoreSpeakingAttempt(
     await checkAndUseCredits(session.user.id);
 
     // 1. Upload audio to Vercel Blob
-    const blob = await upload(
+    const blob = await put(
       `pte/speaking/${type.toLowerCase().replace(/\s+/g, '-')}/${questionId}/${Date.now()}-${audioFile.name}`,
       audioFile,
       {
@@ -239,7 +240,53 @@ export async function scoreSpeakingAttempt(
 }
 
 /**
+ * Helper function to build deterministic answer structure from position indices
+ */
+function buildDeterministicAnswer(
+  type: QuestionType,
+  answerKey: any,
+  options?: string[],
+  paragraphs?: string[]
+): {
+  correctOption?: string;
+  correctOptions?: string[];
+  correctOrder?: string[];
+  correctBlanks?: Record<string, string>;
+} {
+  // If answerKey is already an object (for fill blanks), return it directly
+  if (typeof answerKey === 'object' && !Array.isArray(answerKey)) {
+    return { correctBlanks: answerKey };
+  }
+
+  // If answerKey is an array of positions
+  if (Array.isArray(answerKey) && answerKey.length > 0) {
+    switch (type) {
+      case QuestionType.MULTIPLE_CHOICE_SINGLE:
+        return {
+          correctOption: options?.[answerKey[0]] || ''
+        };
+
+      case QuestionType.MULTIPLE_CHOICE_MULTIPLE:
+        return {
+          correctOptions: answerKey.map((idx: number) => options?.[idx] || '').filter(Boolean)
+        };
+
+      case QuestionType.REORDER_PARAGRAPHS:
+        return {
+          correctOrder: answerKey.map((idx: number) => paragraphs?.[idx] || '').filter(Boolean)
+        };
+
+      default:
+        return {};
+    }
+  }
+
+  return {};
+}
+
+/**
  * Server action to score a Reading attempt.
+ * Uses deterministic (rule-based) scoring for all reading types.
  */
 export async function scoreReadingAttempt(
   type:
@@ -265,25 +312,29 @@ export async function scoreReadingAttempt(
       return { success: false, error: 'Unauthorized' };
     }
 
-    // Check credits
+    // Check credits (for deterministic scoring, we could skip this, but keeping for consistency)
     await checkAndUseCredits(session.user.id);
 
-    // Build question content
-    let questionContent = questionText;
-    if (paragraphs) {
-      questionContent += '\n\nParagraphs:\n' + paragraphs.map((p, i) => `${i + 1}. ${p}`).join('\n');
-    }
-    if (options) {
-      questionContent += '\n\nOptions:\n' + options.map((o, i) => `${i + 1}. ${o}`).join('\n');
-    }
+    // Build correct answer structure from answerKey
+    const correctAnswer = buildDeterministicAnswer(type, answerKey, options, paragraphs);
 
-    // Score using Gemini
-    const feedback = await scorePteAttemptV2(type, {
-      questionContent,
-      submission: { text: JSON.stringify(userResponse) },
-      userId: session.user.id,
-      questionId,
-    });
+    // Build user submission structure
+    const userSubmission = {
+      selectedOption: userResponse?.selectedOption,
+      selectedOptions: userResponse?.selectedOptions,
+      orderedParagraphs: userResponse?.orderedParagraphs,
+      filledBlanks: userResponse?.filledBlanks,
+    };
+
+    // Score using deterministic scoring
+    const feedback = scoreDeterministic(type, userSubmission, correctAnswer);
+
+    if (!feedback) {
+      return {
+        success: false,
+        error: 'Unable to score this question type deterministically. Please contact support.',
+      };
+    }
 
     // Save to database
     const attempt = await savePteAttempt({
@@ -292,16 +343,6 @@ export async function scoreReadingAttempt(
       questionType: type,
       responseData: { userResponse, answerKey },
       aiFeedback: feedback,
-    });
-
-    // Track AI usage
-    await trackAIUsage({
-      userId: session.user.id,
-      attemptId: attempt.id,
-      provider: 'google',
-      model: 'gemini-1.5-flash-latest',
-      totalTokens: 0,
-      cost: 0,
     });
 
     return { success: true, feedback, attemptId: attempt.id };
@@ -316,6 +357,8 @@ export async function scoreReadingAttempt(
 
 /**
  * Server action to score a Listening attempt.
+ * Uses AI scoring ONLY for SUMMARIZE_SPOKEN_TEXT.
+ * Uses deterministic (rule-based) scoring for all other listening types.
  */
 export async function scoreListeningAttempt(
   type:
@@ -348,52 +391,81 @@ export async function scoreListeningAttempt(
     // Check credits
     await checkAndUseCredits(session.user.id);
 
-    let wordCount: number | undefined;
+    let feedback: AIFeedbackData | null = null;
+
+    // CONDITIONAL SCORING: AI only for SUMMARIZE_SPOKEN_TEXT
     if (type === QuestionType.SUMMARIZE_SPOKEN_TEXT) {
-      wordCount = countWords(userResponse as string);
+      // AI Scoring for Summarize Spoken Text
+      let questionContent = questionText || '';
+      if (audioTranscript) {
+        questionContent += '\n\nAudio Transcript:\n' + audioTranscript;
+      }
+
+      feedback = await scorePteAttemptV2(type, {
+        questionContent,
+        submission: { text: userResponse as string },
+        userId: session.user.id,
+        questionId,
+      });
+
+      // Save to database
+      const attempt = await savePteAttempt({
+        userId: session.user.id,
+        questionId,
+        questionType: type,
+        responseText: userResponse as string,
+        aiFeedback: feedback,
+      });
+
+      // Track AI usage for AI-scored question
+      await trackAIUsage({
+        userId: session.user.id,
+        attemptId: attempt.id,
+        provider: 'google',
+        model: 'gemini-1.5-flash-latest',
+        totalTokens: 0,
+        cost: 0,
+      });
+
+      return { success: true, feedback, attemptId: attempt.id };
+    } else {
+      // Deterministic Scoring for all other listening types
+      const correctAnswer = buildDeterministicAnswer(type, answerKey, options);
+
+      // Build user submission structure
+      const userSubmission = {
+        selectedOption: userResponse?.selectedOption,
+        selectedOptions: userResponse?.selectedOptions,
+        filledBlanks: userResponse?.filledBlanks,
+        highlightedWords: userResponse?.highlightedWords,
+        textAnswer: typeof userResponse === 'string' ? userResponse : userResponse?.textAnswer,
+      };
+
+      // Score using deterministic scoring
+      feedback = scoreDeterministic(type, userSubmission, {
+        ...correctAnswer,
+        correctText: answerKey?.correctText,
+        incorrectWords: answerKey?.incorrectWords,
+      });
+
+      if (!feedback) {
+        return {
+          success: false,
+          error: 'Unable to score this question type deterministically. Please contact support.',
+        };
+      }
+
+      // Save to database
+      const attempt = await savePteAttempt({
+        userId: session.user.id,
+        questionId,
+        questionType: type,
+        responseData: { userResponse, answerKey },
+        aiFeedback: feedback,
+      });
+
+      return { success: true, feedback, attemptId: attempt.id };
     }
-
-    // Build question content
-    let questionContent = questionText || '';
-    if (audioTranscript) {
-      questionContent += '\n\nAudio Transcript:\n' + audioTranscript;
-    }
-    if (options) {
-      questionContent += '\n\nOptions:\n' + options.map((o, i) => `${i + 1}. ${o}`).join('\n');
-    }
-    if (wordBank) {
-      questionContent += '\n\nWord Bank:\n' + wordBank.join(', ');
-    }
-
-    // Score using Gemini
-    const feedback = await scorePteAttemptV2(type, {
-      questionContent,
-      submission: { text: typeof userResponse === 'string' ? userResponse : JSON.stringify(userResponse) },
-      userId: session.user.id,
-      questionId,
-    });
-
-    // Save to database
-    const attempt = await savePteAttempt({
-      userId: session.user.id,
-      questionId,
-      questionType: type,
-      responseText: typeof userResponse === 'string' ? userResponse : undefined,
-      responseData: typeof userResponse === 'string' ? undefined : { userResponse, answerKey },
-      aiFeedback: feedback,
-    });
-
-    // Track AI usage
-    await trackAIUsage({
-      userId: session.user.id,
-      attemptId: attempt.id,
-      provider: 'google',
-      model: 'gemini-1.5-flash-latest',
-      totalTokens: 0,
-      cost: 0,
-    });
-
-    return { success: true, feedback, attemptId: attempt.id };
   } catch (error) {
     console.error('Error scoring listening attempt:', error);
     return {

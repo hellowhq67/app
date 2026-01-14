@@ -54,7 +54,7 @@ export async function getPTESession(sessionId: string) {
     return session;
 }
 
-export async function getUserSessions(userId: string) {
+export async function getUserPTESessions(userId: string) {
     const sessions = await db.query.pteSessions.findMany({
         where: eq(pteSessions.userId, userId),
         orderBy: [desc(pteSessions.createdAt)],

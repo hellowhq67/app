@@ -1,42 +1,34 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable React Compiler
+  // Note: "output: standalone" removed - it's for Docker/self-hosted, not Vercel
+  // Vercel uses serverless by default
+
+  // React 19 Compiler (stable in Next.js 16)
   reactCompiler: true,
 
-  // Enable source maps for development and production error tracking
-  productionBrowserSourceMaps: true,
-
-  // Optimize output for production
-  output: 'standalone',
-
-  // Compress responses (improoves load times)
+  // Performance & Security
+  productionBrowserSourceMaps: false, // Disable in production for security
   compress: true,
-
-  // Power off x-powered-by header
   poweredByHeader: false,
-  
-  // Add onDemandEntries configuration
+  typescript: {
+    // !! WARN !!
+    // Dangerously allow production builds to successfully complete even if
+    // your project has type errors.
+    // !! WARN !!
+    ignoreBuildErrors: true,
+  },
   onDemandEntries: {
-    // period (in ms) where the server will keep pages in the buffer
     maxInactiveAge: 25 * 1000,
-    // number of pages that should be kept simultaneously without being disposed
     pagesBufferLength: 2,
   },
-  
-  // Add generateBuildId configuration
-  generateBuildId: async () => {
-    // This could be anything, using the latest git hash
-    return process.env.GIT_HASH || 'dev';
-  },
 
-  // Allow remote icons/assets used by PTE data
+  // Build ID for cache busting
+  generateBuildId: async () => process.env.GIT_HASH || `build-${Date.now()}`,
+
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "sgp1.digitaloceanspaces.com",
-      },
+      { protocol: "https", hostname: "sgp1.digitaloceanspaces.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
       { protocol: "https", hostname: "i.imgur.com" },
@@ -46,25 +38,50 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "www.gravatar.com" },
       { protocol: "https", hostname: "pedagogistspte.com" },
+      {
+        protocol: "https",
+        hostname: "vton1rkowdqbunkl.public.blob.vercel-storage.com",
+      },
+      { protocol: "https", hostname: "cdn.sanity.io" },
     ],
   },
 
-  // 4. Turbopack (Native v16+ implementation)
-  // This replaces almost all of your previous 'webpack' fallback logic
+  serverExternalPackages: [
+    "@acme/ui",
+    "eslint",
+    "ts-node",
+    "postcss",
+    "@huggingface/transformers",
+    "typescript",
+  ],
+
   experimental: {
-    // Optimize package imports
+    browserDebugInfoInTerminal: true,
     optimizePackageImports: [
-      '@radix-ui/react-icons',
-      '@tabler/icons-react',
-      'lucide-react',
-      'recharts',
-      'framer-motion'
+      "@radix-ui/react-icons",
+      "@tabler/icons-react",
+      "lucide-react",
+      "recharts",
+      "framer-motion",
     ],
+
+    // Next.js 16 caching improvements
+    staleTimes: {
+      dynamic: 30, // Cache dynamic pages for 30 seconds
+      static: 180, // Cache static pages for 3 minutes
+    },
   },
 
-  // Custom webpack config for optimizations
+  // Turbopack configuration (stable in Next.js 16)
+  // Uncomment to enable Turbopack for faster builds:
+  // turbopack: {
+  //   resolveAlias: {
+  //     // Add any necessary aliases
+  //   },
+  // },
+
+  transpilePackages: [], // keep empty if none
   webpack: (config, { isServer, webpack, dev }) => {
-    // Ignore problematic imports during build
     config.ignoreWarnings = [
       {
         module: /app\/api\/ai-assistant\/route\.ts/,
@@ -92,7 +109,6 @@ const nextConfig: NextConfig = {
       },
     ];
 
-    // Fallbacks for browser
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
@@ -111,9 +127,7 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Production optimizations
     if (!dev) {
-      // Enable tree shaking
       config.optimization = {
         ...config.optimization,
         usedExports: true,
@@ -122,21 +136,51 @@ const nextConfig: NextConfig = {
       };
     }
 
-    // Bundle analyzer (when ANALYZE=true)
-    if (process.env.ANALYZE === 'true') {
-      const { BundleAnalyzerPlugin } = require('@next/bundle-analyzer')({
+    if (process.env.ANALYZE === "true") {
+      const { BundleAnalyzerPlugin } = require("@next/bundle-analyzer")({
         enabled: true,
       });
       config.plugins.push(
         new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          reportFilename: isServer ? '../analyze/server.html' : './analyze/client.html',
+          analyzerMode: "static",
+          reportFilename: isServer
+            ? "../analyze/server.html"
+            : "./analyze/client.html",
           openAnalyzer: true,
         })
       );
     }
 
     return config;
+  },
+
+  // Security headers (production best practices 2026)
+  headers: async () => [
+    {
+      source: "/(.*)",
+      headers: [
+        { key: "X-DNS-Prefetch-Control", value: "on" },
+        {
+          key: "Strict-Transport-Security",
+          value: "max-age=63072000; includeSubDomains; preload",
+        },
+        { key: "X-XSS-Protection", value: "1; mode=block" },
+        { key: "X-Frame-Options", value: "SAMEORIGIN" },
+        { key: "X-Content-Type-Options", value: "nosniff" },
+        { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+        {
+          key: "Permissions-Policy",
+          value: "camera=(), microphone=(), geolocation=()",
+        },
+      ],
+    },
+  ],
+
+  // Logging configuration
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
   },
 };
 

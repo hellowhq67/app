@@ -212,83 +212,85 @@ export function QuestionListPanel({
       </div>
 
       {/* Question List */}
-      <ScrollArea className="flex-1 bg-muted/5">
-        <div className="divide-y divide-border/40">
+      <ScrollArea className="flex-1 bg-white dark:bg-zinc-950">
+        <div className="divide-y divide-gray-100 dark:divide-white/5">
           {filteredQuestions.map((question, filteredIndex) => {
             const originalIndex = getOriginalIndex(question);
             const isActive = originalIndex === currentQuestionIndex;
             const isCompleted = completedQuestions.has(question.id);
             const isBookmarked = bookmarkedQuestions.has(question.id);
-            const questionNumber = `#${String(originalIndex + 18000201).toString()}`;
-            const qWithTitle = question as QuestionWithTitle;
-
-            // Deterministic fake data
-            const viewedCount = getDeterministicNumber(question.id, 50, 500);
-            const appearedCount = getDeterministicNumber(question.id + "appeared", 5, 50);
+            // Use question ID from data or fallback to index
+            const questionDisplayId = `#${question.id.substring(0, 4) || String(originalIndex + 1).padStart(4, '0')}`;
 
             return (
               <Link
                 key={question.id}
-                href={`/practice/${section}/${question.id}`}
+                href={`/academic/practice/${section}/${testType}/${question.id}`}
                 onClick={() => {
                   if (onClose) onClose();
                   if (onSelectQuestion) onSelectQuestion(originalIndex);
                 }}
                 className={cn(
-                  "group flex items-start gap-4 p-4 transition-all hover:bg-background hover:shadow-sm relative border-l-4 border-l-transparent",
-                  isActive && "bg-background shadow-md border-l-primary z-10"
+                  "group flex items-center justify-between p-4 transition-all hover:bg-gray-50 dark:hover:bg-white/5",
+                  isActive && "bg-blue-50/50 dark:bg-blue-900/10"
                 )}
               >
-                {/* Status Indicator */}
-                <div className="mt-1 shrink-0">
-                  {isCompleted ? (
-                    <CheckCircle2 className="h-4 w-4 text-emerald-500 shadow-sm rounded-full" />
-                  ) : (
-                    <Circle className="h-4 w-4 text-muted-foreground/30" />
-                  )}
+                <div className="flex items-center gap-4 min-w-0 flex-1">
+                  <div className="flex flex-col gap-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-gray-500">#{question.id.substring(0, 4)}</span>
+                      <h4 className={cn(
+                        "text-sm font-medium truncate",
+                        isActive ? "text-primary" : "text-gray-700 dark:text-gray-200"
+                      )}>
+                        {(question as QuestionWithTitle).title || `Question ${originalIndex + 1}`}
+                      </h4>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="secondary"
+                        className="bg-gray-100 text-gray-500 rounded-sm px-1.5 py-0 text-[10px] font-normal"
+                      >
+                        #{question.id.substring(0, 4)}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "rounded-sm px-1.5 py-0 text-[10px] font-normal border",
+                          question.difficulty === 'hard' ? "border-red-200 text-red-600 bg-red-50" :
+                            question.difficulty === 'medium' ? "border-amber-200 text-amber-600 bg-amber-50" :
+                              "border-emerald-200 text-emerald-600 bg-emerald-50"
+                        )}
+                      >
+                        {question.difficulty || 'Medium'}
+                      </Badge>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="flex-1 min-w-0 space-y-1.5">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className={cn(
-                      "text-[10px] font-mono font-medium tracking-wider uppercase",
-                      isActive ? "text-primary" : "text-muted-foreground/70"
-                    )}>
-                      {questionNumber}
-                    </span>
-                    <button
-                      onClick={(e) => toggleBookmark(question.id, e)}
-                      className={cn(
-                        "opacity-0 group-hover:opacity-100 transition-all p-1 -mr-2 rounded-full hover:bg-muted",
-                        isBookmarked && "opacity-100 text-amber-500"
-                      )}
-                    >
-                      <Bookmark className={cn("h-3.5 w-3.5", isBookmarked && "fill-current")} />
-                    </button>
-                  </div>
-
-                  <p className={cn(
-                    "text-sm font-medium leading-snug line-clamp-2 transition-colors",
-                    isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground/80"
-                  )}>
-                    {qWithTitle.title || `Question ${originalIndex + 1}`}
-                  </p>
-
-                  <div className="flex items-center gap-2 pt-1">
-                    <Badge
-                      variant="secondary"
-                      className={cn(
-                        "text-[10px] px-1.5 py-0 h-5 border font-normal uppercase tracking-wider",
-                        getDifficultyColor(question.difficulty)
-                      )}
-                    >
-                      {question.difficulty}
-                    </Badge>
-                    <span className="text-[10px] text-muted-foreground/60 flex items-center gap-1">
-                      <BarChart2 className="h-3 w-3" />
-                      Appeared {appearedCount} | Viewed {viewedCount}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-3 shrink-0 ml-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-7 text-xs px-3 rounded-md",
+                      isCompleted
+                        ? "bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400"
+                        : "bg-gray-200 text-gray-500 hover:bg-gray-300 dark:bg-gray-800 dark:text-gray-400"
+                    )}
+                  >
+                    {isCompleted ? "Done" : "Undone"}
+                  </Button>
+                  <button
+                    onClick={(e) => toggleBookmark(question.id, e)}
+                    className={cn(
+                      "text-gray-300 hover:text-amber-400 transition-colors",
+                      isBookmarked && "text-amber-400"
+                    )}
+                  >
+                    <Bookmark className={cn("h-4 w-4", isBookmarked && "fill-current")} />
+                  </button>
                 </div>
               </Link>
             );

@@ -71,7 +71,7 @@ export async function getStudyToolsProgress(userId: string) {
             },
             overall: {
                 totalTools: 3,
-                activeTools: progress.studyStreak > 0 ? 3 : 0,
+                activeTools: (progress.studyStreak || 0) > 0 ? 3 : 0,
                 averageProgress: Math.round((
                     Math.min(100, Math.round(((progress.questionsAnswered || 0) / 5000) * 100)) +
                     Math.min(100, Math.round(((progress.totalStudyTime || 0) / (50 * 60)) * 100)) +

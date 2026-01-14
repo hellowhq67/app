@@ -17,8 +17,12 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
   },
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
-  trustedOrigins: ["http://localhost:3000"],
+  baseURL: process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com",
+  trustedOrigins: [
+    "https://www.pedagogistspte.com",
+    "https://pedagogistspte-v-0-2-git-main-hellowhq67s-projects.vercel.app",
+    ...(process.env.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
+  ],
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,

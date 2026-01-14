@@ -3,6 +3,7 @@
  */
 
 import { db } from '@/lib/db/drizzle';
+import { eq } from 'drizzle-orm';
 import {
     invoices,
     type Invoice,
@@ -109,7 +110,7 @@ export async function markInvoiceAsPaid(
             amountDue: '0',
             updatedAt: new Date(),
         })
-        .where(db.$with('id').eq(invoiceId))
+        .where(eq(invoices.id, invoiceId))
         .returning();
 
     return updated;
@@ -128,7 +129,7 @@ export async function updateInvoicePdfUrl(
             pdfUrl,
             updatedAt: new Date(),
         })
-        .where(db.$with('id').eq(invoiceId))
+        .where(eq(invoices.id, invoiceId))
         .returning();
 
     return updated;
@@ -203,7 +204,7 @@ export async function syncInvoiceFromPolar(
     const [updated] = await db
         .update(invoices)
         .set(updates)
-        .where(db.$with('id').eq(invoice.id))
+        .where(eq(invoices.id, invoice.id))
         .returning();
 
     return updated;

@@ -4,9 +4,9 @@ import {
   motion,
   useTransform,
   useScroll,
-  useVelocity,
+  useVelocity, // Keep it if it was there, or remove if unused. It was unused in tracing-beam, but let's keep it clean.
   useSpring,
-} from "motion/react";
+} from "framer-motion";
 import { cn } from "@/lib/utils";
 
 export const TracingBeam = ({

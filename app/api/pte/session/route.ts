@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import {
   createPTESession,
   getPTESession,
-  getUserSessions,
+  getUserPTESessions,
   updatePTESession
 } from '@/lib/db/queries/pte-sessions';
 
@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     if (userId) {
       // Get user sessions
-      const sessions = await getUserSessions(userId);
+      const sessions = await getUserPTESessions(userId);
 
       return NextResponse.json({
         success: true,

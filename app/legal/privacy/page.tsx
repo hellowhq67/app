@@ -15,7 +15,7 @@ export default function PrivacyPolicyPage() {
 
       <h2>1. Introduction</h2>
       <p>
-        Welcome to Pedagogist's PTE ("we," "our," or "us"). We are committed to protecting your personal information
+        Welcome to Pedagogist&apos;s PTE (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). We are committed to protecting your personal information
         and your right to privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your
         information when you use our PTE Academic practice platform.
       </p>
@@ -130,7 +130,7 @@ export default function PrivacyPolicyPage() {
         You can control cookies through your browser settings. However, disabling cookies may limit some functionality.
       </p>
 
-      <h2>8. Children's Privacy</h2>
+      <h2>8. Children&apos;s Privacy</h2>
       <p>
         Our services are not directed to individuals under the age of 16. We do not knowingly collect personal information
         from children. If you believe we have collected information from a child, please contact us immediately.
@@ -162,7 +162,7 @@ export default function PrivacyPolicyPage() {
       <h2>12. Changes to This Privacy Policy</h2>
       <p>
         We may update this Privacy Policy from time to time. We will notify you of any material changes by posting the new
-        Privacy Policy on this page and updating the "Last Updated" date. We encourage you to review this Privacy Policy
+        Privacy Policy on this page and updating the &quot;Last Updated&quot; date. We encourage you to review this Privacy Policy
         periodically.
       </p>
 

@@ -37,7 +37,7 @@ export default function HomePage() {
               Get in Touch
             </h2>
             <p className="text-lg text-muted-foreground">
-              Have questions about our plans or the platform? We're here to
+              Have questions about our plans or the platform? We&apos;re here to
               help.
             </p>
           </div>

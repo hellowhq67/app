@@ -71,7 +71,7 @@ export default function ContactPage() {
         <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
             <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600" />
-            <span className="font-bold">Pedagogist's PTE</span>
+            <span className="font-bold">Pedagogist&apos;s PTE</span>
           </Link>
           <nav className="flex items-center space-x-6">
             <Link href="/" className="text-sm font-medium text-muted-foreground hover:text-foreground">
@@ -98,7 +98,7 @@ export default function ContactPage() {
               Get in Touch
             </h1>
             <p className="text-lg text-muted-foreground">
-              Have questions? We're here to help. Contact our support team or chat with our AI assistant.
+              Have questions? We&apos;re here to help. Contact our support team or chat with our AI assistant.
             </p>
           </div>
         </div>
@@ -152,7 +152,7 @@ export default function ContactPage() {
               </p>
               <RealtimeVoiceAgent
                 sessionType="customer_support"
-                instructions="You are a helpful support assistant for Pedagogist's PTE Academic platform. Answer questions about PTE exam preparation, practice tests, scoring, subscriptions, and technical issues. Be friendly, concise, and helpful."
+                instructions="You are a helpful support assistant for Pedagogist&apos;s PTE Academic platform. Answer questions about PTE exam preparation, practice tests, scoring, subscriptions, and technical issues. Be friendly, concise, and helpful."
                 onTranscript={(transcript, role) => console.log(`${role}: ${transcript}`)}
                 onSessionEnd={(sessionId, turns) => console.log(`Session ${sessionId} ended with ${turns.length} turns`)}
               />
@@ -226,7 +226,7 @@ export default function ContactPage() {
 
                 {submitStatus === "success" && (
                   <div className="rounded-lg bg-green-50 p-4 text-sm text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                    ✓ Message sent successfully! We'll get back to you within 24 hours.
+                    ✓ Message sent successfully! We&apos;ll get back to you within 24 hours.
                   </div>
                 )}
 
@@ -286,7 +286,7 @@ export default function ContactPage() {
                   <AccordionTrigger>Can I schedule a demo or consultation?</AccordionTrigger>
                   <AccordionContent>
                     Yes! Premium users can schedule one-on-one consultations with our PTE experts.
-                    Select "Partnership" as the category above to inquire about institutional demos
+                    Select &quot;Partnership&quot; as the category above to inquire about institutional demos
                     or bulk licensing.
                   </AccordionContent>
                 </AccordionItem>
@@ -294,7 +294,7 @@ export default function ContactPage() {
                 <AccordionItem value="item-5">
                   <AccordionTrigger>How do I report a technical bug?</AccordionTrigger>
                   <AccordionContent>
-                    Choose "Technical Support" as the category and include: 1) What you were trying to do,
+                    Choose &quot;Technical Support&quot; as the category and include: 1) What you were trying to do,
                     2) What happened instead, 3) Your browser and device info, 4) Screenshots if possible.
                     Critical bugs are prioritized and addressed within 48 hours.
                   </AccordionContent>
@@ -303,7 +303,7 @@ export default function ContactPage() {
                 <AccordionItem value="item-6">
                   <AccordionTrigger>What if I have billing questions?</AccordionTrigger>
                   <AccordionContent>
-                    For billing inquiries, select "Billing & Payments" and include your account email.
+                    For billing inquiries, select &quot;Billing &amp; Payments&quot; and include your account email.
                     Common issues like subscription changes, refunds, and payment methods are typically
                     resolved within 1 business day. See our{" "}
                     <Link href="/legal/refund" className="text-primary underline">
@@ -323,7 +323,7 @@ export default function ContactPage() {
         <div className="container">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
             <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} Pedagogist's PTE. All rights reserved.
+              &copy; {new Date().getFullYear()} Pedagogist&apos;s PTE. All rights reserved.
             </p>
             <div className="flex gap-6 text-sm">
               <Link href="/legal/privacy" className="text-muted-foreground hover:text-foreground">

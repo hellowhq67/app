@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { PTEAudioState } from '@/types/pte-types';
+import { PTEAudioState } from '@/lib/types/qustionsType';
 
 interface PTAudioPlayerProps {
   audioUrl: string;

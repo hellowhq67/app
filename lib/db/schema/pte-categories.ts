@@ -31,6 +31,7 @@ export const pteQuestionTypeCodeEnum = pgEnum('pte_question_type_code', [
     // Writing (2 types)
     'summarize_written_text',
     'essay',
+    'email',
     // Reading (5 types)
     'reading_fill_blanks_dropdown',
     'reading_mc_multiple',

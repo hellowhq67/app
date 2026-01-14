@@ -1,9 +1,11 @@
+import { PTE_QUESTION_TYPES } from "@/constants/pte-constants";
+
 export type ReadingTestType = 
-  | "mc-single"
-  | "mc-multiple"
-  | "reorder-paragraphs"
-  | "fill-blanks-drag"
-  | "fill-blanks-dropdown";
+  | typeof PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_READING
+  | typeof PTE_QUESTION_TYPES.MC_MULTIPLE_ANSWERS_READING
+  | typeof PTE_QUESTION_TYPES.REORDER_PARAGRAPHS
+  | typeof PTE_QUESTION_TYPES.FILL_IN_BLANKS_DRAG_DROP
+  | typeof PTE_QUESTION_TYPES.FILL_IN_BLANKS_DROPDOWN;
 
 export interface ReadingQuestion {
   id: string;
@@ -27,7 +29,7 @@ export const readingQuestions: ReadingQuestion[] = [
   // MC Single Answer
   {
     id: "mc-single-1",
-    type: "mc-single",
+    type: PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_READING,
     title: "Climate Change Impact",
     instruction: "Read the passage and answer the multiple-choice question below by selecting the best answer.",
     difficulty: "medium",
@@ -50,7 +52,7 @@ The impacts of climate change extend beyond environmental concerns. Agricultural
   },
   {
     id: "mc-single-2",
-    type: "mc-single",
+    type: PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_READING,
     title: "Digital Revolution",
     instruction: "Read the passage and answer the multiple-choice question below by selecting the best answer.",
     difficulty: "easy",
@@ -73,7 +75,7 @@ However, the digital age also presents challenges. Privacy concerns have grown a
   },
   {
     id: "mc-single-3",
-    type: "mc-single",
+    type: PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_READING,
     title: "Ancient Civilizations",
     instruction: "Read the passage and answer the multiple-choice question below by selecting the best answer.",
     difficulty: "hard",
@@ -98,7 +100,7 @@ Recent advances in the decipherment of Maya script have revealed the complexity 
   // MC Multiple Answers
   {
     id: "mc-multiple-1",
-    type: "mc-multiple",
+    type: PTE_QUESTION_TYPES.MC_MULTIPLE_ANSWERS_READING,
     title: "Renewable Energy Sources",
     instruction: "Read the passage and select ALL the correct answers. More than one response is correct.",
     difficulty: "medium",
@@ -122,7 +124,7 @@ The transition to renewable energy faces several challenges including intermitte
   },
   {
     id: "mc-multiple-2",
-    type: "mc-multiple",
+    type: PTE_QUESTION_TYPES.MC_MULTIPLE_ANSWERS_READING,
     title: "Urban Development",
     instruction: "Read the passage and select ALL the correct answers. More than one response is correct.",
     difficulty: "easy",
@@ -148,7 +150,7 @@ Affordable housing remains a persistent challenge in growing cities worldwide. R
   // Reorder Paragraphs
   {
     id: "reorder-1",
-    type: "reorder-paragraphs",
+    type: PTE_QUESTION_TYPES.REORDER_PARAGRAPHS,
     title: "Scientific Method",
     instruction: "The text boxes below have been placed in random order. Restore the original order by dragging the text boxes to their correct positions.",
     difficulty: "medium",
@@ -166,7 +168,7 @@ Affordable housing remains a persistent challenge in growing cities worldwide. R
   },
   {
     id: "reorder-2",
-    type: "reorder-paragraphs",
+    type: PTE_QUESTION_TYPES.REORDER_PARAGRAPHS,
     title: "Coffee Production",
     instruction: "The text boxes below have been placed in random order. Restore the original order by dragging the text boxes to their correct positions.",
     difficulty: "hard",
@@ -186,7 +188,7 @@ Affordable housing remains a persistent challenge in growing cities worldwide. R
   // Fill in the Blanks (Drag & Drop)
   {
     id: "fill-drag-1",
-    type: "fill-blanks-drag",
+    type: PTE_QUESTION_TYPES.FILL_IN_BLANKS_DRAG_DROP,
     title: "Ocean Ecosystems",
     instruction: "Below is a text with blanks. Drag words from the box below to fill in the blanks.",
     difficulty: "medium",
@@ -208,7 +210,7 @@ The health of ocean ecosystems is crucial for human [BLANK5]. Oceans regulate cl
   },
   {
     id: "fill-drag-2",
-    type: "fill-blanks-drag",
+    type: PTE_QUESTION_TYPES.FILL_IN_BLANKS_DRAG_DROP,
     title: "Space Exploration",
     instruction: "Below is a text with blanks. Drag words from the box below to fill in the blanks.",
     difficulty: "easy",
@@ -232,7 +234,7 @@ Looking to the future, space agencies and private companies are developing plans
   // Fill in the Blanks (Dropdown)
   {
     id: "fill-dropdown-1",
-    type: "fill-blanks-dropdown",
+    type: PTE_QUESTION_TYPES.FILL_IN_BLANKS_DROPDOWN,
     title: "Artificial Intelligence",
     instruction: "Read the text and select the appropriate word from each dropdown to complete the passage.",
     difficulty: "hard",
@@ -254,7 +256,7 @@ Researchers and policymakers are working to develop frameworks that promote [BLA
   },
   {
     id: "fill-dropdown-2",
-    type: "fill-blanks-dropdown",
+    type: PTE_QUESTION_TYPES.FILL_IN_BLANKS_DROPDOWN,
     title: "Human Memory",
     instruction: "Read the text and select the appropriate word from each dropdown to complete the passage.",
     difficulty: "medium",
@@ -282,27 +284,27 @@ export function getReadingQuestionsByType(type: ReadingTestType): ReadingQuestio
 
 export function getReadingTestTypeInfo(type: ReadingTestType): { name: string; description: string; icon: string } {
   const info: Record<ReadingTestType, { name: string; description: string; icon: string }> = {
-    "mc-single": {
+    [PTE_QUESTION_TYPES.MC_SINGLE_ANSWER_READING]: {
       name: "MC Single Answer",
       description: "Select the single best answer from multiple options",
       icon: "🔘"
     },
-    "mc-multiple": {
+    [PTE_QUESTION_TYPES.MC_MULTIPLE_ANSWERS_READING]: {
       name: "MC Multiple Answers",
       description: "Select all correct answers from multiple options",
       icon: "☑️"
     },
-    "reorder-paragraphs": {
+    [PTE_QUESTION_TYPES.REORDER_PARAGRAPHS]: {
       name: "Re-order Paragraphs",
       description: "Arrange paragraphs in the correct order",
       icon: "📝"
     },
-    "fill-blanks-drag": {
+    [PTE_QUESTION_TYPES.FILL_IN_BLANKS_DRAG_DROP]: {
       name: "Fill in Blanks (Drag & Drop)",
       description: "Drag words to complete the passage",
       icon: "🎯"
     },
-    "fill-blanks-dropdown": {
+    [PTE_QUESTION_TYPES.FILL_IN_BLANKS_DROPDOWN]: {
       name: "Fill in Blanks (Dropdown)",
       description: "Select words from dropdowns to complete the passage",
       icon: "📋"

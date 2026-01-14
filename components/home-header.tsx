@@ -1,42 +1,52 @@
-'use client'
+"use client";
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import Link from 'next/link'
-import { ChevronDown, Menu, Search } from 'lucide-react'
-import { ThemeToggle } from '@/components/theme-toggle'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { UserNav } from '@/components/user-nav'
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { ChevronDown, Menu, Search } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { UserNav } from "@/components/user-nav";
+import { ThemeSwitcher } from "@/components/ui/theme-switcher";
 
 export function HomeHeader() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [query, setQuery] = useState('')
-  const [resultsOpen, setResultsOpen] = useState(false)
-  const [searchResults, setSearchResults] = useState<any[]>([])
-  const controllerRef = useRef<AbortController | null>(null)
-  const debouncedQuery = query
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const [resultsOpen, setResultsOpen] = useState(false);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const controllerRef = useRef<AbortController | null>(null);
+  const debouncedQuery = query;
   useEffect(() => {
     if (!debouncedQuery) {
-      setSearchResults([])
-      setResultsOpen(false)
-      return
+      setSearchResults([]);
+      setResultsOpen(false);
+      return;
     }
-    if (controllerRef.current) controllerRef.current.abort()
-    const c = new AbortController()
-    controllerRef.current = c
+    if (controllerRef.current) controllerRef.current.abort();
+    const c = new AbortController();
+    controllerRef.current = c;
     const t = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/search?query=${encodeURIComponent(debouncedQuery)}`, {
-          signal: c.signal,
-        })
-        const data = await res.json()
-        setSearchResults(Array.isArray(data.results) ? data.results.slice(0, 6) : [])
-        setResultsOpen(true)
+        const res = await fetch(
+          `/api/search?query=${encodeURIComponent(debouncedQuery)}`,
+          {
+            signal: c.signal,
+          }
+        );
+        const data = await res.json();
+        setSearchResults(
+          Array.isArray(data.results) ? data.results.slice(0, 6) : []
+        );
+        setResultsOpen(true);
       } catch {}
-    }, 250)
-    return () => clearTimeout(t)
-  }, [debouncedQuery])
+    }, 250);
+    return () => clearTimeout(t);
+  }, [debouncedQuery]);
 
   return (
     <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 fixed top-0 right-0 left-0 z-50 border-b backdrop-blur">
@@ -60,40 +70,81 @@ export function HomeHeader() {
               </PopoverTrigger>
               <PopoverContent align="start" className="w-[660px] p-0">
                 <div className="grid grid-cols-3 gap-0">
-                  <Link href="#features" className="hover:bg-accent flex flex-col gap-1 p-4">
+                  <Link
+                    href="#features"
+                    className="hover:bg-accent flex flex-col gap-1 p-4"
+                  >
                     <span className="text-sm font-semibold">Features</span>
-                    <span className="text-muted-foreground text-xs">Practice, scoring, analytics</span>
+                    <span className="text-muted-foreground text-xs">
+                      Practice, scoring, analytics
+                    </span>
                   </Link>
-                  <Link href="#question-types" className="hover:bg-accent flex flex-col gap-1 p-4">
-                    <span className="text-sm font-semibold">Question Types</span>
-                    <span className="text-muted-foreground text-xs">Speaking, Writing, Reading</span>
+                  <Link
+                    href="#question-types"
+                    className="hover:bg-accent flex flex-col gap-1 p-4"
+                  >
+                    <span className="text-sm font-semibold">
+                      Question Types
+                    </span>
+                    <span className="text-muted-foreground text-xs">
+                      Speaking, Writing, Reading
+                    </span>
                   </Link>
-                  <Link href="/pricing" className="hover:bg-accent flex flex-col gap-1 p-4">
+                  <Link
+                    href="/pricing"
+                    className="hover:bg-accent flex flex-col gap-1 p-4"
+                  >
                     <span className="text-sm font-semibold">Pricing</span>
-                    <span className="text-muted-foreground text-xs">Plans that fit you</span>
+                    <span className="text-muted-foreground text-xs">
+                      Plans that fit you
+                    </span>
                   </Link>
-                  <Link href="/blog" className="hover:bg-accent flex flex-col gap-1 p-4">
+                  <Link
+                    href="/blog"
+                    className="hover:bg-accent flex flex-col gap-1 p-4"
+                  >
                     <span className="text-sm font-semibold">Blog</span>
-                    <span className="text-muted-foreground text-xs">Guides and updates</span>
+                    <span className="text-muted-foreground text-xs">
+                      Guides and updates
+                    </span>
                   </Link>
-                  <Link href="/contact" className="hover:bg-accent flex flex-col gap-1 p-4">
+                  <Link
+                    href="/contact"
+                    className="hover:bg-accent flex flex-col gap-1 p-4"
+                  >
                     <span className="text-sm font-semibold">Contact</span>
-                    <span className="text-muted-foreground text-xs">Get help fast</span>
+                    <span className="text-muted-foreground text-xs">
+                      Get help fast
+                    </span>
                   </Link>
-                  <Link href="/pte/dashboard" className="hover:bg-accent flex flex-col gap-1 p-4">
+                  <Link
+                    href="/pte/dashboard"
+                    className="hover:bg-accent flex flex-col gap-1 p-4"
+                  >
                     <span className="text-sm font-semibold">Dashboard</span>
-                    <span className="text-muted-foreground text-xs">Start practicing</span>
+                    <span className="text-muted-foreground text-xs">
+                      Start practicing
+                    </span>
                   </Link>
                 </div>
               </PopoverContent>
             </Popover>
-            <Link href="/blog" className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+            <Link
+              href="/blog"
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+            >
               Blog
             </Link>
-            <Link href="/pricing" className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+            <Link
+              href="/pricing"
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+            >
               Pricing
             </Link>
-            <Link href="/contact" className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors">
+            <Link
+              href="/contact"
+              className="text-muted-foreground hover:text-foreground text-sm font-medium transition-colors"
+            >
               Contact
             </Link>
           </div>
@@ -114,8 +165,12 @@ export function HomeHeader() {
                   <div className="border bg-popover text-popover-foreground absolute left-0 right-0 top-10 z-50 rounded-md shadow-md">
                     <div className="flex flex-col p-2">
                       {searchResults.map((r, i) => (
-                        <Link key={i} href={r.url || '/blog'} className="hover:bg-accent rounded-sm px-2 py-2 text-sm">
-                          {r.title || r.name || 'Result'}
+                        <Link
+                          key={i}
+                          href={r.url || "/blog"}
+                          className="hover:bg-accent rounded-sm px-2 py-2 text-sm"
+                        >
+                          {r.title || r.name || "Result"}
                         </Link>
                       ))}
                     </div>
@@ -123,17 +178,26 @@ export function HomeHeader() {
                 )}
               </div>
             </div>
-            <ThemeToggle />
+            <ThemeSwitcher />
             <div className="hidden items-center gap-2 sm:flex">
               <Button asChild variant="ghost" size="sm">
                 <Link href="/sign-in">Sign In</Link>
               </Button>
-              <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+              <Button
+                asChild
+                size="sm"
+                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+              >
                 <Link href="/sign-up">Get Started</Link>
               </Button>
               <UserNav />
             </div>
-            <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
               <Menu className="h-5 w-5" />
             </Button>
           </div>
@@ -181,5 +245,5 @@ export function HomeHeader() {
         )}
       </nav>
     </header>
-  )
+  );
 }

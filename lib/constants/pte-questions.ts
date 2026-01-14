@@ -249,7 +249,7 @@ export const ALL_QUESTION_TYPES = {
 } as const
 
 // Derived types from the const definitions
-export type DerivedQuestionDefinition = typeof ALL_QUESTION_TYPES[keyof typeof ALL_QUESTION_TYPES]
+export type DerivedQuestionDefinition = QuestionDefinition
 export type QuestionCode = DerivedQuestionDefinition['code']
 
 // Get question type by code
