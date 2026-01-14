@@ -1,6 +1,7 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { Suspense } from 'react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import { RootProvider } from '@/components/providers/root-provider'
 import { Toaster } from 'sonner'
 
@@ -48,6 +49,7 @@ export default function RootLayout({
           <RootProvider>
             {children}
             <Toaster />
+            <SpeedInsights />
           </RootProvider>
         </Suspense>
       </body>
