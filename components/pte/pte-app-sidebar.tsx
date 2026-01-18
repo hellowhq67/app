@@ -35,65 +35,65 @@ import {
 const navMain = [
   {
     title: "Dashboard",
-    url: "/dashboard",
+    url: "/pte/dashboard",
     icon: Home,
   },
   {
     title: "Practice Hub",
-    url: "/academic/practice",
+    url: "/pte/academic/practice",
     icon: SquareTerminal,
     isActive: true,
     items: [
       {
         title: "Speaking",
-        url: "/academic/practice/speaking",
+        url: "/pte/academic/practice/speaking",
         icon: Mic,
       },
       {
         title: "Writing",
-        url: "/academic/practice/writing",
+        url: "/pte/academic/practice/writing",
         icon: PenTool,
       },
       {
         title: "Reading",
-        url: "/academic/practice/reading",
+        url: "/pte/academic/practice/reading",
         icon: BookOpen,
       },
       {
         title: "Listening",
-        url: "/academic/practice/listening",
+        url: "/pte/academic/practice/listening",
         icon: Headphones,
       },
     ],
   },
   {
     title: "Mock Tests",
-    url: "/academic/mock-tests",
+    url: "/pte/academic/mock-tests",
     icon: Trophy,
   },
   {
     title: "Sectional Tests",
-    url: "/academic/sectional-test",
+    url: "/pte/academic/sectional-test",
     icon: Frame,
   },
   {
     title: "Practice History",
-    url: "/academic/practice-attempts",
+    url: "/pte/academic/practice-attempts",
     icon: History,
   },
   {
     title: "Analytics",
-    url: "/academic/analytics",
+    url: "/pte/academic/analytics",
     icon: PieChart,
   },
   {
     title: "AI Tutor",
-    url: "/ai-tutor",
+    url: "/pte/ai-tutor",
     icon: Bot,
   },
   {
     title: "Settings",
-    url: "/settings",
+    url: "/pte/settings",
     icon: Settings,
   },
 ];
@@ -109,7 +109,7 @@ export function PTEAppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/dashboard">
+              <Link href="/pte/dashboard">
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">PedagogistsPTE</span>
                   <span className="truncate text-xs">PTE Academic SASS</span>

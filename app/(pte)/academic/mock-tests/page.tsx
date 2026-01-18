@@ -99,7 +99,7 @@ export default function MockTestLandingPage() {
             }
 
             const data = await res.json();
-            router.push(`/academic/mock-tests/test/${data.testId}`);
+            router.push(`/pte/academic/mock-tests/test/${data.testId}`);
         } catch (e: any) {
             console.error('Start test error:', e);
             toast({
@@ -254,16 +254,13 @@ export default function MockTestLandingPage() {
                             </AlertDescription>
                         </Alert>
 
-                        <div className="flex items-center gap-3 w-full">
-                            <Checkbox
-                                id="terms"
-                                checked={hasRead}
-                                onCheckedChange={(checked) => setHasRead(checked === true)}
-                            />
-                            <label htmlFor="terms" className="text-xs sm:text-sm cursor-pointer select-none">
-                                I have read and understood the test instructions
-                            </label>
-                        </div>
+                        <Checkbox
+                            id="terms"
+                            checked={hasRead}
+                            onChange={(e) => setHasRead(e.target.checked)}
+                            label="I have read and understood the test instructions"
+                            className="text-xs sm:text-sm"
+                        />
 
                         <Button
                             size="lg"
@@ -300,7 +297,7 @@ export default function MockTestLandingPage() {
                                 </p>
                             </div>
                             <Button variant="outline" asChild className="w-full sm:w-auto">
-                                <Link href="/academic/sectional-test">
+                                <Link href="/pte/academic/sectional-test">
                                     Try Sectional Tests
                                     <ArrowRight className="w-4 h-4 ml-2" />
                                 </Link>

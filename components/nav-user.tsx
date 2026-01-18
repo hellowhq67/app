@@ -26,40 +26,32 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import Link from "next/link"
-import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { authClient, useAuth } from "@/lib/auth/client"
 
 export function NavUser() {
   const { isMobile } = useSidebar()
-  const [user, setUser] = useState({
-    name: "PTE Student",
-    email: "student@pte.com",
-    image: "",
-  })
+  const router = useRouter()
+  const { user, isLoading } = useAuth()
 
-  useEffect(() => {
-    // Fetch user data
-    fetch("/api/user")
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && !data.error) {
-          setUser({
-            name: data.name || "PTE Student",
-            email: data.email || "student@pte.com",
-            image: data.image || "",
-          })
-        }
-      })
-      .catch(() => {
-        // Keep default user
-      })
-  }, [])
+  const handleSignOut = async () => {
+    await authClient.signOut()
+    router.push("/sign-in")
+  }
+
+  // Default user data while loading or if not authenticated
+  const displayUser = {
+    name: user?.name || "PTE Student",
+    email: user?.email || "student@pte.com",
+    image: user?.image || "",
+  }
 
   // Get initials for avatar fallback
-  const initials = user.name
+  const initials = displayUser.name
     ?.split(" ")
     .map((n) => n[0])
     .join("")
-    .toUpperCase() || "GU"
+    .toUpperCase() || "PS"
 
   return (
     <SidebarMenu>
@@ -71,12 +63,12 @@ export function NavUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.image || ""} alt={user.name || ""} />
+                <AvatarImage src={displayUser.image} alt={displayUser.name} />
                 <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-semibold">{displayUser.name}</span>
+                <span className="truncate text-xs">{displayUser.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -90,12 +82,12 @@ export function NavUser() {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.image || ""} alt={user.name || ""} />
+                  <AvatarImage src={displayUser.image} alt={displayUser.name} />
                   <AvatarFallback className="rounded-lg">{initials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-semibold">{displayUser.name}</span>
+                  <span className="truncate text-xs">{displayUser.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -114,7 +106,7 @@ export function NavUser() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/pte/analytics">
+                <Link href="/pte/academic/analytics">
                   <Sparkles />
                   Analytics
                 </Link>
@@ -125,11 +117,9 @@ export function NavUser() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link href="/api/auth/sign-out">
-                <LogOut />
-                Log out
-              </Link>
+            <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
+              <LogOut />
+              Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

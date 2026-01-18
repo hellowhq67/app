@@ -126,7 +126,7 @@ export default function SectionalTestDashboard() {
       const data = await res.json();
 
       if (res.ok && data.testId) {
-        router.push(`/academic/sectional-test/${data.testId}`);
+        router.push(`/pte/academic/sectional-test/${data.testId}`);
       } else {
         toast({
           title: "Failed to start test",
