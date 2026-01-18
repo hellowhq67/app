@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
 const authRoutes = ["/sign-in", "/sign-up"];
-const protectedRoutes = ["/pte", "/dashboard", "/checkout"];
+const protectedRoutes = [ "/dashboard", "/checkout"];
 
 export async function proxy(request: NextRequest) {
     const { pathname } = request.nextUrl;
@@ -23,7 +23,7 @@ export async function proxy(request: NextRequest) {
     // If user is authenticated but trying to access auth routes (sign-in/sign-up)
     // Redirect to dashboard
     if (sessionCookie && authRoutes.some((route) => pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL("/pte/dashboard", request.url));
+        return NextResponse.redirect(new URL("/dashboard", request.url));
     }
 
     // If user is NOT authenticated and trying to access protected routes
