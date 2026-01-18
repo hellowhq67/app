@@ -67,7 +67,7 @@ export default function PricingPreview() {
         </p>
       </div>
 
-      <div className="mx-auto mt-10 grid max-w-6xl grid-cols-1 gap-6 sm:mt-16 md:grid-cols-3">
+      <div className="mx-auto mt-10 grid max-w-6xl grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
         {TIERS.map((tier) => (
           <Card
             key={tier.name}

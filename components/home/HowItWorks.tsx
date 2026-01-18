@@ -34,7 +34,7 @@ export default function HowItWorks() {
         </p>
       </div>
 
-      <ol className="mt-10 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-3">
+      <ol className="mt-10 grid grid-cols-1 gap-6 sm:mt-16 md:grid-cols-3">
         {STEPS.map((step, i) => (
           <li key={step.title} className="relative">
             <Card className="h-full">
