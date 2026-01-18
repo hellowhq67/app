@@ -14,7 +14,7 @@ export default async function DashboardPage() {
   });
 
   if (!session?.user) {
-    redirect('/auth/login');
+    redirect('/sign-in');
   }
 
   // Fetch user data and dashboard stats in parallel
