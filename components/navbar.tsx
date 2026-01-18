@@ -97,14 +97,14 @@ const Navbar = memo(function Navbar() {
             {
                 title: 'Tests',
                 items: [
-                    { href: '/pte/mock-tests', label: 'Mock Tests', icon: Sparkles },
-                    { href: '/pte/mock-tests/sectional', label: 'Sectional Tests', icon: Sparkles },
+                    { href: '/pte/academic/mock-tests', label: 'Mock Tests', icon: Sparkles },
+                    { href: '/pte/academic/sectional-test', label: 'Sectional Tests', icon: Sparkles },
                 ],
             },
             {
                 title: 'Insights',
                 items: [
-                    { href: '/pte/analytics', label: 'Analytics', icon: BarChart3 },
+                    { href: '/pte/academic/analytics', label: 'Analytics', icon: BarChart3 },
                     { href: '/pte/profile', label: 'Profile', icon: UserIcon },
                 ],
             },

@@ -186,22 +186,25 @@ export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats
             Ready to continue your PTE preparation journey?
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Button
             variant="outline"
-            className="gap-2"
+            className="gap-2 text-xs sm:text-sm"
             onClick={openVoiceAssistant}
           >
             <Headphones className="h-4 w-4" />
-            Voice Assistant
+            <span className="hidden sm:inline">Voice Assistant</span>
+            <span className="sm:hidden">Voice</span>
           </Button>
-          <Button variant="outline" className="gap-2">
+          <Button variant="outline" className="gap-2 text-xs sm:text-sm">
             <Target className="h-4 w-4" />
-            Set Goal
+            <span className="hidden sm:inline">Set Goal</span>
+            <span className="sm:hidden">Goal</span>
           </Button>
-          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all hover:shadow-blue-500/25">
-            <Zap className="mr-2 h-4 w-4" />
-            Upgrade to VIP
+          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg transition-all hover:shadow-blue-500/25 text-xs sm:text-sm">
+            <Zap className="mr-1 sm:mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Upgrade to VIP</span>
+            <span className="sm:hidden">VIP</span>
           </Button>
         </div>
       </motion.div>
@@ -368,7 +371,7 @@ export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats
               </Button>
             </CardHeader>
             <CardContent>
-              <div className="h-[300px] w-full">
+              <div className="h-[220px] sm:h-[260px] md:h-[300px] w-full">
                 {mounted && chartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={chartData} barSize={40}>
@@ -458,29 +461,29 @@ export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats
             </CardHeader>
             <CardContent>
               {examDate ? (
-                <div className="flex justify-between gap-4 text-center">
-                  <div className="flex flex-1 flex-col items-center gap-2 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/30">
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="flex justify-between gap-2 sm:gap-4 text-center">
+                  <div className="flex flex-1 flex-col items-center gap-1 sm:gap-2 rounded-xl bg-blue-50 p-2 sm:p-3 dark:bg-blue-950/30">
+                    <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {countdown.days}
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">
+                    <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">
                       Days
                     </span>
                   </div>
-                  <div className="flex flex-1 flex-col items-center gap-2 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/30">
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <div className="flex flex-1 flex-col items-center gap-1 sm:gap-2 rounded-xl bg-blue-50 p-2 sm:p-3 dark:bg-blue-950/30">
+                    <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {countdown.hours}
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">
-                      Hours
+                    <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">
+                      Hrs
                     </span>
                   </div>
-                  <div className="flex flex-1 flex-col items-center gap-2 rounded-xl bg-blue-50 p-3 dark:bg-blue-950/30">
-                    <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  <div className="flex flex-1 flex-col items-center gap-1 sm:gap-2 rounded-xl bg-blue-50 p-2 sm:p-3 dark:bg-blue-950/30">
+                    <div className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
                       {countdown.minutes}
                     </div>
-                    <span className="text-xs font-medium text-muted-foreground">
-                      Mins
+                    <span className="text-[10px] sm:text-xs font-medium text-muted-foreground">
+                      Min
                     </span>
                   </div>
                 </div>
@@ -522,22 +525,22 @@ export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats
                 <h4 className="font-medium text-foreground">
                   Practice Summary
                 </h4>
-                <div className="grid grid-cols-3 gap-2 text-center">
-                  <div className="rounded-xl border bg-card p-3 shadow-sm">
-                    <div className="text-xl font-bold text-foreground">{stats?.todayAttempts || 0}</div>
-                    <div className="text-[10px] text-muted-foreground">
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-center">
+                  <div className="rounded-xl border bg-card p-2 sm:p-3 shadow-sm">
+                    <div className="text-lg sm:text-xl font-bold text-foreground">{stats?.todayAttempts || 0}</div>
+                    <div className="text-[9px] sm:text-[10px] text-muted-foreground">
                       Today
                     </div>
                   </div>
-                  <div className="rounded-xl border bg-card p-3 shadow-sm">
-                    <div className="text-xl font-bold text-foreground">{stats?.totalAttempts || 0}</div>
-                    <div className="text-[10px] text-muted-foreground">
+                  <div className="rounded-xl border bg-card p-2 sm:p-3 shadow-sm">
+                    <div className="text-lg sm:text-xl font-bold text-foreground">{stats?.totalAttempts || 0}</div>
+                    <div className="text-[9px] sm:text-[10px] text-muted-foreground">
                       Total
                     </div>
                   </div>
-                  <div className="rounded-xl border bg-card p-3 shadow-sm">
-                    <div className="text-xl font-bold text-foreground">{stats?.studyStreak || 0}</div>
-                    <div className="text-[10px] text-muted-foreground">
+                  <div className="rounded-xl border bg-card p-2 sm:p-3 shadow-sm">
+                    <div className="text-lg sm:text-xl font-bold text-foreground">{stats?.studyStreak || 0}</div>
+                    <div className="text-[9px] sm:text-[10px] text-muted-foreground">
                       Streak
                     </div>
                   </div>
@@ -606,9 +609,9 @@ export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats
 
       {/* Study Guide Section */}
       <motion.div variants={item} className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h2 className="text-xl font-bold text-foreground">Study Guide</h2>
-          <div className="flex gap-2">
+          <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
             {["Pearson PTE", "Speaking", "Writing", "Reading", "Listening"].map(
               (tab) => (
                 <Button
@@ -616,7 +619,7 @@ export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "rounded-full text-xs",
+                    "rounded-full text-[10px] sm:text-xs whitespace-nowrap px-2 sm:px-3",
                     tab === "Pearson PTE"
                       ? "bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
                       : "text-muted-foreground hover:text-foreground"

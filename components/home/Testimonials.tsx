@@ -44,7 +44,7 @@ export default function Testimonials() {
         </p>
       </div>
 
-      <div className="mt-10 grid grid-cols-1 gap-6 sm:mt-16 md:grid-cols-3">
+      <div className="mt-10 grid grid-cols-1 gap-6 sm:mt-16 sm:grid-cols-2 lg:grid-cols-3">
         {TESTIMONIALS.map((t) => (
           <Card key={t.name} className="h-full">
             <CardHeader>
