@@ -1,44 +1,32 @@
-import { NextRequest, NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
-
-const authRoutes = ["/sign-in", "/sign-up"];
-const protectedRoutes = [ "/dashboard", "/checkout"];
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 export async function proxy(request: NextRequest) {
-    const { pathname } = request.nextUrl;
-    const sessionCookie = getSessionCookie(request);
+	const sessionCookie = getSessionCookie(request);
+	const { pathname } = request.nextUrl;
 
-    // Allow API routes to be handled by their own logic, 
-    // but specific protected API routes could be added here if needed.
-    // Ensure auth endpoints are always accessible
-    if (pathname.startsWith("/api/auth")) {
-        return NextResponse.next();
-    }
+	// Protected routes: everything under /pte and /dashboard
+	const isProtectedRoute = pathname.startsWith("/") || pathname.startsWith("/dashboard");
 
-    // Allow webhooks
-    if (pathname.startsWith("/api/webhooks")) {
-        return NextResponse.next();
-    }
+	if (isProtectedRoute && !sessionCookie) {
+		const signInUrl = new URL("/sign-in", request.url);
+		signInUrl.searchParams.set("callbackUrl", pathname);
+		return NextResponse.redirect(signInUrl);
+	}
 
-    // If user is authenticated but trying to access auth routes (sign-in/sign-up)
-    // Redirect to dashboard
-    if (sessionCookie && authRoutes.some((route) => pathname.startsWith(route))) {
-        return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    // If user is NOT authenticated and trying to access protected routes
-    if (!sessionCookie && protectedRoutes.some((route) => pathname.startsWith(route))) {
-        const signInUrl = new URL("/sign-in", request.url);
-        signInUrl.searchParams.set("callbackUrl", pathname);
-        return NextResponse.redirect(signInUrl);
-    }
-
-    return NextResponse.next();
+	return NextResponse.next();
 }
 
 export const config = {
-    matcher: [
-        "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
-        "/(api|trpc)(.*)",
-    ],
+	matcher: [
+		/*
+		 * Match all request paths except for the ones starting with:
+		 * - api (API routes)
+		 * - _next/static (static files)
+		 * - _next/image (image optimization files)
+		 * - favicon.ico (favicon file)
+		 */
+		"/((?!api|_next/static|_next/image|favicon.ico).*)",
+	],
 };
