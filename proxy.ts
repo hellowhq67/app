@@ -48,7 +48,7 @@ export async function proxy(request: NextRequest) {
 
     if (sessionCookie && authRoutes.some((route) => pathname.startsWith(route))) {
 
-        return NextResponse.redirect(new URL("/pte/dashboard", request.url));
+        return NextResponse.redirect(new URL("/dashboard", request.url));
 
     }
 
