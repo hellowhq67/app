@@ -1,40 +1,87 @@
-import { getSessionCookie } from "better-auth/cookies";
-import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
-    const sessionCookie = getSessionCookie(request);
+import { getSessionCookie } from "better-auth/cookies";
+
+
+
+const authRoutes = ["/sign-in", "/sign-up"];
+
+const protectedRoutes = ["/pte", "/dashboard", "/checkout"];
+
+
+
+export async function proxy(request: NextRequest) {
+
     const { pathname } = request.nextUrl;
 
-    // 1. Define the list of public routes that do not need authentication
-    const publicRoutes = ["/sign-in", "/sign-up"];
+    const sessionCookie = getSessionCookie(request);
 
-    // 2. If the current path is in the public routes, let it pass
-    if (publicRoutes.includes(pathname)) {
+
+
+    // Allow API routes to be handled by their own logic, 
+
+    // but specific protected API routes could be added here if needed.
+
+    // Ensure auth endpoints are always accessible
+
+    if (pathname.startsWith("/api/auth")) {
+
         return NextResponse.next();
+
     }
 
-    // 3. Define protected routes
-    // You can protect specific paths like '/dashboard' 
-    // OR protect everything else by removing the if statement below and just checking the cookie.
-    // Here, we ensure '/dashboard' is definitely protected.
-    const isProtectedRoute = pathname.startsWith("/dashboard");
 
-    // Note: If you want to protect the entire site except sign-in/up, 
-    // you can remove the 'isProtectedRoute' check and just run the cookie check below.
 
-    if (isProtectedRoute && !sessionCookie) {
+    // Allow webhooks
+
+    if (pathname.startsWith("/api/webhooks")) {
+
+        return NextResponse.next();
+
+    }
+
+
+
+    // If user is authenticated but trying to access auth routes (sign-in/sign-up)
+
+    // Redirect to dashboard
+
+    if (sessionCookie && authRoutes.some((route) => pathname.startsWith(route))) {
+
+        return NextResponse.redirect(new URL("/pte/dashboard", request.url));
+
+    }
+
+
+
+    // If user is NOT authenticated and trying to access protected routes
+
+    if (!sessionCookie && protectedRoutes.some((route) => pathname.startsWith(route))) {
+
         const signInUrl = new URL("/sign-in", request.url);
+
         signInUrl.searchParams.set("callbackUrl", pathname);
+
         return NextResponse.redirect(signInUrl);
+
     }
+
+
 
     return NextResponse.next();
+
 }
 
+
+
 export const config = {
+
     matcher: [
-        // Match all paths except static files and APIs
-        "/((?!api|_next/static|_next/image|favicon.ico).*)",
+
+        "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
+
+        "/(api|trpc)(.*)",
+
     ],
+
 };
