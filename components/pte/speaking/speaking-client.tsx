@@ -16,10 +16,7 @@ import { toast } from "@/hooks/use-toast";
 import { QuestionType, SpeakingFeedbackData, SpeakingQuestion } from "@/lib/types";
 import { scoreReadAloudAttempt, scoreSpeakingAttempt } from "@/app/actions/pte";
 import { ScoreDisplay } from "@/components/pte/speaking/score-display";
-import { SpeakingRecorder } from "./SpeakingRecorder";
-import { Transcription, TranscriptionSegment } from "@/components/ai-elements/transcription";
-import { TranscriptionSegment as SegmentType } from "@/hooks/useSpeechRecorder";
-import { uploadAudio } from "@/lib/actions/upload-audio";
+import { SpeechInput } from "@/components/ai-elements/speech-input";
 
 interface SpeakingPracticeClientProps {
     question: SpeakingQuestion;
@@ -64,24 +61,22 @@ export function SpeakingPracticeClient({
         "idle" | "playing_audio" | "preparing" | "recording" | "completed"
     >("idle");
     const [prepTime, setPrepTime] = useState(timings.prep);
-    const [recordingTime, setRecordingTime] = useState(0);
     const [feedback, setFeedback] = useState<SpeakingFeedbackData | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
     const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
-    const [liveTranscript, setLiveTranscript] = useState("");
-    const [transcribedSegments, setTranscribedSegments] = useState<SegmentType[]>([]);
+    const [transcript, setTranscript] = useState("");
+    const [isRecordingActive, setIsRecordingActive] = useState(false);
 
     const prepTimerRef = useRef<NodeJS.Timeout | null>(null);
-    const recordTimerRef = useRef<NodeJS.Timeout | null>(null);
     const audioRef = useRef<HTMLAudioElement>(null);
     const { playBeep } = useBeep();
+    const speechInputRef = useRef<HTMLDivElement>(null);
 
     // Cleanup timers
     useEffect(() => {
         return () => {
             if (prepTimerRef.current) clearInterval(prepTimerRef.current);
-            if (recordTimerRef.current) clearInterval(recordTimerRef.current);
         };
     }, []);
 
@@ -101,9 +96,8 @@ export function SpeakingPracticeClient({
         setFeedback(null);
         setRecordedBlob(null);
         setRecordedUrl(null);
-        setLiveTranscript("");
-        setTranscribedSegments([]);
-        setRecordingTime(0);
+        setTranscript("");
+        setIsRecordingActive(false);
 
         // Flow depends on question type
         if (
@@ -149,24 +143,10 @@ export function SpeakingPracticeClient({
         playBeep();
         setTimeout(() => {
             setStatus("recording");
-            startRecordingTimer();
+            setIsRecordingActive(true);
+            // Trigger click on SpeechInput to start recording
+            speechInputRef.current?.querySelector('button')?.click();
         }, 300);
-    };
-
-    const startRecordingTimer = () => {
-        setRecordingTime(0);
-        if (recordTimerRef.current) clearInterval(recordTimerRef.current);
-
-        recordTimerRef.current = setInterval(() => {
-            setRecordingTime(prev => {
-                if (prev >= recordDuration) {
-                    // Force stop handled by Passing stopTrigger to SpeakingRecorder
-                    if (recordTimerRef.current) clearInterval(recordTimerRef.current);
-                    return prev;
-                }
-                return prev + 1;
-            });
-        }, 1000);
     };
 
     const handleAudioEnded = () => {
@@ -177,22 +157,46 @@ export function SpeakingPracticeClient({
         setFeedback(null);
         setRecordedBlob(null);
         setRecordedUrl(null);
+        setTranscript("");
         setStatus("idle");
         setPrepTime(timings.prep);
-        setRecordingTime(0);
+        setIsRecordingActive(false);
     };
 
-    const handleRecorded = async (blob: Blob) => {
-        setRecordedBlob(blob);
-        const url = URL.createObjectURL(blob);
+    const handleTranscriptionChange = (text: string) => {
+        setTranscript(text);
+    };
+
+    const handleAudioRecorded = async (audioBlob: Blob): Promise<string> => {
+        // Store the recorded blob
+        setRecordedBlob(audioBlob);
+        const url = URL.createObjectURL(audioBlob);
         setRecordedUrl(url);
-
-        if (recordTimerRef.current) clearInterval(recordTimerRef.current);
         setStatus("completed");
+        setIsRecordingActive(false);
 
-        // Note: segments are automatically tracked by useSpeechRecorder hook via onSegmentUpdate
-        // Note: We delay actual upload until submission to avoid double-uploading
-        // The scoring action (scoreReadAloudAttempt) handles the authoritative upload.
+        // Fallback transcription for browsers without Web Speech API
+        // This example uses a generic placeholder - replace with your actual transcription service
+        try {
+            const formData = new FormData();
+            formData.append("file", audioBlob, "audio.webm");
+
+            const response = await fetch("/api/transcribe", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error("Transcription failed");
+            }
+
+            const data = await response.json();
+            return data.text || "";
+        } catch (error) {
+            console.error("Transcription error:", error);
+            // Return empty string if transcription fails
+            return "";
+        }
     };
 
     const handleSubmit = async () => {
@@ -277,15 +281,6 @@ export function SpeakingPracticeClient({
         return null;
     };
 
-    // For Transcription Player
-    const [currentTime, setCurrentTime] = useState(0);
-    const playerRef = useRef<HTMLAudioElement>(null);
-    const handleTimeUpdate = () => {
-        if (playerRef.current) setCurrentTime(playerRef.current.currentTime);
-    };
-    const handleSeek = (time: number) => {
-        if (playerRef.current) playerRef.current.currentTime = time;
-    };
 
 
     return (
@@ -327,21 +322,29 @@ export function SpeakingPracticeClient({
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                                 </span>
-                                Recording ({recordingTime}s / {recordDuration}s)
+                                Recording
                             </p>
                         </div>
 
-                        <SpeakingRecorder
-                            onAudioRecorded={handleRecorded}
-                            onTranscriptionChange={setLiveTranscript}
-                            onSegmentUpdate={setTranscribedSegments}
-                            stopTrigger={recordingTime >= recordDuration}
-                        />
+                        <div ref={speechInputRef}>
+                            <SpeechInput
+                                onTranscriptionChange={handleTranscriptionChange}
+                                onAudioRecorded={handleAudioRecorded}
+                                size="icon"
+                                variant="outline"
+                                lang="en-US"
+                                maxDuration={recordDuration}
+                                autoStop={true}
+                            />
+                        </div>
 
-                        {liveTranscript && (
-                            <p className="text-sm text-muted-foreground max-w-md text-center italic opacity-70">
-                                &quot;{liveTranscript.slice(-100)}...&quot;
-                            </p>
+                        {transcript && (
+                            <div className="max-w-2xl rounded-lg border bg-card p-4 text-sm">
+                                <p className="text-muted-foreground mb-2">
+                                    <strong>Live Transcript:</strong>
+                                </p>
+                                <p className="text-sm leading-relaxed">{transcript}</p>
+                            </div>
                         )}
                     </div>
                 )}
@@ -359,22 +362,12 @@ export function SpeakingPracticeClient({
                                     src={recordedUrl}
                                     controls
                                     className="w-full mb-4"
-                                    ref={playerRef}
-                                    onTimeUpdate={handleTimeUpdate}
                                 />
 
-                                {transcribedSegments.length > 0 && (
+                                {transcript && (
                                     <div className="bg-muted p-4 rounded-md text-sm">
-                                        <h4 className="font-semibold text-xs uppercase text-muted-foreground mb-2">Live Transcript</h4>
-                                        <Transcription
-                                            segments={transcribedSegments}
-                                            currentTime={currentTime}
-                                            onSeek={handleSeek}
-                                        >
-                                            {(segment, i) => (
-                                                <TranscriptionSegment segment={segment} index={i} />
-                                            )}
-                                        </Transcription>
+                                        <h4 className="font-semibold text-xs uppercase text-muted-foreground mb-2">Transcript</h4>
+                                        <p className="leading-relaxed">{transcript}</p>
                                     </div>
                                 )}
                             </div>
@@ -414,7 +407,7 @@ export function SpeakingPracticeClient({
                             },
                         }}
                         wordMarking={feedback.wordMarking}
-                        spokenText={feedback.transcript || feedback.wordMarking?.map((w) => w.word).join(" ")}
+                        spokenText={feedback.transcript || transcript}
                         originalText={content}
                         audioUrl={recordedUrl || undefined}
                         onClose={() => setFeedback(null)}
