@@ -57,6 +57,14 @@ export default function SignInPage() {
 						</p>
 					</div>
 					<AuthForm mode="sign-in" />
+					<div className="flex justify-center">
+						<Link
+							href="/forgot-password"
+							className="text-sm text-muted-foreground underline underline-offset-4 hover:text-primary"
+						>
+							Forgot your password?
+						</Link>
+					</div>
 					<p className="px-8 text-center text-sm text-muted-foreground">
 						Don&apos;t have an account?{" "}
 						<Link

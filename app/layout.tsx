@@ -3,12 +3,11 @@ import type { Metadata, Viewport } from 'next'
 import { Suspense } from 'react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { RootProvider } from '@/components/providers/root-provider'
-import { Toaster } from 'sonner'
-
+import { CopilotKit } from "@copilotkit/react-core";
 export const metadata: Metadata = {
   metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL||process.env.NEXT_PUBLIC_BETTER_AUTH_URL ||'https://www.pedagogistspte.com/'
-   // Dev fallback
+    process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_BETTER_AUTH_URL || 'https://www.pedagogistspte.com/'
+    // Dev fallback
   ),
   title: 'PedagogistsPTE',
   description:
@@ -47,8 +46,10 @@ export default function RootLayout({
       <body className={`min-h-[100dvh] ${fontClassName} antialiased`} suppressHydrationWarning>
         <Suspense fallback={null}>
           <RootProvider>
-            {children}
-            <Toaster />
+            <CopilotKit runtimeUrl="/api/copilotkit">
+              {children}
+            </CopilotKit>
+
             <SpeedInsights />
           </RootProvider>
         </Suspense>

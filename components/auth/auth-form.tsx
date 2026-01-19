@@ -36,28 +36,28 @@ export function AuthForm({ mode }: AuthFormProps) {
 					name,
 					callbackURL: "/pte/dashboard",
 				}, {
-                    onSuccess: () => {
-                        toast.success("Account created successfully!");
-                        router.push("/pte/dashboard");
-                    },
-                    onError: (ctx) => {
-                        toast.error(ctx.error.message || "Failed to sign up.");
-                    }
-                });
+					onSuccess: () => {
+						toast.success("Account created successfully!");
+						router.push("/pte/dashboard");
+					},
+					onError: (ctx) => {
+						toast.error(ctx.error.message || "Failed to sign up.");
+					}
+				});
 			} else {
 				await authClient.signIn.email({
 					email,
 					password,
 					callbackURL: "/pte/dashboard",
 				}, {
-                    onSuccess: () => {
-                        toast.success("Signed in successfully!");
-                        router.push("/pte/dashboard");
-                    },
-                    onError: (ctx) => {
-                        toast.error(ctx.error.message || "Invalid credentials.");
-                    }
-                });
+					onSuccess: () => {
+						toast.success("Signed in successfully!");
+						router.push("/pte/dashboard");
+					},
+					onError: (ctx) => {
+						toast.error(ctx.error.message || "Invalid credentials.");
+					}
+				});
 			}
 		} catch (error) {
 			toast.error("An unexpected error occurred.");
@@ -79,9 +79,9 @@ export function AuthForm({ mode }: AuthFormProps) {
 				{mode === "sign-up" && (
 					<div className="space-y-2 group">
 						<Label htmlFor="name" className="group-focus-within:text-primary transition-colors">Name</Label>
-						<Input 
+						<Input
 							id="name"
-							placeholder="John Doe" 
+							placeholder="John Doe"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
 							required
@@ -91,10 +91,10 @@ export function AuthForm({ mode }: AuthFormProps) {
 				)}
 				<div className="space-y-2 group">
 					<Label htmlFor="email" className="group-focus-within:text-primary transition-colors">Email</Label>
-					<Input 
+					<Input
 						id="email"
 						type="email"
-						placeholder="name@example.com" 
+						placeholder="name@example.com"
 						value={email}
 						onChange={(e) => setEmail(e.target.value)}
 						required
@@ -103,25 +103,26 @@ export function AuthForm({ mode }: AuthFormProps) {
 				</div>
 				<div className="space-y-2 group">
 					<Label htmlFor="password" className="group-focus-within:text-primary transition-colors">Password</Label>
-					<Input 
+					<Input
 						id="password"
-						type="password" 
-						placeholder="••••••••" 
+						type="password"
+						placeholder="••••••••"
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 						required
 						className="input-focus-ring"
 					/>
 				</div>
-				<Button 
-					className={`w-full transition-all duration-300 ${isLoading ? "opacity-90 scale-[0.98]" : "hover:scale-[1.01] active:scale-[0.99]"}`} 
-					type="submit" 
+				<Button
+					className={`w-full h-11 text-base font-medium relative overflow-hidden transition-all duration-300 ${isLoading ? "cursor-not-allowed opacity-90" : "hover:shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 active:translate-y-0"}`}
+					type="submit"
 					disabled={isLoading}
 				>
+					<div className={`absolute inset-0 bg-gradient-to-r from-primary/0 via-white/20 to-primary/0 translate-x-[-200%] ${!isLoading && "animate-[shimmer_2s_infinite]"}`} />
 					{isLoading ? (
 						<div className="flex items-center justify-center gap-2">
-							<Loader2 className="h-4 w-4 animate-spin text-primary-foreground" />
-							<span>Processing...</span>
+							<Loader2 className="h-5 w-5 animate-spin" />
+							<span className="animate-pulse">Creating account...</span>
 						</div>
 					) : (
 						mode === "sign-in" ? "Sign In" : "Create Account"
@@ -139,23 +140,23 @@ export function AuthForm({ mode }: AuthFormProps) {
 				</div>
 			</div>
 			<div className="grid grid-cols-2 gap-4">
-				<Button 
-                    variant="outline" 
-                    type="button" 
-                    disabled={isLoading}
-                    onClick={() => handleSocialSignIn("google")}
+				<Button
+					variant="outline"
+					type="button"
+					disabled={isLoading}
+					onClick={() => handleSocialSignIn("google")}
 					className="hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 hover:scale-[1.02]"
-                >
+				>
 					<Mail className="mr-2 h-4 w-4" />
 					Google
 				</Button>
-				<Button 
-                    variant="outline" 
-                    type="button" 
-                    disabled={isLoading}
-                    onClick={() => handleSocialSignIn("github")}
+				<Button
+					variant="outline"
+					type="button"
+					disabled={isLoading}
+					onClick={() => handleSocialSignIn("github")}
 					className="hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 hover:scale-[1.02]"
-                >
+				>
 					<Github className="mr-2 h-4 w-4" />
 					GitHub
 				</Button>

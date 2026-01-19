@@ -3,8 +3,15 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
+import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "./email";
 
 export const auth = betterAuth({
+  // Core configuration
+  appName: "PTE Academic",
+  secret: process.env.BETTER_AUTH_SECRET,
+  baseURL: process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com",
+
+  // Database with Neon PostgreSQL
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -12,35 +19,111 @@ export const auth = betterAuth({
       session: schema.sessions,
       account: schema.accounts,
       verification: schema.verifications,
-    }
+    },
   }),
 
-  // Email and password authentication
+  // Email & Password authentication
   emailAndPassword: {
     enabled: true,
+    requireEmailVerification: process.env.NODE_ENV === 'production',
+    sendResetPassword: async ({ user, url }) => {
+      try {
+        await sendPasswordResetEmail(user.email, url, user.name);
+      } catch (error) {
+        console.error('Failed to send password reset email:', error);
+        throw new Error('Failed to send password reset email');
+      }
+    },
+    autoSignIn: true,
     minPasswordLength: 8,
-    autoSignIn: true, // Auto sign in after sign up
+    maxPasswordLength: 128,
   },
 
-  // Base URL configuration
-  baseURL: process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com",
-  secret: process.env.BETTER_AUTH_SECRET,
+  // Email verification
+  emailVerification: {
+    sendVerificationEmail: async ({ user, url }) => {
+      try {
+        await sendVerificationEmail(user.email, url, user.name);
+      } catch (error) {
+        console.error('Failed to send verification email:', error);
+        throw new Error('Failed to send verification email');
+      }
+    },
+    sendOnSignUp: process.env.NODE_ENV === 'production',
+    autoSignInAfterVerification: true,
+    expiresIn: 60 * 60 * 24, // 24 hours
+  },
 
-  // Trusted origins
-  trustedOrigins: [
-    "https://www.pedagogistspte.com",
-    "https://pedagogistspte.com",
-    "https://pedagogistspte-v-0-2-git-main-hellowhq67s-projects.vercel.app",
-    ...(process.env.NODE_ENV === "development" ? ["http://localhost:3000"] : []),
-  ],
-
-  // Session configuration with cookie caching
+  // Session management
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
-    updateAge: 60 * 60 * 24, // Update session every 24 hours
+    updateAge: 60 * 60 * 24, // Refresh daily
     cookieCache: {
       enabled: true,
-      maxAge: 5 * 60, // Cache for 5 minutes
+      maxAge: 5 * 60, // 5 minutes
+      strategy: "compact", // Most efficient
+    },
+    // Store sessions in database for better control
+    storeSessionInDatabase: true,
+  },
+
+  // User configuration
+  user: {
+    // Enable additional features
+    changeEmail: {
+      enabled: true,
+      sendChangeEmailVerification: async ({ newEmail, url }) => {
+        await sendVerificationEmail(newEmail, url);
+      },
+    },
+    deleteUser: {
+      enabled: true,
+    },
+    additionalFields: {
+      // Map custom fields from your users table
+      role: {
+        type: "string",
+        required: false,
+        defaultValue: "user",
+      },
+      subscriptionTier: {
+        type: "string",
+        required: false,
+        defaultValue: "free",
+      },
+      subscriptionStatus: {
+        type: "string",
+        required: false,
+        defaultValue: "active",
+      },
+      dailyAiCredits: {
+        type: "number",
+        required: false,
+        defaultValue: 10,
+      },
+      aiCreditsUsed: {
+        type: "number",
+        required: false,
+        defaultValue: 0,
+      },
+      dailyPracticeLimit: {
+        type: "number",
+        required: false,
+        defaultValue: 3,
+      },
+      practiceQuestionsUsed: {
+        type: "number",
+        required: false,
+        defaultValue: 0,
+      },
+    },
+  },
+
+  // Account linking
+  account: {
+    accountLinking: {
+      enabled: true,
+      trustedProviders: ["google", "github"],
     },
   },
 
@@ -49,62 +132,121 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      redirectURI: `${process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com"}/api/auth/callback/google`,
+    },
+    github: {
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      redirectURI: `${process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com"}/api/auth/callback/github`,
     },
   },
 
-  // Account configuration
-  account: {
-    accountLinking: {
-      enabled: true,
-      trustedProviders: ["google"],
-    },
-  },
-
-  // Advanced configuration for token storage
+  // Security & Advanced settings
   advanced: {
-    cookiePrefix: "pte_auth",
-    useSecureCookies: process.env.NODE_ENV === "production",
+    // Use secure cookies in production
+    useSecureCookies: process.env.NODE_ENV === 'production',
+
+    // Generate cryptographically secure IDs
+    generateId: () => crypto.randomUUID(),
+
+    // Cross-subdomain cookies for *.pedagogistspte.com
+    crossSubDomainCookies: {
+      enabled: false, // Enable if you have subdomains
+    },
+
+    // IP address detection (Vercel uses x-forwarded-for)
+    ipAddress: {
+      ipAddressHeaders: ['x-forwarded-for', 'x-real-ip'],
+    },
+
+    // CSRF protection enabled by default
+    disableCSRFCheck: false,
   },
 
-  // Database hooks for user profile creation
+  // Rate limiting for security
+  rateLimit: {
+    enabled: true,
+    window: 60, // 60 seconds
+    max: 10, // 10 requests per window
+    storage: "database", // Use Neon DB for rate limit storage
+    customRules: {
+      "/sign-in": {
+        window: 60,
+        max: 5, // More restrictive for login
+      },
+      "/sign-up": {
+        window: 60,
+        max: 3, // Most restrictive for registration
+      },
+      "/forgot-password": {
+        window: 60,
+        max: 3,
+      },
+    },
+  },
+
+  // CORS and trusted origins
+  trustedOrigins: [
+    "https://www.pedagogistspte.com",
+    "https://pedagogistspte.com",
+    "https://pedagogistspte-v-0-2.vercel.app",
+    "https://pedagogistspte-v-0-2-git-main-hellowhq67s-projects.vercel.app",
+    ...(process.env.NODE_ENV === "development"
+      ? ["http://localhost:3000", "http://localhost:3001"]
+      : []
+    ),
+  ],
+
+  // Database hooks for user lifecycle
   databaseHooks: {
     user: {
       create: {
         before: async (user) => {
-          // Ensure default values for new users
+          // Set defaults for new users
           return {
-            data: {
-              ...user,
-              role: user.role || "user",
-              subscriptionTier: "free",
-              subscriptionStatus: "active",
-              monthlyPracticeLimit: 10,
-              practiceQuestionsThisMonth: 0,
-              dailyAiCredits: 10,
-              aiCreditsUsed: 0,
-              dailyPracticeLimit: 3,
-              practiceQuestionsUsed: 0,
-            },
+            ...user,
+            role: user.role || 'user',
+            subscriptionTier: user.subscriptionTier || 'free',
+            subscriptionStatus: user.subscriptionStatus || 'active',
+            dailyAiCredits: user.dailyAiCredits ?? 10,
+            aiCreditsUsed: user.aiCreditsUsed ?? 0,
+            dailyPracticeLimit: user.dailyPracticeLimit ?? 3,
+            practiceQuestionsUsed: user.practiceQuestionsUsed ?? 0,
+            practiceQuestionsThisMonth: user.practiceQuestionsThisMonth ?? 0,
+            monthlyPracticeLimit: user.monthlyPracticeLimit ?? 10,
           };
         },
         after: async (user) => {
-          // Log user creation for debugging
-          console.log(`[Auth] New user created: ${user.id} (${user.email})`);
+          // Send welcome email after successful registration
+          // Only for email/password signups (OAuth users get welcome via their provider)
+          if (user.email && !user.emailVerified && process.env.NODE_ENV === 'production') {
+            try {
+              // Welcome email sent after email verification
+              console.log(`User created: ${user.email}`);
+            } catch (error) {
+              console.error('Failed to log user creation:', error);
+            }
+          }
+          return user;
         },
       },
     },
     session: {
       create: {
         after: async (session) => {
-          console.log(`[Auth] New session created for user: ${session.userId}`);
+          // Log session creation for security monitoring
+          if (process.env.NODE_ENV === 'production') {
+            console.log(`New session created for user: ${session.userId} from IP: ${session.ipAddress || 'unknown'}`);
+          }
+          return session;
         },
       },
     },
   },
 
-  plugins: [nextCookies()]
+  // Plugins
+  plugins: [nextCookies()],
 });
 
-// Export auth types
-export type Session = typeof auth.$Infer.Session;
-export type User = typeof auth.$Infer.Session.user;
+// Type inference for client
+export type Auth = typeof auth;

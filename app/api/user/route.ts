@@ -9,7 +9,10 @@ export async function GET() {
       return apiError(404, 'User not found', 'NOT_FOUND')
     }
     return apiSuccess(user)
-  } catch (error) {
+  } catch (error: any) {
+    if (error.message === 'UNAUTHORIZED' || error.cause === 'UNAUTHORIZED') {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 })
+    }
     return handleApiError(error, 'GET /api/user')
   }
 }

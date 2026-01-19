@@ -2,23 +2,24 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
-import { useAudioRecorder } from "@/hooks/useAudioRecorder";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
-    Mic,
-    Square,
-    Loader2,
     PlayCircle,
     RotateCcw,
     CheckCircle2,
     Volume2,
+    Loader2,
 } from "lucide-react";
 import { useBeep } from "@/hooks/useBeep";
 import { toast } from "@/hooks/use-toast";
 import { QuestionType, SpeakingFeedbackData, SpeakingQuestion } from "@/lib/types";
 import { scoreReadAloudAttempt, scoreSpeakingAttempt } from "@/app/actions/pte";
 import { ScoreDisplay } from "@/components/pte/speaking/score-display";
+import { SpeakingRecorder } from "./SpeakingRecorder";
+import { Transcription, TranscriptionSegment } from "@/components/ai-elements/transcription";
+import { TranscriptionSegment as SegmentType } from "@/hooks/useSpeechRecorder";
+import { uploadAudio } from "@/lib/actions/upload-audio";
 
 interface SpeakingPracticeClientProps {
     question: SpeakingQuestion;
@@ -35,13 +36,14 @@ export function SpeakingPracticeClient({
     const audioUrl = question.audioUrl || question.speaking?.audioPromptUrl || undefined;
     const imageUrl = question.imageUrl || undefined;
     const timeLimit = question.questionType?.timeLimit || 40;
+
     // Determine specific timings based on question type
     const getTimings = () => {
         switch (questionType) {
             case "read_aloud":
                 return { prep: 35, record: 40 };
             case "repeat_sentence":
-                return { prep: 3, record: 15 }; // Short prep after audio
+                return { prep: 3, record: 15 };
             case "describe_image":
                 return { prep: 25, record: 40 };
             case "retell_lecture":
@@ -56,52 +58,36 @@ export function SpeakingPracticeClient({
     };
 
     const timings = getTimings();
-
-    // Hooks
-    const {
-        isRecording,
-        recordingTime,
-        audioUrl: recordedAudioUrl,
-        startRecording,
-        stopRecording,
-        audioBlob,
-        resetRecording,
-    } = useAudioRecorder(timeLimit || timings.record);
+    const recordDuration = timeLimit || timings.record;
 
     const [status, setStatus] = useState<
         "idle" | "playing_audio" | "preparing" | "recording" | "completed"
     >("idle");
     const [prepTime, setPrepTime] = useState(timings.prep);
+    const [recordingTime, setRecordingTime] = useState(0);
     const [feedback, setFeedback] = useState<SpeakingFeedbackData | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
+    const [recordedUrl, setRecordedUrl] = useState<string | null>(null);
+    const [liveTranscript, setLiveTranscript] = useState("");
+    const [transcribedSegments, setTranscribedSegments] = useState<SegmentType[]>([]);
 
     const prepTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const recordTimerRef = useRef<NodeJS.Timeout | null>(null);
     const audioRef = useRef<HTMLAudioElement>(null);
     const { playBeep } = useBeep();
-
-    // --- Effects ---
 
     // Cleanup timers
     useEffect(() => {
         return () => {
             if (prepTimerRef.current) clearInterval(prepTimerRef.current);
+            if (recordTimerRef.current) clearInterval(recordTimerRef.current);
         };
     }, []);
-
-    // Auto-stop detection
-    useEffect(() => {
-        if (status === "recording" && !isRecording && audioBlob) {
-            setStatus("completed");
-            toast({
-                title: "Recording finished automatically",
-            });
-        }
-    }, [isRecording, audioBlob, status]);
 
     // Auto-Start Effect
     useEffect(() => {
         if (autoStart && status === 'idle') {
-            // Short delay to ensure mount
             const timer = setTimeout(() => {
                 startSession();
             }, 500);
@@ -109,13 +95,15 @@ export function SpeakingPracticeClient({
         }
     }, [autoStart]);
 
-    // --- Handlers ---
-
     const startSession = () => {
         // Reset state
         setPrepTime(timings.prep);
         setFeedback(null);
-        resetRecording();
+        setRecordedBlob(null);
+        setRecordedUrl(null);
+        setLiveTranscript("");
+        setTranscribedSegments([]);
+        setRecordingTime(0);
 
         // Flow depends on question type
         if (
@@ -124,7 +112,6 @@ export function SpeakingPracticeClient({
                 questionType === "retell_lecture" ||
                 questionType === "answer_short_question")
         ) {
-            // Play audio first
             setStatus("playing_audio");
             if (audioRef.current) {
                 audioRef.current.play().catch((e) => {
@@ -134,11 +121,10 @@ export function SpeakingPracticeClient({
                         description: "Please click Start.",
                         variant: "destructive"
                     });
-                    setStatus("idle"); // Fallback to manual start
+                    setStatus("idle");
                 });
             }
         } else {
-            // Go straight to prep
             startPrep();
         }
     };
@@ -161,80 +147,88 @@ export function SpeakingPracticeClient({
 
     const beginRecording = () => {
         playBeep();
-        // Small delay to let beep finish (roughly) before recording starts
         setTimeout(() => {
-            startRecording().then(() => {
-                setStatus("recording");
-            });
+            setStatus("recording");
+            startRecordingTimer();
         }, 300);
     };
 
+    const startRecordingTimer = () => {
+        setRecordingTime(0);
+        if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+
+        recordTimerRef.current = setInterval(() => {
+            setRecordingTime(prev => {
+                if (prev >= recordDuration) {
+                    // Force stop handled by Passing stopTrigger to SpeakingRecorder
+                    if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+                    return prev;
+                }
+                return prev + 1;
+            });
+        }, 1000);
+    };
+
     const handleAudioEnded = () => {
-        // For repeat sentence, almost no prep, immediate beep often preferred,
-        // but we'll use the small prep time defined.
         startPrep();
     };
 
-    const handleStop = () => {
-        stopRecording();
-    };
-
     const handleRetry = () => {
-        resetRecording();
         setFeedback(null);
+        setRecordedBlob(null);
+        setRecordedUrl(null);
         setStatus("idle");
         setPrepTime(timings.prep);
+        setRecordingTime(0);
+    };
+
+    const handleRecorded = async (blob: Blob) => {
+        setRecordedBlob(blob);
+        const url = URL.createObjectURL(blob);
+        setRecordedUrl(url);
+
+        if (recordTimerRef.current) clearInterval(recordTimerRef.current);
+        setStatus("completed");
+
+        // Note: segments are automatically tracked by useSpeechRecorder hook via onSegmentUpdate
+        // Note: We delay actual upload until submission to avoid double-uploading
+        // The scoring action (scoreReadAloudAttempt) handles the authoritative upload.
     };
 
     const handleSubmit = async () => {
-        if (!audioBlob) return;
+        if (!recordedBlob) return;
         setIsSubmitting(true);
         try {
-            const file = new File([audioBlob], "recording.webm", {
+            const file = new File([recordedBlob], "recording.webm", {
                 type: "audio/webm",
             });
             let result;
-
-            // Normalize type string for API
             let typeKey: QuestionType;
+
             switch (questionType) {
-                case "read_aloud":
-                    typeKey = QuestionType.READ_ALOUD;
-                    break;
-                case "repeat_sentence":
-                    typeKey = QuestionType.REPEAT_SENTENCE;
-                    break;
-                case "describe_image":
-                    typeKey = QuestionType.DESCRIBE_IMAGE;
-                    break;
-                case "retell_lecture":
-                    typeKey = QuestionType.RE_TELL_LECTURE;
-                    break;
-                case "answer_short_question":
-                    typeKey = QuestionType.ANSWER_SHORT_QUESTION;
-                    break;
-                case "respond_to_situation":
-                    typeKey = QuestionType.RESPOND_TO_A_SITUATION;
-                    break;
+                case "read_aloud": typeKey = QuestionType.READ_ALOUD; break;
+                case "repeat_sentence": typeKey = QuestionType.REPEAT_SENTENCE; break;
+                case "describe_image": typeKey = QuestionType.DESCRIBE_IMAGE; break;
+                case "retell_lecture": typeKey = QuestionType.RE_TELL_LECTURE; break;
+                case "answer_short_question": typeKey = QuestionType.ANSWER_SHORT_QUESTION; break;
+                case "respond_to_situation": typeKey = QuestionType.RESPOND_TO_A_SITUATION; break;
                 default:
-                    // Fallback to Read Aloud if unknown, though this ideally shouldn't happen
-                    console.warn(`Unknown question type: ${questionType}, defaulting to READ_ALOUD`);
                     typeKey = QuestionType.READ_ALOUD;
             }
 
             if (questionType === "read_aloud") {
-                // Specialized for Read Aloud (has text alignment)
                 result = await scoreReadAloudAttempt(file, content, questionId);
             } else {
-                // General scorer
                 result = await scoreSpeakingAttempt(typeKey, file, content, questionId);
             }
 
             if (result.success && result.feedback) {
                 setFeedback(result.feedback);
-                toast({
-                    title: "Scoring complete!",
-                });
+                // Use the persistent URL from the server
+                if (result.audioUrl) {
+                    setRecordedUrl(result.audioUrl);
+                }
+                toast({ title: "Scoring complete!" });
             } else {
                 toast({
                     title: "Scoring failed",
@@ -244,86 +238,63 @@ export function SpeakingPracticeClient({
             }
         } catch (error) {
             console.error(error);
-            toast({
-                title: "Submission failed",
-                variant: "destructive"
-            });
+            toast({ title: "Submission failed", variant: "destructive" });
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    // --- Renders ---
-
     const renderQuestionContent = () => {
-        // 1. Image Questions
         if (imageUrl) {
             return (
                 <div className="mb-6 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-800 bg-gray-50 flex justify-center">
                     <div className="relative w-full max-w-md aspect-[4/3]">
-                        <Image
-                            src={imageUrl}
-                            alt="Describe this image"
-                            fill
-                            className="object-contain"
-                        />
+                        <Image src={imageUrl} alt="Describe this image" fill className="object-contain" />
                     </div>
                 </div>
             );
         }
 
-        // 2. Audio Only (Hidden player handled by logic, but visuals here)
         if (status === "playing_audio") {
             return (
                 <div className="flex flex-col items-center justify-center p-12 bg-blue-50 dark:bg-blue-900/20 rounded-xl mb-6">
                     <div className="bg-blue-100 dark:bg-blue-800 p-4 rounded-full animate-pulse mb-4">
                         <Volume2 className="size-8 text-blue-600 dark:text-blue-300" />
                     </div>
-                    <p className="font-medium text-blue-800 dark:text-blue-200">
-                        Listening...
-                    </p>
+                    <p className="font-medium text-blue-800 dark:text-blue-200">Listening...</p>
                 </div>
             );
         }
 
-        // 3. Text Questions (Read Aloud, Situation)
-        // If content exists and it's not just a transcript for audio questions
-        const showText =
-            questionType === "read_aloud" ||
-            questionType === "respond_to_situation" ||
-            !audioUrl;
-
+        const showText = questionType === "read_aloud" || questionType === "respond_to_situation" || !audioUrl;
         if (showText && content) {
             return (
                 <div className="bg-white dark:bg-[#1e1e20] p-6 rounded-xl border border-gray-100 dark:border-white/5 shadow-sm mb-6">
-                    <p className="text-xl leading-relaxed font-medium text-gray-800 dark:text-gray-200">
-                        {content}
-                    </p>
+                    <p className="text-xl leading-relaxed font-medium text-gray-800 dark:text-gray-200">{content}</p>
                 </div>
             );
         }
-
         return null;
     };
 
+    // For Transcription Player
+    const [currentTime, setCurrentTime] = useState(0);
+    const playerRef = useRef<HTMLAudioElement>(null);
+    const handleTimeUpdate = () => {
+        if (playerRef.current) setCurrentTime(playerRef.current.currentTime);
+    };
+    const handleSeek = (time: number) => {
+        if (playerRef.current) playerRef.current.currentTime = time;
+    };
+
+
     return (
         <div className="space-y-8">
-            {/* Hidden Audio Player for Prompts */}
-            {audioUrl && (
-                <audio
-                    ref={audioRef}
-                    src={audioUrl}
-                    onEnded={handleAudioEnded}
-                    className="hidden"
-                />
-            )}
+            {audioUrl && <audio ref={audioRef} src={audioUrl} onEnded={handleAudioEnded} className="hidden" />}
 
-            {/* Question Display Area */}
             {renderQuestionContent()}
 
-            {/* Control Panel */}
-            <div className="bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-xl p-6 flex flex-col items-center gap-4 transition-all">
-                {/* Status: Idle */}
+            <div className="bg-gray-50 dark:bg-white/[0.02] border border-gray-100 dark:border-white/5 rounded-xl p-6 flex flex-col items-center gap-4 transition-all min-h-[250px] justify-center">
                 {status === "idle" && (
                     <div className="text-center py-4">
                         <Button
@@ -336,103 +307,81 @@ export function SpeakingPracticeClient({
                     </div>
                 )}
 
-                {/* Status: Playing Audio */}
-                {status === "playing_audio" && (
-                    <div className="text-center space-y-2 w-full max-w-md">
-                        <span className="text-sm font-medium text-blue-600 dark:text-blue-400 uppercase tracking-widest">
-                            Playing Audio...
-                        </span>
-                        <div className="h-2 w-full bg-blue-200 rounded-full overflow-hidden mx-auto">
-                            <div className="h-full bg-blue-500 animate-progress-indeterminate"></div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Status: Preparing */}
                 {status === "preparing" && (
                     <div className="text-center space-y-4 w-full max-w-md animate-in fade-in zoom-in-95 duration-300">
                         <div className="flex justify-between items-end">
-                            <span className="text-sm font-medium text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                                Preparing...
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                                Starting in {prepTime}s
-                            </span>
+                            <span className="text-sm font-medium text-amber-600 dark:text-amber-400 uppercase tracking-widest">Preparing...</span>
+                            <span className="text-xs text-muted-foreground">Starting in {prepTime}s</span>
                         </div>
-                        
-                        <Progress 
-                            value={(1 - prepTime / timings.prep) * 100} 
-                            className="h-3 bg-amber-100 dark:bg-amber-900/20" 
-                            indicatorClassName="bg-amber-500"
-                        />
-
-                        <div className="text-6xl font-mono font-bold text-amber-500 tabular-nums">
-                            {prepTime}
-                        </div>
-                        <p className="text-xs text-muted-foreground bg-amber-50 dark:bg-amber-900/10 py-2 px-4 rounded-full inline-block">
-                            Speak after the beep
-                        </p>
+                        <Progress value={(1 - prepTime / timings.prep) * 100} className="h-3 bg-amber-100 dark:bg-amber-900/20" indicatorClassName="bg-amber-500" />
+                        <div className="text-6xl font-mono font-bold text-amber-500 tabular-nums">{prepTime}</div>
+                        <p className="text-xs text-muted-foreground bg-amber-50 dark:bg-amber-900/10 py-2 px-4 rounded-full inline-block">Speak after the beep</p>
                     </div>
                 )}
 
-                {/* Status: Recording */}
                 {status === "recording" && (
-                    <div className="text-center space-y-4 w-full max-w-md animate-in fade-in zoom-in-95 duration-300">
-                        <div className="flex justify-between items-end">
-                            <span className="text-sm font-medium text-red-500 uppercase tracking-widest flex items-center gap-2">
+                    <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in-95">
+                        <div className="text-center space-y-2">
+                            <p className="text-sm font-medium text-red-500 uppercase tracking-widest flex items-center justify-center gap-2">
                                 <span className="relative flex h-3 w-3">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
                                 </span>
-                                Recording
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                                Max {timings.record}s
-                            </span>
+                                Recording ({recordingTime}s / {recordDuration}s)
+                            </p>
                         </div>
 
-                        <Progress 
-                            value={(recordingTime / timings.record) * 100} 
-                            className="h-3 bg-red-100 dark:bg-red-900/20" 
-                            indicatorClassName="bg-red-500"
+                        <SpeakingRecorder
+                            onAudioRecorded={handleRecorded}
+                            onTranscriptionChange={setLiveTranscript}
+                            onSegmentUpdate={setTranscribedSegments}
+                            stopTrigger={recordingTime >= recordDuration}
                         />
 
-                        <div className="text-6xl font-mono font-bold text-red-500 tabular-nums">
-                            {Math.floor(recordingTime / 60)}:
-                            {(recordingTime % 60).toString().padStart(2, "0")}
-                        </div>
-                        
-                        <Button
-                            size="lg"
-                            variant="destructive"
-                            onClick={handleStop}
-                            className="rounded-full px-8 gap-2 mt-4 shadow-lg shadow-red-500/20"
-                        >
-                            <Square className="size-5" /> Stop Recording
-                        </Button>
+                        {liveTranscript && (
+                            <p className="text-sm text-muted-foreground max-w-md text-center italic opacity-70">
+                                &quot;{liveTranscript.slice(-100)}...&quot;
+                            </p>
+                        )}
                     </div>
                 )}
 
-                {/* Status: Completed (Review) */}
                 {status === "completed" && !feedback && (
-                    <div className="text-center space-y-6 py-2 w-full max-w-2xl">
+                    <div className="text-center space-y-6 w-full max-w-2xl">
                         <div className="text-xl font-medium text-green-600 dark:text-green-400 flex items-center gap-2 justify-center">
                             <CheckCircle2 className="size-6" /> Recording Complete
                         </div>
 
-                        {recordedAudioUrl && (
-                            <div className="bg-white dark:bg-black/20 p-4 rounded-lg border border-gray-200 dark:border-white/10">
-                                <audio src={recordedAudioUrl} controls className="w-full" />
+                        {recordedUrl && (
+                            <div className="space-y-4 w-full bg-white dark:bg-black/20 p-6 rounded-lg border border-gray-200 dark:border-white/10 text-left">
+                                {/* biome-ignore lint/a11y/useMediaCaption: <explanation> */}
+                                <audio
+                                    src={recordedUrl}
+                                    controls
+                                    className="w-full mb-4"
+                                    ref={playerRef}
+                                    onTimeUpdate={handleTimeUpdate}
+                                />
+
+                                {transcribedSegments.length > 0 && (
+                                    <div className="bg-muted p-4 rounded-md text-sm">
+                                        <h4 className="font-semibold text-xs uppercase text-muted-foreground mb-2">Live Transcript</h4>
+                                        <Transcription
+                                            segments={transcribedSegments}
+                                            currentTime={currentTime}
+                                            onSeek={handleSeek}
+                                        >
+                                            {(segment, i) => (
+                                                <TranscriptionSegment segment={segment} index={i} />
+                                            )}
+                                        </Transcription>
+                                    </div>
+                                )}
                             </div>
                         )}
 
                         <div className="flex gap-4 justify-center">
-                            <Button
-                                variant="outline"
-                                size="lg"
-                                onClick={handleRetry}
-                                className="rounded-full h-12 px-8"
-                            >
+                            <Button variant="outline" size="lg" onClick={handleRetry} className="rounded-full h-12 px-8">
                                 <RotateCcw className="size-4 mr-2" /> Retry
                             </Button>
                             <Button
@@ -441,9 +390,7 @@ export function SpeakingPracticeClient({
                                 disabled={isSubmitting}
                                 className="rounded-full h-12 px-8 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-900/20"
                             >
-                                {isSubmitting ? (
-                                    <Loader2 className="size-4 animate-spin mr-2" />
-                                ) : null}
+                                {isSubmitting ? <Loader2 className="size-4 animate-spin mr-2" /> : null}
                                 {isSubmitting ? "Scoring..." : "Submit Answer"}
                             </Button>
                         </div>
@@ -451,7 +398,6 @@ export function SpeakingPracticeClient({
                 )}
             </div>
 
-            {/* AI Feedback Display */}
             {feedback && (
                 <div className="animate-in fade-in slide-in-from-bottom-8 duration-700">
                     <ScoreDisplay
@@ -460,7 +406,7 @@ export function SpeakingPracticeClient({
                             content: feedback.content?.score || 0,
                             pronunciation: feedback.pronunciation?.score || 0,
                             fluency: feedback.fluency?.score || 0,
-                            feedback: [], // Added to satisfy ScoreResult interface
+                            feedback: [],
                             detailedAnalysis: {
                                 strengths: feedback.strengths || [],
                                 improvements: feedback.areasForImprovement || [],
@@ -470,10 +416,9 @@ export function SpeakingPracticeClient({
                         wordMarking={feedback.wordMarking}
                         spokenText={feedback.transcript || feedback.wordMarking?.map((w) => w.word).join(" ")}
                         originalText={content}
-                        audioUrl={recordedAudioUrl || undefined}
+                        audioUrl={recordedUrl || undefined}
                         onClose={() => setFeedback(null)}
                     />
-
                     <div className="flex justify-center mt-8">
                         <Button variant="outline" onClick={handleRetry} className="gap-2">
                             <RotateCcw className="size-4" /> Try Another Attempt

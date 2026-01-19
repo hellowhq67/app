@@ -44,7 +44,7 @@ import {
 } from "@/components/ui/dialog";
 import { ExamDateScheduler } from "@/components/pte/dashboard/exam-date-scheduler";
 import { cn } from "@/lib/utils";
-import { useVoiceAssistant } from '@/components/providers/voice-assistant-provider'
+import { useVoiceAssistant } from "@/components/providers/voice-assistant-provider";
 
 const studyGuides = [
   {
@@ -119,7 +119,12 @@ interface DashboardProps {
   stats?: DashboardStats;
 }
 
-export function PTEDashboard({ user, examDate: initialExamDate, chartData, stats }: DashboardProps) {
+export function PTEDashboard({
+  user,
+  examDate: initialExamDate,
+  chartData,
+  stats,
+}: DashboardProps) {
   const [examDate, setExamDate] = useState<Date | null>(initialExamDate);
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0 });
   const [isExamDialogOpen, setIsExamDialogOpen] = useState(false);

@@ -10,5 +10,14 @@
   "coderabbit.autoReviewMode": "auto",
   "github-actions.workflows.pinned.workflows": [
     ".github/workflows/preview.yml"
-  ]
+  ],
+  "git.allowForcePush": true,
+  "git.allowNoVerifyCommit": true,
+  "git.alwaysShowStagedChangesResourceGroup": true,
+  "git.alwaysSignOff": true,
+  "github.codespaces.devcontainerChangedNotificationStyle": "modal",
+  "githubIssues.alwaysPromptForNewIssueRepo": true,
+  "sanity.useCDN": true,
+  "sanity.openJSONFile": true,
+  "extension.prophet.sitecontext.selectedSiteID": ""
 }

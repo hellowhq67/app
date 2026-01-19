@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-no-comment-textnodes */
 "use client";
 
 
@@ -97,6 +98,7 @@ export function AuthPage({ mode = 'login' }: AuthPageProps) {
           <div className="-translate-y-87.5 absolute top-0 right-0 h-320 w-60 rounded-full bg-[radial-gradient(50%_50%_at_50%_50%,--theme(--color-foreground/.04)_0,--theme(--color-foreground/.01)_80%,transparent_100%)]" />
         </div>
         <Button asChild className="absolute top-7 left-5" variant="ghost">
+          // eslint-disable-next-line @next/next/no-html-link-for-pages
           <a href="/">
             <ChevronLeftIcon />
             Home

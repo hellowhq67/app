@@ -3,12 +3,15 @@ ignoredBuiltDependencies:
 
 onlyBuiltDependencies:
   - '@firebase/util'
+  - '@scarf/scarf'
   - '@swc/core'
   - '@tailwindcss/oxide'
   - esbuild
+  - node-pty
   - protobufjs
   - sharp
   - supabase
+  - tree-sitter-bash
   - unrs-resolver
 
 overrides:

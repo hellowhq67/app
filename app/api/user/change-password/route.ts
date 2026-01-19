@@ -1,21 +1,41 @@
-import { apiSuccess, handleApiError, requireAuth } from "@/lib/api";
+import { auth } from "@/lib/auth/auth";
+import { apiSuccess, handleApiError, requireAuth, Errors } from "@/lib/api";
+import { headers } from "next/headers";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
-    const { userId } = await requireAuth();
+    await requireAuth();
 
-    // In a real application, this would:
-    // 1. Generate a password reset token
-    // 2. Send a password reset email to the user
-    // 3. Return a success message
+    const body = await request.json();
+    const { currentPassword, newPassword, revokeOtherSessions = false } = body;
 
-    // For now, we'll return a placeholder response
+    if (!currentPassword || !newPassword) {
+      throw Errors.badRequest("Current password and new password are required");
+    }
+
+    if (newPassword.length < 8) {
+      throw Errors.badRequest("New password must be at least 8 characters");
+    }
+
+    // Use Better Auth's changePassword API
+    await auth.api.changePassword({
+      body: {
+        currentPassword,
+        newPassword,
+        revokeOtherSessions,
+      },
+      headers: await headers(),
+    });
+
     return apiSuccess({
       success: true,
-      message: "Password reset email sent. Please check your inbox.",
-      resetToken: "pending-email-verification",
+      message: "Password changed successfully",
     });
-  } catch (error) {
+  } catch (error: any) {
+    // Handle Better Auth specific errors
+    if (error?.message?.includes("Invalid password")) {
+      return Errors.badRequest("Current password is incorrect").toResponse();
+    }
     return handleApiError(error, "POST /api/user/change-password");
   }
 }

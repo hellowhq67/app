@@ -15,6 +15,9 @@ import {
   Mic,
   PenTool,
   Settings,
+  GraduationCap,
+  FlaskConical,
+  Library,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -75,6 +78,21 @@ const navMain = [
     title: "Sectional Tests",
     url: "/pte/academic/sectional-test",
     icon: Frame,
+  },
+  {
+    title: "Courses",
+    url: "/courses",
+    icon: GraduationCap,
+  },
+  {
+    title: "Research",
+    url: "/research",
+    icon: FlaskConical,
+  },
+  {
+    title: "Publications",
+    url: "/publications",
+    icon: Library,
   },
   {
     title: "Practice History",

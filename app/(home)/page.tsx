@@ -16,7 +16,6 @@ import { ChristmasBanner } from "@/components/marketing/ChristmasBanner";
 export default function HomePage() {
   return (
     <div className="bg-background text-foreground selection:bg-primary/30">
-      <ChristmasBanner />
       <ModernHero />
       <div className="space-y-32 pb-32">
         <Features />

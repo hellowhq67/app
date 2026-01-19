@@ -13,11 +13,6 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-// Using useActionState from react (Need to verify next version, assuming compatible or shimmed)
-// If useActionState is not available, we can use a standard form handler. 
-// Given the original file used it, I will stick to it or standard fetch.
-// Actually, to be safe and portable, I'll use standard onSubmit here without the experimental hook unless necessary.
-// Rewriting to standard simpler react form for the homepage component.
 
 export function ContactForm() {
     const [isPending, setIsPending] = useState(false);

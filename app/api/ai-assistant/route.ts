@@ -29,6 +29,11 @@ export async function POST(req: NextRequest) {
       Keep responses concise but informative. Maintain a friendly and supportive tone.
       If asked about other topics, gently redirect to PTE-related subjects.`,
       messages,
+      experimental_telemetry: {
+        isEnabled: true,
+        recordInputs: true,
+        recordOutputs: true,
+      },
     });
 
     return result.toUIMessageStreamResponse();

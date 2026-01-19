@@ -44,3 +44,22 @@ export const GET_ALL_COURSES = defineQuery(`
         }
     }
 `);
+
+export const GET_COURSE_BY_SLUG = defineQuery(`
+    *[_type == "course" && slug.current == $slug][0] {
+        title,
+        "slug": slug.current,
+        description,
+        price,
+        isFree,
+        "modules": modules[]->{
+            title,
+            "lessons": lessons[]->{
+                title,
+                duration,
+                isFree,
+                "videoMux": video.asset->playbackId
+            }
+        }
+    }
+`);

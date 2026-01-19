@@ -51,7 +51,7 @@ export default async function PracticeAttemptsPage() {
   })
 
   if (!session?.user) {
-    redirect('/auth/login')
+    redirect('/sign-in')
   }
 
   const attempts = await getAllUserAttempts(session.user.id)

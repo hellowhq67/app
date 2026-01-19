@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
@@ -8,11 +9,11 @@ interface AudioWaveformProps {
   barCount?: number;
 }
 
-export function AudioWaveform({ 
-  isRecording, 
-  audioStream, 
+export function AudioWaveform({
+  isRecording,
+  audioStream,
   className,
-  barCount = 32 
+  barCount = 32
 }: AudioWaveformProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
@@ -33,7 +34,7 @@ export function AudioWaveform({
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 64;
     analyser.smoothingTimeConstant = 0.8;
-    
+
     const source = audioContext.createMediaStreamSource(audioStream);
     source.connect(analyser);
     analyserRef.current = analyser;
@@ -42,16 +43,16 @@ export function AudioWaveform({
 
     const animate = () => {
       analyser.getByteFrequencyData(dataArray);
-      
+
       const newBars: number[] = [];
       const step = Math.floor(dataArray.length / barCount);
-      
+
       for (let i = 0; i < barCount; i++) {
         const index = Math.min(i * step, dataArray.length - 1);
         const value = dataArray[index] / 255;
         newBars.push(Math.max(0.1, value));
       }
-      
+
       setBars(newBars);
       animationRef.current = requestAnimationFrame(animate);
     };
@@ -73,8 +74,8 @@ export function AudioWaveform({
           key={index}
           className={cn(
             "w-1.5 rounded-full transition-all duration-75",
-            isRecording 
-              ? "bg-gradient-to-t from-destructive to-destructive/60" 
+            isRecording
+              ? "bg-gradient-to-t from-destructive to-destructive/60"
               : "bg-muted-foreground/20"
           )}
           style={{

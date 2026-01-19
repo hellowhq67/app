@@ -72,15 +72,7 @@ const nextConfig: NextConfig = {
     },
   },
 
-  // Turbopack configuration (stable in Next.js 16)
-  // Uncomment to enable Turbopack for faster builds:
-  // turbopack: {
-  //   resolveAlias: {
-  //     // Add any necessary aliases
-  //   },
-  // },
-
-  transpilePackages: [], // keep empty if none
+  transpilePackages: [], //keep empty if none
   webpack: (config, { isServer, webpack, dev }) => {
     config.ignoreWarnings = [
       {

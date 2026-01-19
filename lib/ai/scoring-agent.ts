@@ -132,6 +132,11 @@ export async function scorePteAttemptV2(
             prompt: finalPrompt,
 
             temperature: 0.1,
+            experimental_telemetry: {
+                isEnabled: true,
+                recordInputs: true,
+                recordOutputs: true,
+            },
         });
 
         // Recalculate overallScore strictly as sum of traits to avoid LLM hallucinations on math

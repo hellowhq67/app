@@ -38,7 +38,7 @@ function SubmitButton() {
 /**
  * Render the login form with email/password fields, a submit button, and Google social sign-in options.
  *
- * Displays an inline error banner when the sign-in action returns an error, preserves an email value from action state, includes a hidden redirect input to `/pte/dashboard`, and shows loading indicators while the form or Google provider is in progress.
+ * Displays an inline error banner when the sign-in action returns an error, preserves an email value from action state, includes a hidden redirect input to `/academic/dashboard`, and shows loading indicators while the form or Google provider is in progress.
  *
  * @returns The rendered login form element.
  */
@@ -68,7 +68,7 @@ export function LoginForm({
                 </div>
               )}
 
-              <input type="hidden" name="redirect" value="/pte/dashboard" />
+              <input type="hidden" name="redirect" value="/academic/dashboard" />
 
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -143,7 +143,7 @@ export function LoginForm({
       <GoogleAuthModal
         onSuccess={() => {
           // Handle successful authentication
-          window.location.href = '/pte/dashboard'
+          window.location.href = '/academic/dashboard'
         }}
       />
     </div>

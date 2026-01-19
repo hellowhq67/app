@@ -26,7 +26,7 @@ export function LMSCourseCard({ course }: LMSCourseCardProps) {
     return (
         <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-all duration-300">
             <CardHeader className="bg-muted/30 pb-8">
-                <div className="flexjustify-between items-start mb-4">
+                <div className="flex justify-between items-start mb-4">
                     <Badge variant={course.isFree ? "secondary" : "default"} className={!course.isFree ? "bg-amber-500 hover:bg-amber-600" : ""}>
                         {course.isFree ? "Free" : `$${course.price}`}
                     </Badge>

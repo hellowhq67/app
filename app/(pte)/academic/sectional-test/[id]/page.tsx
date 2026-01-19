@@ -15,7 +15,7 @@ export default async function SectionalTestPage({
     const session = await auth.api.getSession({ headers: await headers() });
 
     if (!session?.user) {
-        redirect('/auth/login');
+        redirect('/sign-in');
     }
 
     const test = await db.query.pteSectionalTests.findFirst({
