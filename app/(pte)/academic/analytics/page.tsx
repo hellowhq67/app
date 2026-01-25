@@ -4,6 +4,7 @@ import { getAllUserAttempts } from '@/lib/db/queries/pte-scoring'
 import { redirect } from 'next/navigation'
 import { AnalyticsClient } from '@/components/pte/analytics/analytics-client'
 import { QuestionType } from '@/lib/types'
+import { routes } from '@/lib/config/navigation'
 
 
 
@@ -13,7 +14,7 @@ export default async function AnalyticsPage() {
   })
 
   if (!session?.user) {
-    redirect('/auth/login')
+    redirect(routes.auth.signIn)
   }
 
   const attempts = await getAllUserAttempts(session.user.id)

@@ -76,7 +76,7 @@ const UserMenu = memo(function UserMenu() {
     return (
         <div className="flex items-center gap-3">
             <Button asChild variant="outline">
-                <Link href="/academic/dashboard">Go to Dashboard</Link>
+                <Link href="/pte/dashboard">Go to Dashboard</Link>
             </Button>
             <DropdownMenu>
                 <DropdownMenuTrigger
@@ -317,7 +317,7 @@ const Navbar = memo(function Navbar() {
                                 </Link>
                                 <div className="my-2 border-t" />
                                 <Link
-                                    href="/academic/dashboard"
+                                    href="/pte/dashboard"
                                     className="px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground transition-colors text-primary"
                                     aria-label="Go to Dashboard"
                                 >
