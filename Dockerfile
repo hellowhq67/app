@@ -1,61 +1,95 @@
-# Base image
-FROM node:22-alpine AS base
+# syntax=docker/dockerfile:1
+
+# ============================================
+# Base stage - common dependencies
+# ============================================
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
-FROM base AS deps
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine for compatible glibc
-# libc6-compat might be needed for some deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
-RUN npm install -g corepack@latest && corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm i --frozen-lockfile
+# Enable corepack for pnpm
+RUN corepack enable && corepack prepare pnpm@10.28.0 --activate
 
-# Rebuild the source code only when needed
+# ============================================
+# Dependencies stage - install node_modules
+# ============================================
+FROM base AS deps
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies
+RUN pnpm install --frozen-lockfile
+
+# ============================================
+# Builder stage - build the application
+# ============================================
 FROM base AS builder
+
 WORKDIR /app
+
+# Copy node_modules from deps stage
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Next.js collects completely anonymous telemetry data about general usage.
-# Learn more here: https://nextjs.org/telemetry
-# Uncomment the following line in case you want to disable telemetry during the build.
-# ENV NEXT_TELEMETRY_DISABLED 1
+# Build arguments for public env vars (set at build time)
+ARG NEXT_PUBLIC_APP_URL
+ARG NEXT_PUBLIC_BETTER_AUTH_URL
+ARG NEXT_PUBLIC_SANITY_PROJECT_ID
+ARG NEXT_PUBLIC_SANITY_DATASET
 
-RUN npm install -g corepack@latest && corepack enable && corepack prepare pnpm@latest --activate
-RUN pnpm run build
+# Set environment variables for build
+ENV NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+ENV NEXT_PUBLIC_BETTER_AUTH_URL=${NEXT_PUBLIC_BETTER_AUTH_URL}
+ENV NEXT_PUBLIC_SANITY_PROJECT_ID=${NEXT_PUBLIC_SANITY_PROJECT_ID}
+ENV NEXT_PUBLIC_SANITY_DATASET=${NEXT_PUBLIC_SANITY_DATASET}
 
-# Production image, copy all the files and run next
-FROM base AS runner
+# Disable telemetry during build
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Enable standalone output for Docker
+ENV STANDALONE=true
+
+# Build the application
+RUN pnpm build
+
+# ============================================
+# Runner stage - production image
+# ============================================
+FROM node:20-alpine AS runner
+
 WORKDIR /app
 
-ENV NODE_ENV production
-# Uncomment the following line in case you want to disable telemetry during runtime.
-# ENV NEXT_TELEMETRY_DISABLED 1
+# Set production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
+# Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
+# Copy necessary files from builder
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/package.json ./package.json
 
-# Set the correct permission for prerender cache
-# mkdir .next needed for some permissions
+# Set correct permissions for prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
 
-# Automatically leverage output traces to reduce image size
-# https://nextjs.org/docs/advanced-features/output-file-tracing
+# Copy standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Switch to non-root user
 USER nextjs
 
+# Expose port
 EXPOSE 3000
 
-ENV PORT 3000
-# set hostname to localhost
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
+# Start the application
 CMD ["node", "server.js"]

@@ -1,8 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Note: "output: standalone" removed - it's for Docker/self-hosted, not Vercel
-  // Vercel uses serverless by default
+  // Enable standalone output for Docker builds
+  // Set STANDALONE=true when building Docker image
+  output: process.env.STANDALONE === 'true' ? 'standalone' : undefined,
 
   // React 19 Compiler (stable in Next.js 16)
   reactCompiler: true,
