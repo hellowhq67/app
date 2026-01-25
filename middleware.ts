@@ -1,21 +1,34 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-import { authConfig, isProtectedRoute, isPublicRoute } from '@/lib/config/navigation'
+/**
+ * Routes that require authentication
+ * Based on app/(pte)/ route group structure
+ */
+const protectedPrefixes = ['/dashboard', '/academic', '/analytics', '/profile', '/billing', '/settings', '/account']
+
+/**
+ * Check if a path requires authentication
+ */
+function isProtectedRoute(pathname: string): boolean {
+  return protectedPrefixes.some(
+    (prefix) => pathname === prefix || pathname.startsWith(prefix + '/')
+  )
+}
 
 /**
  * Middleware for authentication and route protection
  * Runs on every request to protected routes
  */
-export async function middleware(request: NextRequest) {
+export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // Skip middleware for static files and API routes (except auth check)
+  // Skip middleware for static files and API routes
   if (
     pathname.startsWith('/_next') ||
     pathname.startsWith('/static') ||
-    pathname.includes('.') ||
-    pathname.startsWith('/api/') && !pathname.startsWith('/api/auth')
+    pathname.startsWith('/api/') ||
+    pathname.includes('.')
   ) {
     return NextResponse.next()
   }
@@ -29,7 +42,7 @@ export async function middleware(request: NextRequest) {
 
   // If user is on a protected route and not authenticated, redirect to sign-in
   if (isProtectedRoute(pathname) && !isAuthenticated) {
-    const signInUrl = new URL(authConfig.signInRedirect, request.url)
+    const signInUrl = new URL('/sign-in', request.url)
     // Add callback URL so user can be redirected back after login
     signInUrl.searchParams.set('callbackUrl', pathname)
     return NextResponse.redirect(signInUrl)
@@ -37,7 +50,7 @@ export async function middleware(request: NextRequest) {
 
   // If user is authenticated and trying to access auth pages, redirect to dashboard
   if (isAuthenticated && (pathname === '/sign-in' || pathname === '/sign-up')) {
-    return NextResponse.redirect(new URL(authConfig.afterLoginRedirect, request.url))
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
   return NextResponse.next()

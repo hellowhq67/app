@@ -68,7 +68,7 @@ export function LoginForm({
                 </div>
               )}
 
-              <input type="hidden" name="redirect" value="/pte/dashboard" />
+              <input type="hidden" name="redirect" value="/dashboard" />
 
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
@@ -143,7 +143,7 @@ export function LoginForm({
       <GoogleAuthModal
         onSuccess={() => {
           // Handle successful authentication
-          window.location.href = '/pte/dashboard'
+          window.location.href = '/dashboard'
         }}
       />
     </div>

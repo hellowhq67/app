@@ -94,19 +94,19 @@ export function NavUser() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem asChild>
-                <Link href="/pte/profile">
+                <Link href="/profile">
                   <BadgeCheck />
                   Account
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/pte/billing">
+                <Link href="/billing">
                   <CreditCard />
                   Billing
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
-                <Link href="/pte/academic/analytics">
+                <Link href="/academic/analytics">
                   <Sparkles />
                   Analytics
                 </Link>

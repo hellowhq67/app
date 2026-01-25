@@ -1,6 +1,9 @@
 /**
  * Centralized Navigation Configuration
  * All routes and navigation items are defined here for consistency
+ *
+ * NOTE: Route groups like (pte), (auth), (home) are NOT part of the URL path.
+ * They are only for file organization in Next.js App Router.
  */
 
 // =============================================================================
@@ -8,7 +11,7 @@
 // =============================================================================
 
 export const routes = {
-  // Auth routes
+  // Auth routes (from app/(auth)/)
   auth: {
     signIn: '/sign-in',
     signUp: '/sign-up',
@@ -25,30 +28,29 @@ export const routes = {
     courses: '/courses',
   },
 
-  // Protected PTE routes
-  pte: {
-    dashboard: '/pte/dashboard',
-    academic: {
-      root: '/pte/academic',
-      practice: {
-        root: '/pte/academic/practice',
-        speaking: '/pte/academic/practice/speaking',
-        writing: '/pte/academic/practice/writing',
-        reading: '/pte/academic/practice/reading',
-        listening: '/pte/academic/practice/listening',
-      },
-      mockTests: {
-        root: '/pte/academic/mock-tests',
-        test: (testId: string) => `/pte/academic/mock-tests/test/${testId}`,
-      },
-      sectionalTest: {
-        root: '/pte/academic/sectional-test',
-        test: (id: string) => `/pte/academic/sectional-test/${id}`,
-        result: (id: string) => `/pte/academic/sectional-test/${id}/result`,
-      },
-      analytics: '/pte/academic/analytics',
-      practiceAttempts: '/pte/academic/practice-attempts',
+  // Protected routes (from app/(pte)/)
+  // Note: (pte) is a route group - not part of URL
+  dashboard: '/dashboard',
+  academic: {
+    root: '/academic',
+    practice: {
+      root: '/academic/practice',
+      speaking: '/academic/practice/speaking',
+      writing: '/academic/practice/writing',
+      reading: '/academic/practice/reading',
+      listening: '/academic/practice/listening',
     },
+    mockTests: {
+      root: '/academic/mock-tests',
+      test: (testId: string) => `/academic/mock-tests/test/${testId}`,
+    },
+    sectionalTest: {
+      root: '/academic/sectional-test',
+      test: (id: string) => `/academic/sectional-test/${id}`,
+      result: (id: string) => `/academic/sectional-test/${id}/result`,
+    },
+    analytics: '/academic/analytics',
+    practiceAttempts: '/academic/practice-attempts',
   },
 
   // Account routes
@@ -71,7 +73,7 @@ export const routes = {
 
 export const authConfig = {
   /** Where to redirect after successful login */
-  afterLoginRedirect: routes.pte.dashboard,
+  afterLoginRedirect: routes.dashboard,
 
   /** Where to redirect unauthenticated users */
   signInRedirect: routes.auth.signIn,
@@ -93,7 +95,13 @@ export const authConfig = {
   ],
 
   /** Routes that require authentication */
-  protectedRoutePatterns: ['/pte', '/pte/(.*)', '/account', '/account/(.*)'],
+  protectedRoutePatterns: [
+    '/dashboard',
+    '/academic',
+    '/academic/(.*)',
+    '/account',
+    '/account/(.*)',
+  ],
 } as const
 
 // =============================================================================
@@ -131,17 +139,17 @@ export const pteSidebarNav: NavSection[] = [
     items: [
       {
         title: 'Dashboard',
-        href: routes.pte.dashboard,
+        href: routes.dashboard,
         icon: 'LayoutDashboard',
       },
       {
         title: 'Analytics',
-        href: routes.pte.academic.analytics,
+        href: routes.academic.analytics,
         icon: 'BarChart3',
       },
       {
         title: 'Practice History',
-        href: routes.pte.academic.practiceAttempts,
+        href: routes.academic.practiceAttempts,
         icon: 'History',
       },
     ],
@@ -151,25 +159,25 @@ export const pteSidebarNav: NavSection[] = [
     items: [
       {
         title: 'Speaking',
-        href: routes.pte.academic.practice.speaking,
+        href: routes.academic.practice.speaking,
         icon: 'Mic',
         description: 'Read Aloud, Repeat Sentence, and more',
       },
       {
         title: 'Writing',
-        href: routes.pte.academic.practice.writing,
+        href: routes.academic.practice.writing,
         icon: 'PenTool',
         description: 'Summarize Written Text, Write Essay',
       },
       {
         title: 'Reading',
-        href: routes.pte.academic.practice.reading,
+        href: routes.academic.practice.reading,
         icon: 'BookOpen',
         description: 'Fill in the Blanks, Multiple Choice',
       },
       {
         title: 'Listening',
-        href: routes.pte.academic.practice.listening,
+        href: routes.academic.practice.listening,
         icon: 'Headphones',
         description: 'Summarize Spoken Text, Write from Dictation',
       },
@@ -180,13 +188,13 @@ export const pteSidebarNav: NavSection[] = [
     items: [
       {
         title: 'Mock Tests',
-        href: routes.pte.academic.mockTests.root,
+        href: routes.academic.mockTests.root,
         icon: 'ClipboardList',
         description: 'Full-length practice tests',
       },
       {
         title: 'Sectional Tests',
-        href: routes.pte.academic.sectionalTest.root,
+        href: routes.academic.sectionalTest.root,
         icon: 'Layers',
         description: 'Focus on specific sections',
       },
@@ -196,8 +204,8 @@ export const pteSidebarNav: NavSection[] = [
 
 // User dropdown menu items
 export const userMenuItems: NavItem[] = [
-  { title: 'Dashboard', href: routes.pte.dashboard, icon: 'LayoutDashboard' },
-  { title: 'Analytics', href: routes.pte.academic.analytics, icon: 'BarChart3' },
+  { title: 'Dashboard', href: routes.dashboard, icon: 'LayoutDashboard' },
+  { title: 'Analytics', href: routes.academic.analytics, icon: 'BarChart3' },
   { title: 'Settings', href: routes.account.settings, icon: 'Settings' },
   { title: 'Billing', href: routes.account.billing, icon: 'CreditCard' },
 ]

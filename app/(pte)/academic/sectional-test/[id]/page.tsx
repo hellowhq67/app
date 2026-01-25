@@ -38,18 +38,18 @@ export default async function SectionalTestPage({
     }
 
     if (test.userId !== session.user.id) {
-        redirect(routes.pte.dashboard);
+        redirect(routes.dashboard);
     }
 
     if (test.status === 'completed') {
-        redirect(routes.pte.academic.sectionalTest.result(id));
+        redirect(routes.academic.sectionalTest.result(id));
     }
 
     const currentAttempt = test.attempts.find(a => !a.attemptId);
 
     if (!currentAttempt) {
         // If no unattempted questions found but status not completed, assume completed?
-        redirect(routes.pte.academic.sectionalTest.result(id)); // Logic in API should handle status update
+        redirect(routes.academic.sectionalTest.result(id)); // Logic in API should handle status update
     }
 
     // Fetch full details

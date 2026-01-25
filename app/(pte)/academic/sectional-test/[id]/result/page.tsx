@@ -36,7 +36,7 @@ export default async function SectionalTestResultPage({
     }
 
     if (test.userId !== session.user.id) {
-        redirect(routes.pte.dashboard);
+        redirect(routes.dashboard);
     }
 
     // Calculate aggregated scores
