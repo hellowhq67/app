@@ -76,7 +76,7 @@ const UserMenu = memo(function UserMenu() {
     return (
         <div className="flex items-center gap-3">
             <Button asChild variant="outline">
-                <Link href="/academic/dashboard">Go to Dashboard</Link>
+                <Link href="/dashboard">Go to Dashboard</Link>
             </Button>
             <DropdownMenu>
                 <DropdownMenuTrigger
@@ -129,22 +129,22 @@ const FloatingNavbar = memo(function FloatingNavbar() {
                 title: "Practice",
                 items: [
                     {
-                        href: "/pte/academic/practice",
+                        href: "/academic/practice",
                         label: "Academic Practice",
                         icon: BookOpen,
                     },
-                    { href: "/pte/templates", label: "Templates", icon: FileText },
-                    { href: "/pte/vocab-books", label: "Vocab Books", icon: Layers },
-                    { href: "/pte/shadowing", label: "Shadowing", icon: LayoutGrid },
-                    { href: "/pte/wizard", label: "Wizard", icon: Wand2 },
+                    { href: "/templates", label: "Templates", icon: FileText },
+                    { href: "/vocab-books", label: "Vocab Books", icon: Layers },
+                    { href: "/shadowing", label: "Shadowing", icon: LayoutGrid },
+                    { href: "/wizard", label: "Wizard", icon: Wand2 },
                 ],
             },
             {
                 title: "Tests",
                 items: [
-                    { href: "/pte/mock-tests", label: "Mock Tests", icon: Sparkles },
+                    { href: "/academic/mock-tests", label: "Mock Tests", icon: Sparkles },
                     {
-                        href: "/pte/mock-tests/sectional",
+                        href: "/academic/sectional-test",
                         label: "Sectional Tests",
                         icon: Sparkles,
                     },
@@ -153,8 +153,8 @@ const FloatingNavbar = memo(function FloatingNavbar() {
             {
                 title: "Insights",
                 items: [
-                    { href: "/pte/analytics", label: "Analytics", icon: BarChart3 },
-                    { href: "/pte/profile", label: "Profile", icon: UserIcon },
+                    { href: "/analytics", label: "Analytics", icon: BarChart3 },
+                    { href: "/profile", label: "Profile", icon: UserIcon },
                 ],
             },
             {
@@ -317,7 +317,7 @@ const FloatingNavbar = memo(function FloatingNavbar() {
                                 </Link>
                                 <div className="my-2 border-t" />
                                 <Link
-                                    href="/academic/dashboard"
+                                    href="/dashboard"
                                     className="px-4 py-3 text-base font-medium hover:bg-accent hover:text-accent-foreground transition-colors text-primary"
                                     aria-label="Go to Dashboard"
                                 >

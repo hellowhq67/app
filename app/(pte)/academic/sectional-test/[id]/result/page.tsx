@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { pteSectionalTests, pteSectionalAttempts } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import ModernResultsView from "@/components/pte/sectional-test/ModernResultsView";
+import { routes } from "@/lib/config/navigation";
 
 export default async function SectionalTestResultPage({
     params
@@ -35,7 +36,7 @@ export default async function SectionalTestResultPage({
     }
 
     if (test.userId !== session.user.id) {
-        redirect('/dashboard');
+        redirect(routes.dashboard);
     }
 
     // Calculate aggregated scores

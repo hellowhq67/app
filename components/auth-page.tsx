@@ -33,7 +33,7 @@ export function AuthPage({ mode = 'login' }: AuthPageProps) {
     try {
       await authClient.signIn.social({
         provider: 'google',
-        callbackURL: mode === 'login' ? '/pte/dashboard' : '/pte/dashboard', // Same redirect for both modes
+        callbackURL: '/dashboard',
       });
     } catch (error) {
       console.error('Google login error:', error);

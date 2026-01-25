@@ -34,11 +34,11 @@ export function AuthForm({ mode }: AuthFormProps) {
 					email,
 					password,
 					name,
-					callbackURL: "/pte/dashboard",
+					callbackURL: "/dashboard",
 				}, {
 					onSuccess: () => {
 						toast.success("Account created successfully!");
-						router.push("/pte/dashboard");
+						router.push("/dashboard");
 					},
 					onError: (ctx) => {
 						toast.error(ctx.error.message || "Failed to sign up.");
@@ -48,11 +48,11 @@ export function AuthForm({ mode }: AuthFormProps) {
 				await authClient.signIn.email({
 					email,
 					password,
-					callbackURL: "/pte/dashboard",
+					callbackURL: "/dashboard",
 				}, {
 					onSuccess: () => {
 						toast.success("Signed in successfully!");
-						router.push("/pte/dashboard");
+						router.push("/dashboard");
 					},
 					onError: (ctx) => {
 						toast.error(ctx.error.message || "Invalid credentials.");
@@ -69,7 +69,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 	const handleSocialSignIn = async (provider: "google" | "github") => {
 		await authClient.signIn.social({
 			provider,
-			callbackURL: "/pte/dashboard",
+			callbackURL: "/dashboard",
 		});
 	};
 

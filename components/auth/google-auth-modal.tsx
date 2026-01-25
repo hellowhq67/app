@@ -23,7 +23,7 @@ export function useGoogleAuthModal() {
         try {
             await authClient.signIn.social({
                 provider: "google",
-                callbackURL: "/pte/dashboard"
+                callbackURL: "/dashboard"
             })
         } catch (err) {
             toast.error("Failed to connect with Google")

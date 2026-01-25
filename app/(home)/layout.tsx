@@ -1,6 +1,6 @@
 import { Suspense } from 'react'
 import { CookieConsentBanner } from '@/components/cookie-consent'
-import { FloatingNavbar } from '@/components/floating-navbar'
+import FloatingNavbar from '@/components/floating-navbar'
 
 export default function HomeLayout({
   children,

@@ -38,45 +38,45 @@ import {
 const navMain = [
   {
     title: "Dashboard",
-    url: "/pte/dashboard",
+    url: "/dashboard",
     icon: Home,
   },
   {
     title: "Practice Hub",
-    url: "/pte/academic/practice",
+    url: "/academic/practice",
     icon: SquareTerminal,
     isActive: true,
     items: [
       {
         title: "Speaking",
-        url: "/pte/academic/practice/speaking",
+        url: "/academic/practice/speaking",
         icon: Mic,
       },
       {
         title: "Writing",
-        url: "/pte/academic/practice/writing",
+        url: "/academic/practice/writing",
         icon: PenTool,
       },
       {
         title: "Reading",
-        url: "/pte/academic/practice/reading",
+        url: "/academic/practice/reading",
         icon: BookOpen,
       },
       {
         title: "Listening",
-        url: "/pte/academic/practice/listening",
+        url: "/academic/practice/listening",
         icon: Headphones,
       },
     ],
   },
   {
     title: "Mock Tests",
-    url: "/pte/academic/mock-tests",
+    url: "/academic/mock-tests",
     icon: Trophy,
   },
   {
     title: "Sectional Tests",
-    url: "/pte/academic/sectional-test",
+    url: "/academic/sectional-test",
     icon: Frame,
   },
   {
@@ -96,22 +96,22 @@ const navMain = [
   },
   {
     title: "Practice History",
-    url: "/pte/academic/practice-attempts",
+    url: "/academic/practice-attempts",
     icon: History,
   },
   {
     title: "Analytics",
-    url: "/pte/academic/analytics",
+    url: "/academic/analytics",
     icon: PieChart,
   },
   {
     title: "AI Tutor",
-    url: "/pte/ai-tutor",
+    url: "/ai-tutor",
     icon: Bot,
   },
   {
     title: "Settings",
-    url: "/pte/settings",
+    url: "/settings",
     icon: Settings,
   },
 ];
@@ -127,7 +127,7 @@ export function PTEAppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link href="/pte/dashboard">
+              <Link href="/dashboard">
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">PedagogistsPTE</span>
                   <span className="truncate text-xs">PTE Academic SASS</span>

@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { pteSectionalTests, pteSectionalAttempts, pteQuestions } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
 import SectionalTestRunner from "@/components/pte/sectional-test/SectionalTestRunner";
+import { routes } from "@/lib/config/navigation";
 
 export default async function SectionalTestPage({
     params
@@ -37,18 +38,18 @@ export default async function SectionalTestPage({
     }
 
     if (test.userId !== session.user.id) {
-        redirect('/dashboard');
+        redirect(routes.dashboard);
     }
 
     if (test.status === 'completed') {
-        redirect(`/academic/sectional-test/${id}/result`);
+        redirect(routes.academic.sectionalTest.result(id));
     }
 
     const currentAttempt = test.attempts.find(a => !a.attemptId);
 
     if (!currentAttempt) {
         // If no unattempted questions found but status not completed, assume completed?
-        redirect(`/academic/sectional-test/${id}/result`); // Logic in API should handle status update
+        redirect(routes.academic.sectionalTest.result(id)); // Logic in API should handle status update
     }
 
     // Fetch full details
