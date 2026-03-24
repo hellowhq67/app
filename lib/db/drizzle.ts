@@ -13,16 +13,6 @@ if (!connectionString) {
 // Create Neon HTTP client for serverless environments
 const sql = neon(connectionString);
 
-// Test database connection
-(async () => {
-  try {
-    const result = await sql`SELECT 1 as ok`;
-    console.log('✅ Database connection successful', result);
-  } catch (error) {
-    console.error('❌ Database connection failed:', error);
-  }
-})();
-
 // Export the Drizzle ORM instance with schema for relational queries
 export const db = drizzle(sql, { schema });
 export const client = sql;

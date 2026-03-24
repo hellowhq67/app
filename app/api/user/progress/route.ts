@@ -1,4 +1,4 @@
-import { getUserProgress, getUserAnalytics, calculateUserProgressFallback } from '@/lib/db/queries'
+import { getUserProgress, getUserAnalytics, calculateUserProgressFallback } from '@/lib/db/queries/users'
 import {
   apiSuccess,
   handleApiError,
