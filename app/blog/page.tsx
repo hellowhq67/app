@@ -60,7 +60,12 @@ interface SanityPost {
 }
 
 export default async function BlogPage() {
-    const sanityPosts = await getAllPostsFromSanity();
+    let sanityPosts: SanityPost[] = [];
+    try {
+        sanityPosts = await getAllPostsFromSanity();
+    } catch {
+        // Sanity unavailable — render empty state gracefully
+    }
 
     const posts = sanityPosts.map((post: SanityPost) => ({
         slug: post.slug,

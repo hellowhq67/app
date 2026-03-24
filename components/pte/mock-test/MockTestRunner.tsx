@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import QuestionPrompt from "@/components/pte/speaking/QuestionPrompt";
-import SpeakingRecorder from "@/components/pte/speaking/SpeakingRecorder";
+import { SpeakingRecorder } from "@/components/pte/speaking/SpeakingRecorder";
 import ReadingInput from "@/components/pte/reading/ReadingInput";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";

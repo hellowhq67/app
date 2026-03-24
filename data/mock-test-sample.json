@@ -1,0 +1,384 @@
+{
+  "testName": "PTE Academic Sample Mock Test 1",
+  "description": "A complete simulation of the PTE Academic exam with representative questions across all four sections.",
+  "totalDurationMinutes": 120,
+  "scoreBands": [
+    { "min": 10, "max": 35, "label": "Needs Improvement", "color": "red" },
+    { "min": 36, "max": 64, "label": "Developing", "color": "amber" },
+    { "min": 65, "max": 79, "label": "Proficient", "color": "blue" },
+    { "min": 80, "max": 90, "label": "Expert", "color": "green" }
+  ],
+  "sections": {
+    "speaking": {
+      "durationMinutes": 30,
+      "totalQuestions": 22,
+      "questionTypes": [
+        {
+          "type": "READ_ALOUD",
+          "count": 6,
+          "timeLimitSeconds": 40,
+          "prepTimeSeconds": 35,
+          "questions": [
+            {
+              "id": "ra-001",
+              "text": "The development of artificial intelligence has transformed numerous industries over the past decade. Machine learning algorithms can now process vast amounts of data to identify patterns that would be impossible for humans to detect manually.",
+              "difficulty": "medium"
+            },
+            {
+              "id": "ra-002",
+              "text": "Climate change represents one of the most significant challenges facing humanity in the twenty-first century. Rising global temperatures are causing widespread environmental disruptions, including more frequent extreme weather events.",
+              "difficulty": "medium"
+            },
+            {
+              "id": "ra-003",
+              "text": "The human brain contains approximately eighty-six billion neurons, each forming thousands of synaptic connections. This remarkable complexity enables cognitive functions ranging from basic motor control to abstract reasoning.",
+              "difficulty": "hard"
+            }
+          ]
+        },
+        {
+          "type": "REPEAT_SENTENCE",
+          "count": 10,
+          "timeLimitSeconds": 15,
+          "questions": [
+            { "id": "rs-001", "audioUrl": null, "text": "The library will be closed for renovations from Monday through Wednesday next week.", "difficulty": "easy" },
+            { "id": "rs-002", "audioUrl": null, "text": "Students are reminded to submit their assignments before the deadline to avoid late penalties.", "difficulty": "medium" },
+            { "id": "rs-003", "audioUrl": null, "text": "The quarterly financial report indicates a significant increase in revenue compared to the previous year.", "difficulty": "hard" },
+            { "id": "rs-004", "audioUrl": null, "text": "Please ensure that all laboratory equipment has been properly cleaned and stored after each experiment.", "difficulty": "medium" }
+          ]
+        },
+        {
+          "type": "DESCRIBE_IMAGE",
+          "count": 3,
+          "timeLimitSeconds": 40,
+          "prepTimeSeconds": 25,
+          "questions": [
+            {
+              "id": "di-001",
+              "imageType": "bar_chart",
+              "imageUrl": null,
+              "imageDescription": "Bar chart showing global renewable energy adoption rates by country (2019-2023), with Germany, China, USA, and Australia compared",
+              "difficulty": "medium"
+            },
+            {
+              "id": "di-002",
+              "imageType": "pie_chart",
+              "imageUrl": null,
+              "imageDescription": "Pie chart illustrating the distribution of global water usage across agriculture (70%), industry (19%), and domestic use (11%)",
+              "difficulty": "easy"
+            },
+            {
+              "id": "di-003",
+              "imageType": "process_diagram",
+              "imageUrl": null,
+              "imageDescription": "Flow diagram showing the water cycle: evaporation, condensation, precipitation, and runoff stages",
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "RETELL_LECTURE",
+          "count": 1,
+          "timeLimitSeconds": 40,
+          "prepTimeSeconds": 10,
+          "questions": [
+            {
+              "id": "rl-001",
+              "audioUrl": null,
+              "transcript": "Today we're going to discuss the concept of neuroplasticity — the brain's remarkable ability to reorganize itself by forming new neural connections throughout life. Until recently, scientists believed that the brain was fixed after early childhood. However, modern research has demonstrated that the brain can change in response to learning, experience, and even injury. This has profound implications for education, rehabilitation, and our understanding of human potential.",
+              "difficulty": "hard"
+            }
+          ]
+        },
+        {
+          "type": "ANSWER_SHORT_QUESTION",
+          "count": 5,
+          "timeLimitSeconds": 10,
+          "prepTimeSeconds": 3,
+          "questions": [
+            { "id": "asq-001", "audioUrl": null, "question": "What do you call a person who studies the stars and planets?", "answer": "astronomer", "difficulty": "easy" },
+            { "id": "asq-002", "audioUrl": null, "question": "What is the chemical symbol for gold?", "answer": "Au", "difficulty": "easy" },
+            { "id": "asq-003", "audioUrl": null, "question": "What instrument measures atmospheric pressure?", "answer": "barometer", "difficulty": "medium" },
+            { "id": "asq-004", "audioUrl": null, "question": "In which organ does digestion primarily begin?", "answer": "mouth or stomach", "difficulty": "easy" },
+            { "id": "asq-005", "audioUrl": null, "question": "What is the process by which plants make food using sunlight?", "answer": "photosynthesis", "difficulty": "easy" }
+          ]
+        }
+      ]
+    },
+    "writing": {
+      "durationMinutes": 40,
+      "totalQuestions": 3,
+      "questionTypes": [
+        {
+          "type": "SUMMARIZE_WRITTEN_TEXT",
+          "count": 2,
+          "timeLimitSeconds": 600,
+          "questions": [
+            {
+              "id": "swt-001",
+              "passage": "The concept of circular economy represents a departure from the traditional linear model of production and consumption — take, make, dispose. In a circular economy, resources are kept in use for as long as possible, with maximum value extracted before recovering and regenerating products and materials at the end of each service life. Companies adopting circular principles have reported significant cost savings through reduced material inputs. The Ellen MacArthur Foundation estimates that the circular economy could generate $4.5 trillion in economic benefits by 2030. However, the transition requires systemic change across supply chains, consumer behaviour, and regulatory frameworks. Critics argue that the circular economy may not fully address fundamental issues of overconsumption and growth-driven economic models.",
+              "wordLimit": { "min": 5, "max": 75 },
+              "difficulty": "medium"
+            },
+            {
+              "id": "swt-002",
+              "passage": "Urbanisation is one of the most significant demographic shifts of the modern era. More than half of the world's population now lives in cities, and this proportion is expected to reach two-thirds by 2050. Cities drive economic growth, innovation, and cultural exchange. However, rapid and unplanned urbanisation also creates serious challenges, including housing shortages, traffic congestion, environmental degradation, and widening inequality. Smart city technologies — including sensors, data analytics, and connected infrastructure — offer potential solutions by enabling more efficient resource management and improved urban services. Yet the success of smart city initiatives depends on inclusive governance that ensures benefits are equitably distributed rather than concentrated among the already advantaged.",
+              "wordLimit": { "min": 5, "max": 75 },
+              "difficulty": "hard"
+            }
+          ]
+        },
+        {
+          "type": "WRITE_ESSAY",
+          "count": 1,
+          "timeLimitSeconds": 1200,
+          "questions": [
+            {
+              "id": "we-001",
+              "prompt": "Some people believe that social media has had a predominantly negative impact on society, particularly on young people. Others argue that social media provides significant benefits and opportunities. Discuss both views and give your own opinion.",
+              "wordLimit": { "min": 200, "max": 300 },
+              "difficulty": "medium",
+              "scoringCriteria": ["content", "formal_discourse", "grammar", "vocabulary", "spelling", "structure"]
+            }
+          ]
+        }
+      ]
+    },
+    "reading": {
+      "durationMinutes": 32,
+      "totalQuestions": 15,
+      "questionTypes": [
+        {
+          "type": "READING_FILL_BLANKS",
+          "count": 5,
+          "questions": [
+            {
+              "id": "rfb-001",
+              "passage": "The Amazon rainforest, often referred to as the 'lungs of the Earth', [BLANK1] approximately 10% of all species on the planet. Deforestation [BLANK2] a significant threat, with an estimated 17% of the forest having been lost in the past fifty years. Conservation efforts are [BLANK3] increasingly urgent as scientists warn that the ecosystem could [BLANK4] to a savanna if deforestation continues.",
+              "blanks": [
+                { "id": "BLANK1", "options": ["houses", "contains", "supports", "provides"], "answer": "contains" },
+                { "id": "BLANK2", "options": ["represents", "poses", "creates", "forms"], "answer": "poses" },
+                { "id": "BLANK3", "options": ["becoming", "seeming", "getting", "turning"], "answer": "becoming" },
+                { "id": "BLANK4", "options": ["convert", "change", "transition", "shift"], "answer": "transition" }
+              ],
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "MULTIPLE_CHOICE_MULTIPLE",
+          "count": 2,
+          "questions": [
+            {
+              "id": "mcm-001",
+              "passage": "The Industrial Revolution, which began in Britain in the late eighteenth century, fundamentally transformed economic and social structures worldwide. Mechanised production replaced artisanal craft. Urban populations swelled as workers migrated from rural areas. Child labour was rampant in factories. Working conditions were often dangerous and hours were long. However, over time, industrialisation also created unprecedented levels of material wealth, improved living standards for many, and laid the technological foundations for the modern world.",
+              "question": "According to the passage, which of the following were consequences of the Industrial Revolution? Select ALL that apply.",
+              "options": [
+                "A significant shift from rural to urban populations",
+                "Immediate improvement in living conditions for all workers",
+                "The widespread employment of children in factories",
+                "The creation of greater material prosperity over time",
+                "A decline in technological innovation"
+              ],
+              "answers": [0, 2, 3],
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "REORDER_PARAGRAPHS",
+          "count": 2,
+          "questions": [
+            {
+              "id": "rp-001",
+              "paragraphs": [
+                { "id": "A", "text": "The discovery of penicillin by Alexander Fleming in 1928 is often described as one of the most significant medical breakthroughs of the twentieth century." },
+                { "id": "B", "text": "Before antibiotics, even minor infections could prove fatal, and diseases such as pneumonia, tuberculosis, and scarlet fever claimed millions of lives annually." },
+                { "id": "C", "text": "Fleming noticed that a mould contaminating one of his petri dishes had killed the surrounding bacteria, leading him to investigate its antimicrobial properties." },
+                { "id": "D", "text": "Subsequent development by Florey and Chain enabled mass production of penicillin during World War II, saving countless soldiers from dying of infected wounds." },
+                { "id": "E", "text": "Today, however, the overuse and misuse of antibiotics has led to the emergence of antibiotic-resistant bacteria, posing a major new threat to global public health." }
+              ],
+              "correctOrder": ["A", "C", "B", "D", "E"],
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "READING_WRITING_FILL_BLANKS",
+          "count": 4,
+          "questions": [
+            {
+              "id": "rwfb-001",
+              "passage": "Biodiversity refers to the variety of life on Earth at all levels, from genes to ecosystems. It [BLANK1] not only the number of species in an area, but also their interactions and the roles they play in maintaining ecosystem health. Biodiversity [BLANK2] a range of services that are essential for human wellbeing, including clean air, fresh water, food security, and climate regulation. Despite its importance, biodiversity is [BLANK3] threatened by habitat destruction, pollution, invasive species, and climate change. Scientists [BLANK4] that the current rate of species extinction is up to one thousand times higher than natural background rates.",
+              "blanks": [
+                { "id": "BLANK1", "options": ["encompasses", "includes", "covers", "involves"], "answer": "encompasses" },
+                { "id": "BLANK2", "options": ["provides", "gives", "offers", "delivers"], "answer": "provides" },
+                { "id": "BLANK3", "options": ["increasingly", "severely", "rapidly", "hugely"], "answer": "increasingly" },
+                { "id": "BLANK4", "options": ["estimate", "suggest", "argue", "predict"], "answer": "estimate" }
+              ],
+              "difficulty": "hard"
+            }
+          ]
+        },
+        {
+          "type": "MULTIPLE_CHOICE_SINGLE",
+          "count": 2,
+          "questions": [
+            {
+              "id": "mcs-001",
+              "passage": "Remote work, once considered a privilege for a small segment of knowledge workers, was rapidly accelerated by the global pandemic of 2020. Companies that had previously resisted flexible work arrangements were forced to adapt practically overnight. While many employees reported improved work-life balance and eliminated commuting time, challenges around isolation, communication, and maintaining organisational culture have also emerged. Research suggests that productivity outcomes vary significantly depending on the role, individual, and management practices.",
+              "question": "What is the author's main point about remote work?",
+              "options": [
+                "Remote work is universally beneficial for all workers.",
+                "Remote work was already common before the pandemic.",
+                "The impact of remote work is complex and context-dependent.",
+                "Remote work negatively affects productivity in all cases."
+              ],
+              "answer": 2,
+              "difficulty": "medium"
+            }
+          ]
+        }
+      ]
+    },
+    "listening": {
+      "durationMinutes": 35,
+      "totalQuestions": 16,
+      "questionTypes": [
+        {
+          "type": "SUMMARIZE_SPOKEN_TEXT",
+          "count": 2,
+          "timeLimitSeconds": 600,
+          "questions": [
+            {
+              "id": "sst-001",
+              "audioUrl": null,
+              "transcript": "Today I want to talk about the concept of growth mindset, introduced by psychologist Carol Dweck. A growth mindset is the belief that abilities and intelligence can be developed through dedication and hard work. This contrasts with a fixed mindset, where people believe their qualities are carved in stone. Research shows that students with a growth mindset are more resilient, embrace challenges, and ultimately achieve more. Teachers can cultivate growth mindsets by praising effort rather than innate ability, and by framing mistakes as learning opportunities rather than failures.",
+              "wordLimit": { "min": 50, "max": 70 },
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "LISTENING_MULTIPLE_CHOICE_MULTIPLE",
+          "count": 2,
+          "questions": [
+            {
+              "id": "lmcm-001",
+              "audioUrl": null,
+              "transcript": "Marine protected areas, or MPAs, are designated ocean zones where human activities are restricted to allow ecosystems to recover. Studies have shown that fish populations within MPAs are significantly larger and healthier than in unprotected areas. Additionally, MPAs provide spillover benefits to surrounding fisheries as populations grow and fish migrate outward. They also protect coral reefs from destructive fishing practices. Despite these benefits, only about eight percent of the world's oceans are currently protected, far below the thirty percent target set by international conservation bodies.",
+              "question": "According to the talk, which of the following are benefits of marine protected areas? Select TWO.",
+              "options": [
+                "They eliminate all fishing from protected zones permanently.",
+                "Fish populations inside MPAs are larger and healthier.",
+                "They provide spillover benefits to adjacent fisheries.",
+                "They have already achieved the 30% ocean protection target.",
+                "They reduce ocean temperatures globally."
+              ],
+              "answers": [1, 2],
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "LISTENING_FILL_BLANKS",
+          "count": 3,
+          "questions": [
+            {
+              "id": "lfb-001",
+              "audioUrl": null,
+              "transcript": "The seminar will cover three main topics: first, the [BLANK1] of data privacy regulations; second, the technical [BLANK2] for organisations seeking compliance; and third, best practice [BLANK3] for data handling. Participants are [BLANK4] to bring a laptop as some exercises will be conducted online.",
+              "blanks": [
+                { "id": "BLANK1", "answer": "evolution" },
+                { "id": "BLANK2", "answer": "requirements" },
+                { "id": "BLANK3", "answer": "frameworks" },
+                { "id": "BLANK4", "answer": "encouraged" }
+              ],
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "HIGHLIGHT_CORRECT_SUMMARY",
+          "count": 2,
+          "questions": [
+            {
+              "id": "hcs-001",
+              "audioUrl": null,
+              "transcript": "Citizen science is a growing movement in which members of the public participate in scientific research. Volunteers contribute data, observations, and analysis to projects ranging from tracking migratory birds to monitoring air quality and classifying galaxies. This approach allows researchers to collect data on a scale that would be impossible with professional scientists alone. It also promotes public engagement with science and helps communities connect with local environmental issues. However, data quality can be variable, and scientists must invest time in training volunteers and validating contributions.",
+              "options": [
+                "Citizen science projects are conducted exclusively by trained professionals who collect large datasets without public involvement.",
+                "Citizen science enables members of the public to participate in research, expanding data collection capacity while promoting scientific engagement, though data quality management is a challenge.",
+                "Citizen science has been proven to produce more accurate data than professional research because volunteers are more motivated than paid scientists.",
+                "Citizen science is primarily used for tracking weather patterns and has limited application in other scientific fields."
+              ],
+              "answer": 1,
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "LISTENING_MULTIPLE_CHOICE_SINGLE",
+          "count": 1,
+          "questions": [
+            {
+              "id": "lmcs-001",
+              "audioUrl": null,
+              "transcript": "Good morning everyone. I'd like to begin by addressing a common misconception about sleep. Many people believe that they can 'catch up' on sleep lost during the week by sleeping longer at the weekend. However, recent research from the University of Colorado indicates that this strategy does not fully reverse the metabolic and cognitive impairments caused by sleep deprivation. While a recovery weekend may partially reduce feelings of tiredness, the biological damage accumulates over time. Experts recommend consistently sleeping seven to nine hours per night rather than relying on weekend recovery.",
+              "question": "What does the speaker say about 'catching up' on sleep?",
+              "options": [
+                "It is an effective strategy recommended by sleep experts.",
+                "It can reverse all the negative effects of sleep deprivation.",
+                "It partially reduces tiredness but does not fully undo the biological damage.",
+                "It is only beneficial if done for more than ten hours."
+              ],
+              "answer": 2,
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "SELECT_MISSING_WORD",
+          "count": 1,
+          "questions": [
+            {
+              "id": "smw-001",
+              "audioUrl": null,
+              "transcript": "The global logistics industry is experiencing significant disruption due to automation technologies. Autonomous vehicles, robotic warehouses, and AI-powered route optimisation are transforming supply chain operations. While these technologies promise greater efficiency and lower costs, they also raise concerns about job displacement. Economists are divided on whether new technology creates enough new roles to offset the positions that are [BLANK].",
+              "options": ["created", "eliminated", "automated", "maintained"],
+              "answer": 1,
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "HIGHLIGHT_INCORRECT_WORDS",
+          "count": 2,
+          "questions": [
+            {
+              "id": "hiw-001",
+              "audioUrl": null,
+              "transcript": "The Renaissance was a cultural and intellectual movement that began in Italy during the fourteenth century and gradually spread across Europe. It was characterised by a renewed interest in classical antiquity, humanist philosophy, and the arts. Renaissance thinkers challenged medieval assumptions and promoted observation and reason as tools for understanding the world.",
+              "textWithErrors": "The Renaissance was a cultural and artistic movement that began in France during the fourteenth century and gradually spread across Europe. It was characterised by a renewed interest in classical antiquity, humanist philosophy, and the sciences. Renaissance thinkers challenged medieval assumptions and promoted observation and reason as tools for understanding the world.",
+              "incorrectWords": [
+                { "word": "artistic", "correctWord": "intellectual", "position": 6 },
+                { "word": "France", "correctWord": "Italy", "position": 15 },
+                { "word": "sciences", "correctWord": "arts", "position": 34 }
+              ],
+              "difficulty": "medium"
+            }
+          ]
+        },
+        {
+          "type": "WRITE_FROM_DICTATION",
+          "count": 3,
+          "questions": [
+            { "id": "wfd-001", "audioUrl": null, "sentence": "The professor will announce the examination schedule during the next lecture.", "difficulty": "easy" },
+            { "id": "wfd-002", "audioUrl": null, "sentence": "Significant advances in renewable energy technology have reduced the cost of solar panels considerably.", "difficulty": "medium" },
+            { "id": "wfd-003", "audioUrl": null, "sentence": "Students who wish to appeal their grades must submit a written request within ten working days.", "difficulty": "hard" }
+          ]
+        }
+      ]
+    }
+  }
+}

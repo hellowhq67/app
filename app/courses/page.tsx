@@ -9,7 +9,12 @@ export const metadata: Metadata = {
 };
 
 export default async function CoursesPage() {
-    const courses = await getAllCoursesFromSanity();
+    let courses: any[] = [];
+    try {
+        courses = await getAllCoursesFromSanity();
+    } catch {
+        // Sanity unavailable — render empty state gracefully
+    }
 
     return (
         <div className="min-h-screen bg-background pt-32 pb-20">

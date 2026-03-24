@@ -1,23 +1,29 @@
 import { Redis } from '@upstash/redis'
 
-// Initialize Redis client
-// It automatically attempts to read UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN from .env
-const redis = Redis.fromEnv()
+// Initialize Redis only when valid credentials are present.
+// Prevents build-time crashes when env vars are not configured.
+const url = process.env.UPSTASH_REDIS_REST_URL
+const token = process.env.UPSTASH_REDIS_REST_TOKEN
 
-export { redis }
+export const redis: Redis | null = (() => {
+    if (!url?.startsWith('https://') || !token) return null
+    try {
+        return new Redis({ url, token })
+    } catch {
+        return null
+    }
+})()
 
 /**
  * Helper to get cached data safely
  */
 export async function getCached<T>(key: string): Promise<T | null> {
+    if (!redis) return null
     try {
-        // Upstash Redis returns the object directly if it was stored as JSON
-        const data = await redis.get<T>(key)
-        return data
-    } catch (error) {
-        // Only log error in development, and even then, make it less noisy
+        return await redis.get<T>(key)
+    } catch {
         if (process.env.NODE_ENV === 'development') {
-            console.warn('⚠️ [Redis] Cache get failed - continuing without cache');
+            console.warn('⚠️ [Redis] Cache get failed - continuing without cache')
         }
         return null
     }
@@ -31,11 +37,12 @@ export async function setCached(
     data: unknown,
     ttlSeconds: number = 3600
 ): Promise<void> {
+    if (!redis) return
     try {
         await redis.set(key, data, { ex: ttlSeconds })
-    } catch (error) {
+    } catch {
         if (process.env.NODE_ENV === 'development') {
-            console.warn('⚠️ [Redis] Cache set failed');
+            console.warn('⚠️ [Redis] Cache set failed')
         }
     }
 }
@@ -44,11 +51,12 @@ export async function setCached(
  * Helper to delete cached data
  */
 export async function delCached(key: string): Promise<void> {
+    if (!redis) return
     try {
         await redis.del(key)
-    } catch (error) {
+    } catch {
         if (process.env.NODE_ENV === 'development') {
-            console.warn('⚠️ [Redis] Cache del failed');
+            console.warn('⚠️ [Redis] Cache del failed')
         }
     }
 }

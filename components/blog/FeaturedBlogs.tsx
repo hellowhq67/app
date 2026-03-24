@@ -19,7 +19,12 @@ interface SanityPost {
 }
 
 export async function FeaturedBlogs() {
-    const sanityPosts = await getFeaturedPostsFromSanity();
+    let sanityPosts: SanityPost[] = [];
+    try {
+        sanityPosts = await getFeaturedPostsFromSanity();
+    } catch {
+        // Sanity unavailable — render empty state gracefully
+    }
 
     // Transform Sanity data to match what BlogCard might expect or update BlogCard. 
     // Assuming BlogCard expects BlogPost, we map minimal data.
