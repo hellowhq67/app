@@ -15,13 +15,10 @@ interface CheckoutPageProps {
   }>
 }
 
-export default function CheckoutPage({
-  params,
-}: CheckoutPageProps) {
+export default function CheckoutPage({ params }: CheckoutPageProps) {
   const { tier } = use(params)
   const [isLoading, setIsLoading] = useState(false)
   const [selectedProvider, setSelectedProvider] = useState<string | null>(null)
-  const [currency, setCurrency] = useState<'USD' | 'BDT'>('USD')
   const tierParam = tier as SubscriptionTier
 
   if (!['pro', 'premium'].includes(tierParam)) {
@@ -41,51 +38,24 @@ export default function CheckoutPage({
   const pricing = TIER_PRICING[tierParam]
   const features = TIER_FEATURES_DISPLAY[tierParam]
 
-  const handleCheckout = async (provider: 'stripe' | 'polar' | 'sslcommerz') => {
+  const handleCheckout = async (provider: 'polar') => {
     setIsLoading(true)
     setSelectedProvider(provider)
 
     try {
-      if (provider === 'polar') {
-        // Call Polar.sh checkout API
-        const response = await fetch('/api/checkout/polar', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ tier }),
-        })
+      const response = await fetch('/api/checkout/polar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier }),
+      })
 
-        if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.error || 'Failed to create checkout session')
-        }
-
-        const { url } = await response.json()
-        window.location.href = url // Redirect to Polar.sh checkout
-      } else if (provider === 'sslcommerz') {
-        // Call SSL Commerz checkout API
-        const response = await fetch('/api/checkout/sslcommerz', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ tier, currency }),
-        })
-
-        if (!response.ok) {
-          const error = await response.json()
-          throw new Error(error.error || 'Failed to create checkout session')
-        }
-
-        const { url } = await response.json()
-        window.location.href = url // Redirect to SSL Commerz checkout
-      } else {
-        // TODO: Implement Stripe checkout
-        alert('Stripe checkout not yet implemented. Please use Polar.sh or SSL Commerz.')
-        setIsLoading(false)
-        setSelectedProvider(null)
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create checkout session')
       }
+
+      const { url } = await response.json()
+      window.location.href = url
     } catch (error) {
       console.error('Checkout error:', error)
       alert('Failed to start checkout. Please try again.')
@@ -100,39 +70,11 @@ export default function CheckoutPage({
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <Badge className="mb-4" variant="outline">
-              Checkout
-            </Badge>
+            <Badge className="mb-4" variant="outline">Checkout</Badge>
             <h1 className="text-3xl font-bold mb-2">
               Complete Your {tier.charAt(0).toUpperCase() + tier.slice(1)} Subscription
             </h1>
-            <p className="text-muted-foreground">
-              Choose your currency and payment method below
-            </p>
-          </div>
-
-          {/* Currency Selector */}
-          <div className="flex gap-2 justify-center mb-8">
-            <Button
-              variant={currency === 'USD' ? 'default' : 'outline'}
-              onClick={() => {
-                setCurrency('USD')
-                setSelectedProvider(null)
-              }}
-              disabled={isLoading}
-            >
-              USD $ (International)
-            </Button>
-            <Button
-              variant={currency === 'BDT' ? 'default' : 'outline'}
-              onClick={() => {
-                setCurrency('BDT')
-                setSelectedProvider(null)
-              }}
-              disabled={isLoading}
-            >
-              BDT ৳ (Bangladesh)
-            </Button>
+            <p className="text-muted-foreground">Choose your payment method below</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -140,27 +82,20 @@ export default function CheckoutPage({
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${
-                    tier === 'pro' ? 'bg-blue-500' : 'bg-purple-500'
-                  }`} />
+                  <div className={`w-3 h-3 rounded-full ${tier === 'pro' ? 'bg-blue-500' : 'bg-purple-500'}`} />
                   {tier.charAt(0).toUpperCase() + tier.slice(1)} Plan
                 </CardTitle>
                 <CardDescription>
-                  {tier === 'pro'
-                    ? 'Best for serious learners'
-                    : 'Maximum features for peak performance'
-                  }
+                  {tier === 'pro' ? 'Best for serious learners' : 'Maximum features for peak performance'}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="text-center mb-6">
                   <div className="text-4xl font-bold">
-                    {currency === 'USD' ? `$${pricing.price}` : `৳${pricing.bdtPrice}`}
+                    ${pricing.price}
                     <span className="text-lg text-muted-foreground">/{pricing.period}</span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {currency === 'USD' ? 'US Dollar' : 'Bangladeshi Taka'}
-                  </p>
+                  <p className="text-sm text-muted-foreground mt-1">US Dollar</p>
                 </div>
 
                 <ul className="space-y-2">
@@ -176,102 +111,40 @@ export default function CheckoutPage({
 
             {/* Payment Methods */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold mb-4">Choose Payment Method</h3>
+              <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
 
-              {/* Show Polar.sh for USD */}
-              {currency === 'USD' && (
-                <Card
-                  className={`cursor-pointer transition-all hover:shadow-md ${
-                    selectedProvider === 'polar' ? 'ring-2 ring-primary' : ''
-                  }`}
-                  onClick={() => !isLoading && setSelectedProvider('polar')}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                          <CreditCard className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold">Polar.sh</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Modern payments infrastructure
-                          </p>
-                        </div>
+              {/* Polar.sh */}
+              <Card
+                className={`cursor-pointer transition-all hover:shadow-md ${
+                  selectedProvider === 'polar' ? 'ring-2 ring-primary' : ''
+                }`}
+                onClick={() => !isLoading && setSelectedProvider('polar')}
+              >
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <CreditCard className="h-5 w-5 text-white" />
                       </div>
-                      <div className={`w-4 h-4 rounded-full border-2 ${
-                        selectedProvider === 'polar'
-                          ? 'border-primary bg-primary'
-                          : 'border-muted-foreground'
-                      }`}>
-                        {selectedProvider === 'polar' && (
-                          <div className="w-full h-full rounded-full bg-white scale-50" />
-                        )}
+                      <div>
+                        <h4 className="font-semibold">Polar.sh</h4>
+                        <p className="text-sm text-muted-foreground">Cards, PayPal & more</p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Show SSL Commerz for BDT */}
-              {currency === 'BDT' && (
-                <Card
-                  className={`cursor-pointer transition-all hover:shadow-md ${
-                    selectedProvider === 'sslcommerz' ? 'ring-2 ring-primary' : ''
-                  }`}
-                  onClick={() => !isLoading && setSelectedProvider('sslcommerz')}
-                >
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center">
-                          <CreditCard className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold">SSL Commerz</h4>
-                          <p className="text-sm text-muted-foreground">
-                            bKash, Nagad, Cards & more
-                          </p>
-                        </div>
-                      </div>
-                      <div className={`w-4 h-4 rounded-full border-2 ${
-                        selectedProvider === 'sslcommerz'
-                          ? 'border-primary bg-primary'
-                          : 'border-muted-foreground'
-                      }`}>
-                        {selectedProvider === 'sslcommerz' && (
-                          <div className="w-full h-full rounded-full bg-white scale-50" />
-                        )}
-                      </div>
+                    <div className={`w-4 h-4 rounded-full border-2 ${
+                      selectedProvider === 'polar' ? 'border-primary bg-primary' : 'border-muted-foreground'
+                    }`}>
+                      {selectedProvider === 'polar' && (
+                        <div className="w-full h-full rounded-full bg-white scale-50" />
+                      )}
                     </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Stripe Option (Coming Soon) */}
-              {currency === 'USD' && (
-                <Card className="cursor-not-allowed transition-all opacity-50">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center">
-                          <CreditCard className="h-5 w-5 text-white" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold">Stripe</h4>
-                          <p className="text-sm text-muted-foreground">
-                            Coming soon
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Checkout Button */}
               <Button
-                onClick={() => selectedProvider && handleCheckout(selectedProvider as 'stripe' | 'polar' | 'sslcommerz')}
+                onClick={() => selectedProvider && handleCheckout(selectedProvider as 'polar')}
                 disabled={!selectedProvider || isLoading}
                 className="w-full"
                 size="lg"
@@ -282,13 +155,7 @@ export default function CheckoutPage({
                     Creating checkout...
                   </>
                 ) : selectedProvider ? (
-                  `Subscribe with ${
-                    selectedProvider === 'polar'
-                      ? 'Polar.sh'
-                      : selectedProvider === 'sslcommerz'
-                      ? 'SSL Commerz'
-                      : 'Stripe'
-                  }`
+                  'Subscribe with Polar.sh'
                 ) : (
                   'Select a payment method'
                 )}
@@ -296,24 +163,11 @@ export default function CheckoutPage({
 
               <p className="text-xs text-muted-foreground text-center">
                 By subscribing, you agree to our{' '}
-                <Link href="/legal/terms" className="underline hover:no-underline">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link href="/legal/privacy" className="underline hover:no-underline">
-                  Privacy Policy
-                </Link>
+                <Link href="/legal/terms" className="underline hover:no-underline">Terms of Service</Link>
+                {' '}and{' '}
+                <Link href="/legal/privacy" className="underline hover:no-underline">Privacy Policy</Link>
               </p>
             </div>
-          </div>
-
-          {/* Back to Pricing */}
-          <div className="text-center mt-8">
-            <Link href="/pricing">
-              <Button variant="outline">
-                ← Back to Pricing
-              </Button>
-            </Link>
           </div>
         </div>
       </div>
