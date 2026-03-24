@@ -75,33 +75,6 @@ const nextConfig: NextConfig = {
 
   transpilePackages: [], //keep empty if none
   webpack: (config, { isServer, webpack, dev }) => {
-    config.ignoreWarnings = [
-      {
-        module: /app\/api\/ai-assistant\/route\.ts/,
-        message: /createGoogle.*is not exported/,
-      },
-      {
-        module: /app\/api\/questions\/bookmark\/route\.ts/,
-        message: /toggleQuestionBookmark.*is not exported/,
-      },
-      {
-        module: /app\/api\/user\/progress\/route\.ts/,
-        message: /getUserAnalytics.*is not exported/,
-      },
-      {
-        module: /app\/api\/webhooks\/polar\/route\.ts/,
-        message: /upsertUserSubscription.*is not exported/,
-      },
-      {
-        module: /app\/pte\/academic\/mocktest\/page\.tsx/,
-        message: /pteTests.*is not exported/,
-      },
-      {
-        module: /app\/pte\/academic\/mocktest\/page\.tsx/,
-        message: /testAttempts.*is not exported/,
-      },
-    ];
-
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,

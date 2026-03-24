@@ -4,8 +4,8 @@ import {
   handleApiError,
   requireAuth,
 } from "@/lib/api";
-import { toggleQuestionBookmark } from "@/lib/db/queries";
-import { z } from 'zod/v3';
+import { toggleQuestionBookmark } from "@/lib/db/queries/questions";
+import { z } from 'zod';
 
 const BookmarkSchema = z.object({
   questionId: z.string(),

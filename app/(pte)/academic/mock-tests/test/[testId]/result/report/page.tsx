@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 
 import { db } from '@/lib/db';
 import { pteMockTests, users } from '@/lib/db/schema';

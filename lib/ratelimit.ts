@@ -1,18 +1,22 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { redis } from "@/lib/redis"; // Assumes we have this, or I'll use @upstash/redis directly if not.
+import { redis } from "@/lib/redis";
 
-// Create a new ratelimiter, that allows 10 requests per 10 seconds
-export const ratelimit = new Ratelimit({
-    redis: redis,
-    limiter: Ratelimit.slidingWindow(10, "10 s"),
-    analytics: true,
-    prefix: "@upstash/ratelimit",
-});
+// If Redis is not configured, ratelimiters are null — callers must handle this.
+export const ratelimit: Ratelimit | null = redis
+    ? new Ratelimit({
+          redis,
+          limiter: Ratelimit.slidingWindow(10, "10 s"),
+          analytics: true,
+          prefix: "@upstash/ratelimit",
+      })
+    : null;
 
 // Stricter limiter for creating tests/content
-export const strictRatelimit = new Ratelimit({
-    redis: redis,
-    limiter: Ratelimit.slidingWindow(2, "60 s"), // 2 start attempts per minute
-    analytics: true,
-    prefix: "@upstash/strict-ratelimit",
-});
+export const strictRatelimit: Ratelimit | null = redis
+    ? new Ratelimit({
+          redis,
+          limiter: Ratelimit.slidingWindow(2, "60 s"),
+          analytics: true,
+          prefix: "@upstash/strict-ratelimit",
+      })
+    : null;

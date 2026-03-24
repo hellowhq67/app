@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { auth } from '@/lib/auth/auth'
 import { headers } from 'next/headers'
 import { getAllUserAttempts } from '@/lib/db/queries/pte-scoring'

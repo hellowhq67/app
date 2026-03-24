@@ -12,7 +12,12 @@ interface PageProps {
 
 export default async function CoursePage({ params }: PageProps) {
     const { slug } = await params;
-    const course = await getCourseBySlugFromSanity(slug);
+    let course: any = null;
+    try {
+        course = await getCourseBySlugFromSanity(slug);
+    } catch {
+        // Sanity unavailable
+    }
 
     if (!course) {
         notFound();

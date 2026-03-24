@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server'
 import { apiSuccess, handleApiError } from '@/lib/api'
-import { upsertUserSubscription } from '@/lib/db/queries'
+import { upsertUserSubscription } from '@/lib/db/queries/billing'
 
 export async function POST(request: NextRequest) {
   try {

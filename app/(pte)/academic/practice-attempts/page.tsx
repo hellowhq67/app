@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { PracticeAttemptsClient } from '@/components/pte/practice-attempts/practice-attempts-client'
 import { AcademicPracticeHeader } from '@/components/pte/practice-header'
 import {

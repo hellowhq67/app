@@ -1,4 +1,8 @@
-import { google } from '@ai-sdk/google';
+import { createGoogleGenerativeAI } from '@ai-sdk/google';
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+});
 import { streamText } from 'ai';
 import { NextRequest } from 'next/server';
 import { z } from 'zod';
@@ -22,7 +26,7 @@ export async function POST(req: NextRequest) {
     const { messages } = requestBodySchema.parse(body);
 
     const result = streamText({
-      model: google('gemini-1.5-pro'),
+      model: google('gemini-2.5-flash'),
       system: `You are an AI tutor for PTE (Pearson Test of English) preparation.
       Provide helpful, educational responses to help students improve their English language skills.
       Be encouraging, clear, and focus on PTE-specific content.
