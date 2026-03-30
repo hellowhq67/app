@@ -12,7 +12,7 @@ export default function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-purple-600">
                 <span className="text-lg font-bold text-white">P</span>
               </div>
-              <span className="text-lg font-semibold">Pedagogist's PTE</span>
+              <span className="text-lg font-semibold">Pedagogist&apos;s PTE</span>
             </Link>
             <p className="text-muted-foreground mt-3 text-sm">
               AI-powered PTE Academic practice with mock tests and instant feedback.
@@ -116,7 +116,7 @@ export default function Footer() {
 
         <div className="text-muted-foreground mt-10 flex flex-col items-center justify-between gap-4 border-t pt-6 sm:flex-row">
           <p className="text-xs sm:text-sm">
-            © <CurrentYear /> Pedagogist's PTE. All rights reserved.
+            © <CurrentYear /> Pedagogist&apos;s PTE. All rights reserved.
           </p>
           <div className="flex gap-4">
             <Link href="#" aria-label="Twitter" className="hover:text-foreground text-xs sm:text-sm">

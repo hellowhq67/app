@@ -123,7 +123,7 @@ export default function AccessibilityPage() {
       <ul>
         <li>Contact us at <a href="mailto:accessibility@pedagogistpte.com">accessibility@pedagogistpte.com</a></li>
         <li>Provide documentation of your accommodation needs</li>
-        <li>We'll adjust your account settings accordingly</li>
+        <li>We&apos;ll adjust your account settings accordingly</li>
       </ul>
 
       <h3>7.2 Alternative Formats</h3>
@@ -150,7 +150,7 @@ export default function AccessibilityPage() {
 
       <h2>9. Ongoing Improvements</h2>
       <p>
-        We're continuously working to improve accessibility:
+        We&apos;re continuously working to improve accessibility:
       </p>
 
       <h3>Current Priorities:</h3>
@@ -224,7 +224,7 @@ export default function AccessibilityPage() {
           <li><strong>Keyboard Users:</strong> Use Tab to navigate, Enter to select, Escape to close dialogs</li>
           <li><strong>Screen Readers:</strong> Use heading navigation (H) to jump between sections</li>
           <li><strong>Visual Adjustments:</strong> Use browser zoom (Ctrl/Cmd +/-) or system accessibility settings</li>
-          <li><strong>Motion Sensitivity:</strong> Enable "Reduce Motion" in your OS settings</li>
+          <li><strong>Motion Sensitivity:</strong> Enable &quot;Reduce Motion&quot; in your OS settings</li>
         </ul>
       </div>
     </article>

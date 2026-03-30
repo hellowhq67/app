@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 
 export default function BlogVideoCard() {
   return (
@@ -23,22 +24,22 @@ export default function BlogVideoCard() {
             Watch quick deep-dives on speaking strategies, writing templates, and reading hacks from our instructors.
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <a href="/blog" className="border rounded-xl p-4 hover:bg-accent">
+            <Link href="/blog" className="border rounded-xl p-4 hover:bg-accent">
               <div className="text-sm font-semibold">Speaking tips</div>
               <div className="text-xs text-muted-foreground">Answer fluency and content</div>
-            </a>
-            <a href="/blog" className="border rounded-xl p-4 hover:bg-accent">
+            </Link>
+            <Link href="/blog" className="border rounded-xl p-4 hover:bg-accent">
               <div className="text-sm font-semibold">Writing templates</div>
               <div className="text-xs text-muted-foreground">Summarize written text</div>
-            </a>
-            <a href="/blog" className="border rounded-xl p-4 hover:bg-accent">
+            </Link>
+            <Link href="/blog" className="border rounded-xl p-4 hover:bg-accent">
               <div className="text-sm font-semibold">Reading hacks</div>
               <div className="text-xs text-muted-foreground">Fill in the blanks</div>
-            </a>
-            <a href="/blog" className="border rounded-xl p-4 hover:bg-accent">
+            </Link>
+            <Link href="/blog" className="border rounded-xl p-4 hover:bg-accent">
               <div className="text-sm font-semibold">Listening practice</div>
               <div className="text-xs text-muted-foreground">Summarize spoken text</div>
-            </a>
+            </Link>
           </div>
         </div>
       </div>

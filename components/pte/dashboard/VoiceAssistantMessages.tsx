@@ -26,7 +26,7 @@ export function VoiceAssistantMessages({ messages, status }: VoiceAssistantMessa
           </div>
           <div>
             <h4 className="font-semibold text-foreground">
-              Hi! I'm your PTE Voice Assistant
+              Hi! I&apos;m your PTE Voice Assistant
             </h4>
             <p className="mt-2 text-sm text-muted-foreground">
               I can help you with study planning, answer questions about PTE, and guide you through practice sections.

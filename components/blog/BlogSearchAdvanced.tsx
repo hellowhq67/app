@@ -131,7 +131,7 @@ export function BlogSearchAdvanced() {
                         </>
                     ) : query ? (
                         <div className="p-8 text-center">
-                            <p className="text-muted-foreground mb-4">No articles found matching "{query}"</p>
+                            <p className="text-muted-foreground mb-4">No articles found matching &quot;{query}&quot;</p>
                             <p className="text-xs text-muted-foreground">Try different keywords or browse all articles</p>
                         </div>
                     ) : (

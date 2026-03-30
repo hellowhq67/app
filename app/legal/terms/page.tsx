@@ -21,7 +21,7 @@ export default function TermsOfServicePage() {
 
       <h2>2. Description of Service</h2>
       <p>
-        Pedagogist's PTE is an online PTE Academic test preparation platform that provides:
+        Pedagogist&apos;s PTE is an online PTE Academic test preparation platform that provides:
       </p>
       <ul>
         <li>Practice questions for all PTE Academic question types</li>
@@ -31,8 +31,9 @@ export default function TermsOfServicePage() {
         <li>Study materials and tips</li>
       </ul>
       <p>
-        <strong>Important Notice:</strong> Pedagogist's PTE is an independent test preparation service and is NOT affiliated
+        <strong>Important Notice:</strong> Pedagogist&apos;s PTE is an independent test preparation service and is NOT affiliated
         with, endorsed by, or connected to Pearson PLC or the official PTE Academic test.
+
       </p>
 
       <h2>3. Account Registration</h2>
@@ -72,7 +73,7 @@ export default function TermsOfServicePage() {
         <li>Subscriptions are billed monthly or annually as selected</li>
         <li>Payments are processed securely through Stripe or Polar</li>
         <li>All fees are in USD unless otherwise stated</li>
-        <li>Prices are subject to change with 30 days' notice</li>
+        <li>Prices are subject to change with 30 days&apos; notice</li>
       </ul>
 
       <h3>4.3 Auto-Renewal</h3>
@@ -117,7 +118,7 @@ export default function TermsOfServicePage() {
       <h3>6.1 Our Content</h3>
       <p>
         All content on the Platform, including but not limited to text, graphics, logos, images, audio recordings,
-        software, and AI algorithms, is the property of Pedagogist's PTE or its licensors and is protected by copyright,
+        software, and AI algorithms, is the property of Pedagogist&apos;s PTE or its licensors and is protected by copyright,
         trademark, and other intellectual property laws.
       </p>
 
@@ -135,7 +136,7 @@ export default function TermsOfServicePage() {
 
       <h3>6.3 Trademarks</h3>
       <p>
-        "Pedagogist's PTE" and associated logos are trademarks of our company. PTE Academic is a trademark of Pearson PLC.
+        &quot;Pedagogist&apos;s PTE&quot; and associated logos are trademarks of our company. PTE Academic is a trademark of Pearson PLC.
         We are not affiliated with or endorsed by Pearson PLC.
       </p>
 
@@ -179,7 +180,7 @@ export default function TermsOfServicePage() {
 
       <h2>10. Indemnification</h2>
       <p>
-        You agree to indemnify and hold harmless Pedagogist's PTE, its affiliates, and their respective officers,
+        You agree to indemnify and hold harmless Pedagogist&apos;s PTE, its affiliates, and their respective officers,
         directors, employees, and agents from any claims, damages, losses, liabilities, and expenses (including legal fees)
         arising from:
       </p>
@@ -247,7 +248,7 @@ export default function TermsOfServicePage() {
       <h2>16. Entire Agreement</h2>
       <p>
         These Terms, together with our Privacy Policy and Refund Policy, constitute the entire agreement between you and
-        Pedagogist's PTE regarding the use of the Platform.
+        Pedagogist&apos;s PTE regarding the use of the Platform.
       </p>
 
       <h2>17. Contact Information</h2>
@@ -260,7 +261,7 @@ export default function TermsOfServicePage() {
       </ul>
 
       <div className="mt-8 rounded-lg border bg-muted p-6">
-        <h3 className="mb-2 text-lg font-semibold">By using Pedagogist's PTE, you acknowledge that:</h3>
+        <h3 className="mb-2 text-lg font-semibold">By using Pedagogist&apos;s PTE, you acknowledge that:</h3>
         <ul className="text-sm">
           <li>You have read and understood these Terms of Service</li>
           <li>You agree to be bound by these Terms</li>
