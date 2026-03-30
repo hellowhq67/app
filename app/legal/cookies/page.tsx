@@ -123,7 +123,7 @@ export default function CookiePolicyPage() {
       </p>
       <ul>
         <li>You may need to log in every time you visit</li>
-        <li>Your preferences and settings won't be saved</li>
+        <li>Your preferences and settings won&apos;t be saved</li>
         <li>Some features may not work properly</li>
         <li>Page load times may increase</li>
       </ul>

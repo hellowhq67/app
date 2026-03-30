@@ -57,7 +57,7 @@ export function ContactForm() {
     return (
         <div className="rounded-2xl border bg-card p-6 sm:p-10 shadow-lg" id="contact-form">
             <h2 className="mb-2 text-2xl font-bold">Send Us a Message</h2>
-            <p className="mb-6 text-muted-foreground">We'd love to hear from you. Fill out the form below.</p>
+            <p className="mb-6 text-muted-foreground">We&apos;d love to hear from you. Fill out the form below.</p>
 
             <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
@@ -122,7 +122,7 @@ export function ContactForm() {
 
                 {submitStatus === "success" && (
                     <div className="rounded-lg bg-green-50 p-4 text-sm text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                        ✓ Message sent successfully! We'll get back to you within 24 hours.
+                        ✓ Message sent successfully! We&apos;ll get back to you within 24 hours.
                     </div>
                 )}
 
