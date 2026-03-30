@@ -36,10 +36,20 @@ jobs:
       - name: Build application
         run: pnpm build
         env:
-          # Add dummy env vars for build to succeed
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'dummy-secret-for-ci-build' }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'dummy-secret-for-ci-build-minimum-32-chars' }}
           BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_BETTER_AUTH_URL: 'http://localhost:3000'
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY || 'dummy-google-ai-key' }}
+          ASSEMBLYAI_API_KEY: ${{ secrets.ASSEMBLYAI_API_KEY || 'dummy-assemblyai-key' }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN || 'dummy-blob-token' }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL || 'https://dummy.upstash.io' }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN || 'dummy-upstash-token' }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID || 'dummyprojectid' }}
+          NEXT_PUBLIC_SANITY_DATASET: 'production'
+          RESEND_API_KEY: 'dummy-resend-key'
+          BASE_URL: 'http://localhost:3000'
+          NEXT_PUBLIC_APP_URL: 'http://localhost:3000'
 
       - name: Run Playwright tests
         run: pnpm test:e2e
@@ -47,8 +57,19 @@ jobs:
           CI: true
           PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
           DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://dummy:dummy@localhost:5432/dummy' }}
-          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'dummy-secret-for-ci-build' }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET || 'dummy-secret-for-ci-build-minimum-32-chars' }}
           BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL || 'http://localhost:3000' }}
+          NEXT_PUBLIC_BETTER_AUTH_URL: 'http://localhost:3000'
+          GOOGLE_GENERATIVE_AI_API_KEY: ${{ secrets.GOOGLE_GENERATIVE_AI_API_KEY || 'dummy-google-ai-key' }}
+          ASSEMBLYAI_API_KEY: ${{ secrets.ASSEMBLYAI_API_KEY || 'dummy-assemblyai-key' }}
+          BLOB_READ_WRITE_TOKEN: ${{ secrets.BLOB_READ_WRITE_TOKEN || 'dummy-blob-token' }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL || 'https://dummy.upstash.io' }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN || 'dummy-upstash-token' }}
+          NEXT_PUBLIC_SANITY_PROJECT_ID: ${{ secrets.NEXT_PUBLIC_SANITY_PROJECT_ID || 'dummyprojectid' }}
+          NEXT_PUBLIC_SANITY_DATASET: 'production'
+          RESEND_API_KEY: 'dummy-resend-key'
+          BASE_URL: 'http://localhost:3000'
+          NEXT_PUBLIC_APP_URL: 'http://localhost:3000'
 
       - name: Upload Playwright Report
         uses: actions/upload-artifact@v4
