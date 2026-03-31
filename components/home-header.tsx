@@ -68,8 +68,8 @@ export function HomeHeader() {
                 Explore
                 <ChevronDown className="h-4 w-4" />
               </PopoverTrigger>
-              <PopoverContent align="start" className="w-[660px] p-0">
-                <div className="grid grid-cols-3 gap-0">
+              <PopoverContent align="start" className="w-[min(90vw,660px)] p-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0">
                   <Link
                     href="#features"
                     className="hover:bg-accent flex flex-col gap-1 p-4"

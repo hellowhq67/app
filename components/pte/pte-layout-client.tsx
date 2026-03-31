@@ -48,15 +48,15 @@ function PTELayoutContent({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <PTEAppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <header className="flex min-h-16 shrink-0 items-center gap-2 border-b px-4 py-2">
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem className="hidden md:block">
+              <BreadcrumbItem className="hidden sm:block">
                 <BreadcrumbLink href="/pte/dashboard">PTE</BreadcrumbLink>
               </BreadcrumbItem>
-              <BreadcrumbSeparator className="hidden md:block" />
+              <BreadcrumbSeparator className="hidden sm:block" />
               {pathname
                 ?.split("/")
                 .filter(Boolean)
@@ -78,7 +78,7 @@ function PTELayoutContent({ children }: { children: React.ReactNode }) {
                         )}
                       </BreadcrumbItem>
                       {!isLast && (
-                        <BreadcrumbSeparator className="hidden md:block" />
+                        <BreadcrumbSeparator className="hidden sm:block" />
                       )}
                     </React.Fragment>
                   );

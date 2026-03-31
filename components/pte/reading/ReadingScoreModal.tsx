@@ -38,7 +38,7 @@ export function ReadingScoreModal({
     // For specific questions, score might be small (e.g. 5 points).
     // We'll trust the visual cues.
 
-    const isGoodScore = feedback.overallScore > 0 // Simple check for now
+    const isGoodScore = feedback.overallScore >= 50
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>

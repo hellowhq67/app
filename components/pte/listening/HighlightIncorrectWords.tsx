@@ -83,7 +83,7 @@ export function HighlightIncorrectWords({
                             onClick={() => toggleWord(entry.index)}
                             className={cn(
                                 "cursor-pointer rounded px-0.5 py-0.5 transition-all",
-                                "hover:bg-yellow-100 dark:hover:bg-yellow-900/30",
+                                "hover:bg-yellow-200 dark:hover:bg-yellow-800/50",
                                 isSelected && "bg-yellow-300 dark:bg-yellow-600 text-yellow-900 dark:text-yellow-100 font-medium",
                                 disabled && "cursor-not-allowed opacity-60"
                             )}

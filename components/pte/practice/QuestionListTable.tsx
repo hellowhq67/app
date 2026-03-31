@@ -74,15 +74,15 @@ export default function QuestionListTable({
           </p>
         </div>
       ) : (
-        <div className="border rounded-lg">
+        <div className="border rounded-lg overflow-x-auto w-full">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[80px]">#</TableHead>
+                <TableHead className="w-10 min-w-[40px]">#</TableHead>
                 <TableHead>Question</TableHead>
-                <TableHead className="w-[120px]">Difficulty</TableHead>
-                <TableHead className="w-[120px]">Status</TableHead>
-                <TableHead className="w-[100px] text-right">Action</TableHead>
+                <TableHead className="hidden sm:table-cell w-[120px]">Difficulty</TableHead>
+                <TableHead className="hidden md:table-cell w-[120px]">Status</TableHead>
+                <TableHead className="w-[80px] text-right">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -92,7 +92,7 @@ export default function QuestionListTable({
                     {questions.length - index}
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-medium">
                         {q.title || `Question ${q.id.substring(0, 8)}`}
                       </span>
@@ -101,9 +101,24 @@ export default function QuestionListTable({
                           <Lock className="h-3 w-3" /> VIP
                         </Badge>
                       )}
+                      {/* Show difficulty inline on small screens */}
+                      <span className="sm:hidden">
+                        <Badge
+                          variant={
+                            q.difficulty === 'Hard'
+                              ? 'destructive'
+                              : q.difficulty === 'Medium'
+                              ? 'default'
+                              : 'secondary'
+                          }
+                          className="text-xs"
+                        >
+                          {q.difficulty}
+                        </Badge>
+                      </span>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden sm:table-cell">
                     <Badge
                       variant={
                         q.difficulty === 'Hard'
@@ -116,7 +131,7 @@ export default function QuestionListTable({
                       {q.difficulty}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="hidden md:table-cell">
                     {q.userStatus === 'completed' ? (
                       <Badge
                         variant="outline"
