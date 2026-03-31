@@ -59,6 +59,18 @@ export const routes = {
     billing: '/account/billing',
   },
 
+  // Admin routes
+  admin: {
+    root: '/admin',
+    users: '/admin/users',
+    user: (id: string) => `/admin/users/${id}`,
+    questions: '/admin/questions',
+    question: (id: string) => `/admin/questions/${id}`,
+    mockTests: '/admin/mock-tests',
+    mockTest: (id: string) => `/admin/mock-tests/${id}`,
+    status: '/admin/status',
+  },
+
   // Checkout routes
   checkout: {
     root: '/checkout',
@@ -101,6 +113,8 @@ export const authConfig = {
     '/academic/(.*)',
     '/account',
     '/account/(.*)',
+    '/admin',
+    '/admin/(.*)',
   ],
 } as const
 

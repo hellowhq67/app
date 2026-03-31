@@ -28,6 +28,10 @@ pnpm db:seed:pte      # Seed PTE question data
 pnpm test             # Run all tests
 pnpm test:watch       # Watch mode
 pnpm vitest <pattern> # Run tests matching pattern (e.g., pnpm vitest scoring)
+pnpm test:e2e         # Run Playwright E2E tests (e2e/ directory)
+
+# Validation
+pnpm deploy-checklist # Pre-deployment env/config validation
 
 # Cleaning
 pnpm clean            # Clear .next, .turbo, .swc caches
@@ -124,3 +128,31 @@ pnpm build         # Build succeeds
 - **Zustand** for global client state (e.g., test session state)
 - **nuqs** for URL search params state
 - **SWR** for data fetching and caching
+
+## Testing Details
+
+### Unit Tests (Vitest)
+- Globals enabled — no need to import `describe`/`it`/`expect`
+- Setup file: `vitest.setup.ts` (loads `@testing-library/jest-dom`)
+- Coverage: v8 reporter, output to `./coverage/`
+- E2E tests in `e2e/` are excluded from unit test runs
+
+### E2E Tests (Playwright)
+- Config: `playwright.config.ts`, tests in `e2e/`
+- Base URL: `PLAYWRIGHT_TEST_BASE_URL` env var (defaults to http://localhost:3000)
+- Chromium only; auto-starts `pnpm dev` locally or `pnpm start` on CI
+- 2 retries on CI, screenshots on failure, video on first retry
+
+## Key Utilities
+
+- **`lib/env.ts`** — Zod-validated env schema; all required env vars are validated at startup. If a required var is missing the app will throw with a clear error.
+- **`lib/utils.ts`** — `cn()` (clsx + tailwind-merge) and `countWords()` helpers
+- **`lib/auth/email.ts`** — Resend-powered transactional emails; falls back to `console.log` in dev if `RESEND_API_KEY` is unset
+
+## Important Gotchas
+
+- **`ignoreBuildErrors: true`** in `next.config.ts` — TypeScript errors do not block production builds (intentional). Always run `pnpm type-check` separately.
+- **No `middleware.ts`** — Auth is handled entirely via better-auth API routes at `/api/auth/*`, not Next.js middleware.
+- **Database pooling** — Drizzle prefers `DATABASE_URL_POOLED` over `DATABASE_URL` when set; use the pooled URL for serverless environments.
+- **React Compiler enabled** — Next.js 16 has React Compiler on by default. Some patterns (state in effects, refs) produce warnings, downgraded to non-blocking in ESLint config.
+- **CORS** — Open CORS for `/api/*` is configured in `vercel.json`, not in Next.js config.
