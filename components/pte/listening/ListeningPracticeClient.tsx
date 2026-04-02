@@ -215,9 +215,9 @@ export function ListeningPracticeClient({
               {options.map((opt, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="flex items-start space-x-2 border p-4 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
-                  <RadioGroupItem value={opt} id={`opt-${idx}`} />
+                  <RadioGroupItem value={opt} id={`opt-${idx}`} className="mt-1" />
                   <Label htmlFor={`opt-${idx}`} className="cursor-pointer flex-1">
                     {opt}
                   </Label>
@@ -240,13 +240,13 @@ export function ListeningPracticeClient({
               {options.map((opt, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
+                  className="flex items-start space-x-2 border p-4 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
                 >
                   <Checkbox
                     id={`opt-${idx}`}
+                    className="mt-1"
                     checked={selectedOptions.includes(opt)}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
+                    onCheckedChange={(checked) => {
                       if (checked) {
                         setSelectedOptions([...selectedOptions, opt]);
                       } else {

@@ -21,16 +21,27 @@ export default function ReorderParagraphs({
         if (paragraphs.length === 0) return
 
         if (value && value.length === paragraphs.length) {
-            // Reconstruct items from value using stable index-based IDs
-            // Map each value text back to its original index for a stable ID
-            const textToOriginalIndex = new Map(
-                paragraphs.map((text, i) => [text, i])
-            )
-            const newItems = value.map((text, i) => ({
-                id: `para-${textToOriginalIndex.get(text) ?? i}`,
-                text,
-            }))
-            setItems(newItems)
+            // Reconstruct items from value using stable index-based IDs.
+            // Track which original indices have been consumed to handle duplicate text.
+            const availableIndices = new Map<string, number[]>()
+            paragraphs.forEach((text, i) => {
+                if (!availableIndices.has(text)) availableIndices.set(text, [])
+                availableIndices.get(text)!.push(i)
+            })
+            const usedIndices = new Set<number>()
+            const newItems = value.map((text) => {
+                const pool = availableIndices.get(text) ?? []
+                const idx = pool.find((i) => !usedIndices.has(i)) ?? pool[0] ?? 0
+                usedIndices.add(idx)
+                return { id: `para-${idx}`, text }
+            })
+
+            // Only update if the order actually changed to avoid infinite re-renders
+            setItems((prev) => {
+                const prevOrder = prev.map((it) => it.id).join(',')
+                const nextOrder = newItems.map((it) => it.id).join(',')
+                return prevOrder === nextOrder ? prev : newItems
+            })
         } else {
             // Initialize with default order from props using index-based IDs
             const initialItems = paragraphs.map((text, i) => ({
@@ -39,7 +50,7 @@ export default function ReorderParagraphs({
             }))
             setItems(initialItems)
         }
-    }, [paragraphs]) // Only re-init when paragraphs change, not on every value update
+    }, [paragraphs, value]) // Keep value in deps so external resets (e.g. "Clear" button) are respected
 
     const handleReorder = (newOrder: { id: string; text: string }[]) => {
         setItems(newOrder)
