@@ -133,8 +133,44 @@ export function ListeningPracticeClient({
     }
   };
 
+  // Per-type instruction text
+  const getInstruction = () => {
+    switch (questionType) {
+      case QuestionType.SUMMARIZE_SPOKEN_TEXT:
+      case "summarize_spoken_text":
+        return "Listen to the recording and write a summary in 50–70 words.";
+      case QuestionType.WRITE_FROM_DICTATION:
+      case "write_from_dictation":
+        return "Listen carefully and type the sentence you hear exactly as spoken.";
+      case QuestionType.LISTENING_MULTIPLE_CHOICE_SINGLE:
+      case "listening_mc_single":
+      case "multiple_choice_single":
+        return "Listen to the recording and choose the best answer from the options below.";
+      case QuestionType.HIGHLIGHT_CORRECT_SUMMARY:
+      case "highlight_correct_summary":
+        return "Listen to the recording and select the paragraph that best summarises it.";
+      case QuestionType.SELECT_MISSING_WORD:
+      case "select_missing_word":
+        return "Listen to the recording and select the word that completes the sentence.";
+      case QuestionType.LISTENING_MULTIPLE_CHOICE_MULTIPLE:
+      case "listening_mc_multiple":
+      case "multiple_choice_multiple":
+        return "Listen to the recording and choose all options that apply.";
+      case QuestionType.LISTENING_BLANKS:
+      case "fill_blanks":
+        return "Listen to the recording and type the missing words into the gaps.";
+      case QuestionType.HIGHLIGHT_INCORRECT_WORDS:
+      case "highlight_incorrect_words":
+        return "Click on the words in the text that differ from what you hear in the recording.";
+      default:
+        return null;
+    }
+  };
+
   // Render Input Area based on Type
   const renderInputArea = () => {
+    const instruction = getInstruction();
+
     switch (questionType) {
       case QuestionType.SUMMARIZE_SPOKEN_TEXT:
       case "summarize_spoken_text":
@@ -142,6 +178,11 @@ export function ListeningPracticeClient({
       case "write_from_dictation":
         return (
           <div className="space-y-4">
+            {instruction && (
+              <p className="text-sm text-muted-foreground border-l-4 border-primary/40 pl-3 py-1 bg-muted/30 rounded-r">
+                {instruction}
+              </p>
+            )}
             <Label>Your Answer:</Label>
             <Textarea
               value={textAnswer}
@@ -157,85 +198,115 @@ export function ListeningPracticeClient({
 
       case QuestionType.LISTENING_MULTIPLE_CHOICE_SINGLE:
       case "listening_mc_single":
+      case "multiple_choice_single":
       case QuestionType.HIGHLIGHT_CORRECT_SUMMARY:
       case "highlight_correct_summary":
       case QuestionType.SELECT_MISSING_WORD:
       case "select_missing_word":
         return (
-          <RadioGroup
-            value={selectedOption}
-            onValueChange={setSelectedOption}
-            className="space-y-3"
-          >
-            {options.map((opt, idx) => (
-              <div
-                key={idx}
-                className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-              >
-                <RadioGroupItem value={opt} id={`opt-${idx}`} />
-                <Label htmlFor={`opt-${idx}`} className="cursor-pointer flex-1">
-                  {opt}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
+          <div className="space-y-4">
+            {instruction && (
+              <p className="text-sm text-muted-foreground border-l-4 border-primary/40 pl-3 py-1 bg-muted/30 rounded-r">
+                {instruction}
+              </p>
+            )}
+            <RadioGroup
+              value={selectedOption}
+              onValueChange={setSelectedOption}
+              className="space-y-3"
+            >
+              {options.map((opt, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start space-x-2 border p-4 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
+                >
+                  <RadioGroupItem value={opt} id={`opt-${idx}`} className="mt-1" />
+                  <Label htmlFor={`opt-${idx}`} className="cursor-pointer flex-1">
+                    {opt}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </div>
         );
 
       case QuestionType.LISTENING_MULTIPLE_CHOICE_MULTIPLE:
       case "listening_mc_multiple":
+      case "multiple_choice_multiple":
         return (
-          <div className="space-y-3">
-            {options.map((opt, idx) => (
-              <div
-                key={idx}
-                className="flex items-center space-x-2 border p-4 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-              >
-                <Checkbox
-                  id={`opt-${idx}`}
-                  checked={selectedOptions.includes(opt)}
-                  onChange={(e) => {
-                    const checked = e.target.checked;
-                    if (checked) {
-                      setSelectedOptions([...selectedOptions, opt]);
-                    } else {
-                      setSelectedOptions(
-                        selectedOptions.filter((o) => o !== opt)
-                      );
-                    }
-                  }}
-                />
-                <Label htmlFor={`opt-${idx}`} className="cursor-pointer flex-1">
-                  {opt}
-                </Label>
-              </div>
-            ))}
+          <div className="space-y-4">
+            {instruction && (
+              <p className="text-sm text-muted-foreground border-l-4 border-primary/40 pl-3 py-1 bg-muted/30 rounded-r">
+                {instruction}
+              </p>
+            )}
+            <div className="space-y-3">
+              {options.map((opt, idx) => (
+                <div
+                  key={idx}
+                  className="flex items-start space-x-2 border p-4 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors"
+                >
+                  <Checkbox
+                    id={`opt-${idx}`}
+                    className="mt-1"
+                    checked={selectedOptions.includes(opt)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      if (e.target.checked) {
+                        setSelectedOptions([...selectedOptions, opt]);
+                      } else {
+                        setSelectedOptions(
+                          selectedOptions.filter((o) => o !== opt)
+                        );
+                      }
+                    }}
+                  />
+                  <Label htmlFor={`opt-${idx}`} className="cursor-pointer flex-1">
+                    {opt}
+                  </Label>
+                </div>
+              ))}
+            </div>
           </div>
         );
 
       case QuestionType.LISTENING_BLANKS:
       case "fill_blanks":
         return (
-          <ListeningFillBlanks
-            transcript={content}
-            value={filledBlanks}
-            onChange={setFilledBlanks}
-          />
+          <div className="space-y-4">
+            {instruction && (
+              <p className="text-sm text-muted-foreground border-l-4 border-primary/40 pl-3 py-1 bg-muted/30 rounded-r">
+                {instruction}
+              </p>
+            )}
+            <ListeningFillBlanks
+              transcript={content}
+              value={filledBlanks}
+              onChange={setFilledBlanks}
+            />
+          </div>
         );
 
       case QuestionType.HIGHLIGHT_INCORRECT_WORDS:
       case "highlight_incorrect_words":
         return (
-          <HighlightIncorrectWords
-            transcript={content}
-            value={highlightedWords}
-            onChange={setHighlightedWords}
-          />
+          <div className="space-y-4">
+            {instruction && (
+              <p className="text-sm text-muted-foreground border-l-4 border-primary/40 pl-3 py-1 bg-muted/30 rounded-r">
+                {instruction}
+              </p>
+            )}
+            <HighlightIncorrectWords
+              transcript={transcript ?? content}
+              value={highlightedWords}
+              onChange={setHighlightedWords}
+            />
+          </div>
         );
 
       default:
         return (
-          <div className="text-red-500">
-            Input type not implemented for {questionType} yet.
+          <div className="rounded-lg border border-dashed p-6 text-center text-muted-foreground">
+            <p className="text-sm">This question type is not yet supported.</p>
           </div>
         );
     }

@@ -79,60 +79,44 @@ export default function FillBlanksDragDrop({ text, options = [], value, onChange
     setActiveId(null);
     setActiveWord(null);
 
-    if (!over) {
-      // Dropped nowhere? If it was in a slot, maybe clear it?
-      // If it came from a slot (id starts with 'slot-'), and dropped in 'bank-area' (if we made one) or just outside,
-      // strictly speaking, dropping outside usually returns to bank.
-      if (active.id.toString().startsWith('assigned-')) {
-        const slotKey = active.id.toString().replace('assigned-', '').replace(/-.*/, ''); // Extract slot index hackily or loop
-        // Better: search assignments
-        const slotIdx = Object.keys(assignments).find(key => {
-          // Reconstruct the id logic used in render: `assigned-${currentIdx}-${filledWord}`
-          // This assumes unique words or simple logic. Let's simplify.
-          return `assigned-${key}-${assignments[key]}` === active.id;
-        });
+    const draggedWord = active.data.current?.word as string | undefined;
+    if (!draggedWord) return;
 
-        if (slotIdx) {
-          const newAssignments = { ...assignments };
-          delete newAssignments[slotIdx];
-          onChange(newAssignments);
-        }
+    // Find which slot the dragged item came from (if any)
+    // Draggables assigned to slots have id: `assigned-${slotIndex}`
+    const sourceSlotKey = active.id.toString().startsWith('assigned-')
+      ? active.id.toString().replace('assigned-', '')
+      : null;
+
+    if (!over) {
+      // Dropped outside — if it was from a slot, return it to bank
+      if (sourceSlotKey !== null) {
+        const newAssignments = { ...assignments };
+        delete newAssignments[sourceSlotKey];
+        onChange(newAssignments);
       }
       return;
     }
 
     const overId = over.id as string;
-    const activeWord = active.data.current?.word;
-
-    if (!activeWord) return;
 
     if (overId.startsWith('slot-')) {
       const targetSlotIndex = overId.replace('slot-', '');
+      const newAssignments = { ...assignments };
 
-      // If item came from another slot, remove from old slot
-      let newAssignments = { ...assignments };
-
-      // Remove from old slot if it was there
-      const oldSlotKey = Object.keys(newAssignments).find(key =>
-        `assigned-${key}-${newAssignments[key]}` === active.id
-      );
-      if (oldSlotKey) {
-        delete newAssignments[oldSlotKey];
+      // Remove from source slot if dragged from one
+      if (sourceSlotKey !== null) {
+        delete newAssignments[sourceSlotKey];
       }
 
-      // Assign to new slot
-      newAssignments[targetSlotIndex] = activeWord;
+      // If target slot already has a word, swap it back to bank (by just overwriting)
+      newAssignments[targetSlotIndex] = draggedWord;
       onChange(newAssignments);
-    }
-    // If dropped back to bank (we can make bank droppable or just 'not a slot')
-    else if (overId === 'bank-container') {
-      // Remove from slot if it was there
-      const oldSlotKey = Object.keys(assignments).find(key =>
-        `assigned-${key}-${assignments[key]}` === active.id
-      );
-      if (oldSlotKey) {
+    } else if (overId === 'bank-container') {
+      // Dropped back to bank — remove from source slot
+      if (sourceSlotKey !== null) {
         const newAssignments = { ...assignments };
-        delete newAssignments[oldSlotKey];
+        delete newAssignments[sourceSlotKey];
         onChange(newAssignments);
       }
     }
@@ -154,7 +138,7 @@ export default function FillBlanksDragDrop({ text, options = [], value, onChange
                   {filledWord ? (
                     <DraggableWord
                       word={filledWord}
-                      id={`assigned-${currentIdx}-${filledWord}`}
+                      id={`assigned-${currentIdx}`}
                     />
                   ) : null}
                 </DroppableSlot>

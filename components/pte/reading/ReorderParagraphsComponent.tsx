@@ -21,25 +21,36 @@ export default function ReorderParagraphs({
         if (paragraphs.length === 0) return
 
         if (value && value.length === paragraphs.length) {
-            // Reconstruct items from value (which is array of strings)
-            // We need unique IDs for Reorder. using index + text hash or just index if carefully managed.
-            // But if we just use the text as ID (assuming unique paragraphs for now), it's easier.
-            // To be safe, let's maps back to original paragraphs to get stable IDs if possible,
-            // OR just generate new stable IDs based on content.
-            const newItems = value.map((text) => ({
-                id: text, // Assuming unique paragraphs
-                text: text,
-            }))
-            setItems(newItems)
+            // Reconstruct items from value using stable index-based IDs.
+            // Track which original indices have been consumed to handle duplicate text.
+            const availableIndices = new Map<string, number[]>()
+            paragraphs.forEach((text, i) => {
+                if (!availableIndices.has(text)) availableIndices.set(text, [])
+                availableIndices.get(text)!.push(i)
+            })
+            const usedIndices = new Set<number>()
+            const newItems = value.map((text) => {
+                const pool = availableIndices.get(text) ?? []
+                const idx = pool.find((i) => !usedIndices.has(i)) ?? pool[0] ?? 0
+                usedIndices.add(idx)
+                return { id: `para-${idx}`, text }
+            })
+
+            // Only update if the order actually changed to avoid infinite re-renders
+            setItems((prev) => {
+                const prevOrder = prev.map((it) => it.id).join(',')
+                const nextOrder = newItems.map((it) => it.id).join(',')
+                return prevOrder === nextOrder ? prev : newItems
+            })
         } else {
-            // Initialize with default order from props
-            const initialItems = paragraphs.map((text) => ({
-                id: text,
+            // Initialize with default order from props using index-based IDs
+            const initialItems = paragraphs.map((text, i) => ({
+                id: `para-${i}`,
                 text,
             }))
             setItems(initialItems)
         }
-    }, [paragraphs, value]) // Added value dependency to sync if parent updates it
+    }, [paragraphs, value]) // Keep value in deps so external resets (e.g. "Clear" button) are respected
 
     const handleReorder = (newOrder: { id: string; text: string }[]) => {
         setItems(newOrder)

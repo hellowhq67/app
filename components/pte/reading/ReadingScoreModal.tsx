@@ -30,15 +30,13 @@ export function ReadingScoreModal({
 }: ReadingScoreModalProps) {
     if (!feedback) return null
 
-    // Determine color based on score (assuming score is 0-90 or 0-100)
-    // PTE Reading is usually max points per question, but feedback might normalize it.
-    // Let's assume overallScore is normalized or raw.
-    // If it's low, red; medium, yellow; high, green.
-    
-    // For specific questions, score might be small (e.g. 5 points).
-    // We'll trust the visual cues.
+    // Use percentage-based threshold when maxScore is available (deterministic scoring),
+    // otherwise fall back to absolute threshold for AI-scored questions (scale ~0-90).
+    const scorePercent = feedback.maxScore && feedback.maxScore > 0
+        ? (feedback.overallScore / feedback.maxScore) * 100
+        : feedback.overallScore  // AI scores are already on a larger scale
 
-    const isGoodScore = feedback.overallScore > 0 // Simple check for now
+    const isGoodScore = scorePercent >= 50
 
     return (
         <Dialog open={isOpen} onOpenChange={onOpenChange}>

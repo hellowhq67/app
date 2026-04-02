@@ -189,6 +189,7 @@ export function scoreDeterministically(
     // Construct Feedback Object
     return {
         overallScore: score,
+        maxScore,
         accuracy: {
             score: score,
             feedback: feedbackLines.join(" ") || "Evaluated potentially."
@@ -196,6 +197,5 @@ export function scoreDeterministically(
         strengths: score === maxScore ? ["Perfect accuracy."] : [],
         areasForImprovement: score < maxScore ? ["Review incorrect answers."] : [],
         suggestions: ["Practice similar questions to improve accuracy."],
-        // We can include breakdown if needed
     };
 }

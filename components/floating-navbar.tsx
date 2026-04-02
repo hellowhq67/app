@@ -201,7 +201,7 @@ const FloatingNavbar = memo(function FloatingNavbar() {
                                 Explore
                             </PopoverTrigger>
                             <PopoverContent align="start" className="w-[min(90vw,52rem)] p-6">
-                                <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                                     {menu.slice(0, 3).map((section) => (
                                         <div key={section.title}>
                                             <div className="text-xs uppercase text-muted-foreground mb-2 font-semibold tracking-wider">
@@ -282,7 +282,7 @@ const FloatingNavbar = memo(function FloatingNavbar() {
                             <Menu className="size-5" />
                             <span className="sr-only">Open menu</span>
                         </SheetTrigger>
-                        <SheetContent side="right" className="p-0 w-[300px] sm:w-[400px]">
+                        <SheetContent side="right" className="p-0 w-[min(85vw,400px)]">
                             <SheetHeader className="p-4 border-b text-left">
                                 <SheetTitle>Menu</SheetTitle>
                             </SheetHeader>

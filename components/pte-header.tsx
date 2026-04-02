@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { cn } from '@/lib/utils'
 import {
   BarChart3,
   BookOpen,
@@ -42,7 +43,7 @@ export function PTEHeader() {
   ]
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-200 bg-white">
+    <header className="sticky top-0 z-50 border-b border-border bg-background">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo/Brand */}
@@ -61,12 +62,12 @@ export function PTEHeader() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center rounded-md px-3 py-2 text-sm font-medium ${
-                    pathname === item.href ||
-                    pathname.startsWith(item.href + '/')
-                      ? 'bg-blue-100 text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                  }`}
+                  className={cn(
+                    'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                    pathname === item.href || pathname.startsWith(item.href + '/')
+                      ? 'bg-primary/10 text-primary'
+                      : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                  )}
                 >
                   <Icon className="mr-1 h-4 w-4" />
                   {item.title}
@@ -88,7 +89,7 @@ export function PTEHeader() {
                   <span className="sr-only">Open menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-64">
+              <SheetContent side="left" className="w-[min(85vw,16rem)]">
                 <div className="flex flex-col space-y-4">
                   <Link
                     href="/pte/dashboard"
@@ -104,12 +105,12 @@ export function PTEHeader() {
                         <Link
                           key={item.href}
                           href={item.href}
-                          className={`flex items-center rounded-md px-3 py-2 text-sm font-medium ${
-                            pathname === item.href ||
-                            pathname.startsWith(item.href + '/')
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                          }`}
+                          className={cn(
+                            'flex items-center rounded-md px-3 py-2 text-sm font-medium transition-colors',
+                            pathname === item.href || pathname.startsWith(item.href + '/')
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:bg-accent hover:text-foreground'
+                          )}
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           <Icon className="mr-2 h-4 w-4" />

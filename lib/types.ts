@@ -102,6 +102,7 @@ export interface WordMarking {
 
 export interface AIFeedbackData {
   overallScore: number
+  maxScore?: number
   pronunciation?: {
     score: number
     feedback: string
