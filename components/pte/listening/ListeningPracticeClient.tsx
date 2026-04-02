@@ -144,6 +144,7 @@ export function ListeningPracticeClient({
         return "Listen carefully and type the sentence you hear exactly as spoken.";
       case QuestionType.LISTENING_MULTIPLE_CHOICE_SINGLE:
       case "listening_mc_single":
+      case "multiple_choice_single":
         return "Listen to the recording and choose the best answer from the options below.";
       case QuestionType.HIGHLIGHT_CORRECT_SUMMARY:
       case "highlight_correct_summary":
@@ -153,6 +154,7 @@ export function ListeningPracticeClient({
         return "Listen to the recording and select the word that completes the sentence.";
       case QuestionType.LISTENING_MULTIPLE_CHOICE_MULTIPLE:
       case "listening_mc_multiple":
+      case "multiple_choice_multiple":
         return "Listen to the recording and choose all options that apply.";
       case QuestionType.LISTENING_BLANKS:
       case "fill_blanks":
@@ -196,6 +198,7 @@ export function ListeningPracticeClient({
 
       case QuestionType.LISTENING_MULTIPLE_CHOICE_SINGLE:
       case "listening_mc_single":
+      case "multiple_choice_single":
       case QuestionType.HIGHLIGHT_CORRECT_SUMMARY:
       case "highlight_correct_summary":
       case QuestionType.SELECT_MISSING_WORD:
@@ -229,6 +232,7 @@ export function ListeningPracticeClient({
 
       case QuestionType.LISTENING_MULTIPLE_CHOICE_MULTIPLE:
       case "listening_mc_multiple":
+      case "multiple_choice_multiple":
         return (
           <div className="space-y-4">
             {instruction && (
@@ -292,7 +296,7 @@ export function ListeningPracticeClient({
               </p>
             )}
             <HighlightIncorrectWords
-              transcript={content}
+              transcript={transcript ?? content}
               value={highlightedWords}
               onChange={setHighlightedWords}
             />
