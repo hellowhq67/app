@@ -246,8 +246,8 @@ export function ListeningPracticeClient({
                     id={`opt-${idx}`}
                     className="mt-1"
                     checked={selectedOptions.includes(opt)}
-                    onCheckedChange={(checked) => {
-                      if (checked) {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      if (e.target.checked) {
                         setSelectedOptions([...selectedOptions, opt]);
                       } else {
                         setSelectedOptions(
