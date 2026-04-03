@@ -9,7 +9,7 @@ export const auth = betterAuth({
   // Core configuration
   appName: "PTE Academic",
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com",
+  baseURL: process.env.BETTER_AUTH_URL || "https://pedagogistsptev021.vercel.app/",
 
   // Database with Neon PostgreSQL
   database: drizzleAdapter(db, {
