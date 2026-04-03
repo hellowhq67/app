@@ -14,7 +14,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { PasswordInput } from "@/components/ui/password-input";
-import { authClient } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth/client";
 
 const resetPasswordSchema = z
 	.object({

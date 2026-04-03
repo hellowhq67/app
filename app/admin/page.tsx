@@ -1,3 +1,5 @@
+"use client"
+
 import dynamic from 'next/dynamic'
 import { StatsCards } from '@/components/admin/dashboard/stats-cards'
 import { RecentSignupsTable } from '@/components/admin/dashboard/recent-signups-table'

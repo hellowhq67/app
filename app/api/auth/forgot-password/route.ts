@@ -3,6 +3,7 @@ import { users, verifications } from "@/lib/db/schema";
 import { apiSuccess, Errors } from "@/lib/api";
 import { eq } from "drizzle-orm";
 import { randomBytes } from "crypto";
+import { sendPasswordResetEmail } from "@/lib/auth/email";
 
 export async function POST(request: Request) {
   try {
@@ -42,16 +43,8 @@ export async function POST(request: Request) {
       const baseUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
       const resetUrl = `${baseUrl}/reset-password?token=${token}`;
 
-      // TODO: Send email with reset link
-      // For now, log the reset URL (remove in production)
-      console.log(`Password reset link for ${email}: ${resetUrl}`);
-
-      // In production, integrate with email service:
-      // await sendEmail({
-      //   to: email,
-      //   subject: "Reset your password",
-      //   html: `<p>Click <a href="${resetUrl}">here</a> to reset your password.</p>`
-      // });
+      // Send password reset email
+      await sendPasswordResetEmail(email, resetUrl, user.name ?? undefined);
     }
 
     // Always return success to prevent email enumeration
