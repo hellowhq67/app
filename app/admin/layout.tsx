@@ -12,17 +12,29 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
 
-  if (!session?.user) {
+    if (!session?.user) {
+      redirect('/sign-in')
+    }
+
+    if (session.user.banned) {
+      redirect('/sign-in')
+    }
+
+    if (session.user.role !== 'admin') {
+      redirect('/dashboard')
+    }
+
+    return <AdminLayoutClient>{children}</AdminLayoutClient>
+  } catch (error: unknown) {
+    // Next.js redirect() throws an error internally - must re-throw it
+    if (error && typeof error === 'object' && 'digest' in error) {
+      throw error
+    }
     redirect('/sign-in')
   }
-
-  if (session.user.role !== 'admin') {
-    redirect('/dashboard')
-  }
-
-  return <AdminLayoutClient>{children}</AdminLayoutClient>
 }

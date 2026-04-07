@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth/client";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { Loader2, Github, Mail } from "lucide-react";
+import { Loader2, Linkedin, Mail } from "lucide-react";
 
 interface AuthFormProps {
 	mode: "sign-in" | "sign-up";
@@ -20,10 +20,37 @@ export function AuthForm({ mode }: AuthFormProps) {
 	const [password, setPassword] = useState("");
 	const [name, setName] = useState("");
 
+	function getErrorMessage(error: { message?: string; code?: string; status?: number }) {
+		const msg = error.message?.toLowerCase() || '';
+		const code = error.code?.toUpperCase() || '';
+
+		if (code === 'ACCOUNT_BANNED' || msg.includes('banned') || msg.includes('suspended')) {
+			return "Your account has been suspended. Please contact support.";
+		}
+		if (code === 'EMAIL_NOT_VERIFIED' || msg.includes('verify') || msg.includes('verification')) {
+			return "Please verify your email address before signing in.";
+		}
+		if (code === 'RATE_LIMITED' || error.status === 429 || msg.includes('rate limit') || msg.includes('too many')) {
+			return "Too many attempts. Please wait a moment and try again.";
+		}
+		if (msg.includes('user already exists') || msg.includes('already registered')) {
+			return "An account with this email already exists. Try signing in instead.";
+		}
+		if (msg.includes('password') && msg.includes('short')) {
+			return "Password must be at least 8 characters long.";
+		}
+		return null;
+	}
+
 	async function onSubmit(e: React.FormEvent) {
 		e.preventDefault();
 		if (!email || !password || (mode === "sign-up" && !name)) {
 			toast.error("Please fill in all fields.");
+			return;
+		}
+
+		if (mode === "sign-up" && password.length < 8) {
+			toast.error("Password must be at least 8 characters long.");
 			return;
 		}
 
@@ -41,7 +68,8 @@ export function AuthForm({ mode }: AuthFormProps) {
 						router.push("/dashboard");
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Failed to sign up.");
+						const friendly = getErrorMessage(ctx.error);
+						toast.error(friendly || ctx.error.message || "Failed to sign up.");
 					}
 				});
 			} else {
@@ -55,18 +83,19 @@ export function AuthForm({ mode }: AuthFormProps) {
 						router.push("/dashboard");
 					},
 					onError: (ctx) => {
-						toast.error(ctx.error.message || "Invalid credentials.");
+						const friendly = getErrorMessage(ctx.error);
+						toast.error(friendly || ctx.error.message || "Invalid email or password.");
 					}
 				});
 			}
 		} catch (error) {
-			toast.error("An unexpected error occurred.");
+			toast.error("An unexpected error occurred. Please try again.");
 		} finally {
 			setIsLoading(false);
 		}
 	}
 
-	const handleSocialSignIn = async (provider: "google" | "github") => {
+	const handleSocialSignIn = async (provider: "google" | "linkedin") => {
 		await authClient.signIn.social({
 			provider,
 			callbackURL: "/dashboard",
@@ -154,11 +183,11 @@ export function AuthForm({ mode }: AuthFormProps) {
 					variant="outline"
 					type="button"
 					disabled={isLoading}
-					onClick={() => handleSocialSignIn("github")}
+					onClick={() => handleSocialSignIn("linkedin")}
 					className="hover:bg-primary/5 hover:border-primary/30 transition-all duration-300 hover:scale-[1.02]"
 				>
-					<Github className="mr-2 h-4 w-4" />
-					GitHub
+					<Linkedin className="mr-2 h-4 w-4" />
+					LinkedIn
 				</Button>
 			</div>
 		</div>

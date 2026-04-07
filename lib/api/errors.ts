@@ -45,6 +45,12 @@ export const Errors = {
 
   unsupportedMediaType: (message = 'Unsupported media type') =>
     new ApiError(415, message, 'UNSUPPORTED_MEDIA_TYPE'),
+
+  banned: (message = 'Your account has been suspended') =>
+    new ApiError(403, message, 'ACCOUNT_BANNED'),
+
+  emailNotVerified: (message = 'Please verify your email address') =>
+    new ApiError(403, message, 'EMAIL_NOT_VERIFIED'),
 }
 
 /**

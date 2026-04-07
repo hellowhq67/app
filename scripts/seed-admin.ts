@@ -38,6 +38,7 @@ async function seedAdmin() {
     email: ADMIN_EMAIL,
     emailVerified: true,
     role: 'admin',
+    banned: false,
     subscriptionTier: 'unlimited',
     subscriptionStatus: 'active',
     dailyAiCredits: 999,

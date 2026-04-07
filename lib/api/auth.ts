@@ -2,6 +2,17 @@ import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { Errors } from './errors'
 
+// Extended user type with admin plugin fields
+type SessionUser = {
+  id: string
+  email: string
+  name: string
+  role?: string
+  banned?: boolean
+  banReason?: string
+  [key: string]: unknown
+}
+
 async function getSession() {
   return auth.api.getSession({
     headers: await headers()
@@ -10,11 +21,11 @@ async function getSession() {
 
 export type AuthResult = {
   userId: string
-  role?: string
+  role: string
 }
 
 /**
- * Require authentication - throws if not authenticated
+ * Require authentication - throws if not authenticated or banned
  */
 export async function requireAuth(): Promise<AuthResult> {
   const session = await getSession()
@@ -23,9 +34,19 @@ export async function requireAuth(): Promise<AuthResult> {
     throw Errors.unauthorized()
   }
 
+  const user = session.user as SessionUser
+
+  if (user.banned) {
+    throw Errors.banned(
+      user.banReason
+        ? `Your account has been suspended: ${user.banReason}`
+        : 'Your account has been suspended'
+    )
+  }
+
   return {
-    userId: session.user.id,
-    role: (session.user as any).role,
+    userId: user.id,
+    role: (user.role as string) ?? 'user',
   }
 }
 
@@ -37,9 +58,12 @@ export async function optionalAuth(): Promise<AuthResult | null> {
     const session = await getSession()
     if (!session?.user?.id) return null
 
+    const user = session.user as SessionUser
+    if (user.banned) return null
+
     return {
-      userId: session.user.id,
-      role: (session.user as any).role,
+      userId: user.id,
+      role: (user.role as string) ?? 'user',
     }
   } catch {
     return null
@@ -50,11 +74,24 @@ export async function optionalAuth(): Promise<AuthResult | null> {
  * Require admin role - throws if not admin
  */
 export async function requireAdmin(): Promise<AuthResult> {
-  const auth = await requireAuth()
+  const authResult = await requireAuth()
 
-  if (auth.role !== 'admin') {
+  if (authResult.role !== 'admin') {
     throw Errors.forbidden('Admin access required')
   }
 
-  return auth
+  return authResult
+}
+
+/**
+ * Require teacher role - throws if not teacher or admin
+ */
+export async function requireTeacher(): Promise<AuthResult> {
+  const authResult = await requireAuth()
+
+  if (authResult.role !== 'teacher' && authResult.role !== 'admin') {
+    throw Errors.forbidden('Teacher access required')
+  }
+
+  return authResult
 }

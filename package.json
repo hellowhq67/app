@@ -11,6 +11,7 @@
     "dev:webpack": "next dev",
     "dev:debug": "cross-env NODE_OPTIONS=\"--inspect\" next dev --turbopack",
     "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" next build --webpack",
+    "vercel-build": "drizzle-kit push && cross-env NODE_OPTIONS=\"--max-old-space-size=8192\" next build --webpack",
     "build:analyze": "cross-env ANALYZE=true next build",
     "start": "next start",
     "start:prod": "cross-env NODE_ENV=production next start -p 3000",

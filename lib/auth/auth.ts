@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins/admin";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
 import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "./email";
@@ -81,11 +82,6 @@ export const auth = betterAuth({
     },
     additionalFields: {
       // Map custom fields from your users table
-      role: {
-        type: "string",
-        required: false,
-        defaultValue: "user",
-      },
       subscriptionTier: {
         type: "string",
         required: false,
@@ -123,7 +119,7 @@ export const auth = betterAuth({
   account: {
     accountLinking: {
       enabled: true,
-      trustedProviders: ["google", "github"],
+      trustedProviders: ["google", "linkedin"],
     },
   },
 
@@ -134,10 +130,10 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       redirectURI: `${process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com"}/api/auth/callback/google`,
     },
-    github: {
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-      redirectURI: `${process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com"}/api/auth/callback/github`,
+    linkedin: {
+      clientId: process.env.LINKEDIN_CLIENT_ID!,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+      redirectURI: `${process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com"}/api/auth/callback/linkedin`,
     },
   },
 
@@ -145,9 +141,6 @@ export const auth = betterAuth({
   advanced: {
     // Use secure cookies in production
     useSecureCookies: process.env.NODE_ENV === 'production',
-
-    // Generate cryptographically secure IDs
-    generateId: () => crypto.randomUUID(),
 
     // Cross-subdomain cookies for *.pedagogistspte.com
     crossSubDomainCookies: {
@@ -204,30 +197,24 @@ export const auth = betterAuth({
         before: async (user) => {
           // Set defaults for new users
           return {
-            ...user,
-            role: user.role || 'user',
-            subscriptionTier: user.subscriptionTier || 'free',
-            subscriptionStatus: user.subscriptionStatus || 'active',
-            dailyAiCredits: user.dailyAiCredits ?? 10,
-            aiCreditsUsed: user.aiCreditsUsed ?? 0,
-            dailyPracticeLimit: user.dailyPracticeLimit ?? 3,
-            practiceQuestionsUsed: user.practiceQuestionsUsed ?? 0,
-            practiceQuestionsThisMonth: user.practiceQuestionsThisMonth ?? 0,
-            monthlyPracticeLimit: user.monthlyPracticeLimit ?? 10,
+            data: {
+              ...user,
+              subscriptionTier: user.subscriptionTier || 'free',
+              subscriptionStatus: user.subscriptionStatus || 'active',
+              dailyAiCredits: user.dailyAiCredits ?? 10,
+              aiCreditsUsed: user.aiCreditsUsed ?? 0,
+              dailyPracticeLimit: user.dailyPracticeLimit ?? 3,
+              practiceQuestionsUsed: user.practiceQuestionsUsed ?? 0,
+              practiceQuestionsThisMonth: user.practiceQuestionsThisMonth ?? 0,
+              monthlyPracticeLimit: user.monthlyPracticeLimit ?? 10,
+            },
           };
         },
         after: async (user) => {
-          // Send welcome email after successful registration
-          // Only for email/password signups (OAuth users get welcome via their provider)
+          // Log user creation for monitoring
           if (user.email && !user.emailVerified && process.env.NODE_ENV === 'production') {
-            try {
-              // Welcome email sent after email verification
-              console.log(`User created: ${user.email}`);
-            } catch (error) {
-              console.error('Failed to log user creation:', error);
-            }
+            console.log(`User created: ${user.email}`);
           }
-          return user;
         },
       },
     },
@@ -238,14 +225,18 @@ export const auth = betterAuth({
           if (process.env.NODE_ENV === 'production') {
             console.log(`New session created for user: ${session.userId} from IP: ${session.ipAddress || 'unknown'}`);
           }
-          return session;
         },
       },
     },
   },
 
   // Plugins
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    admin({
+      defaultRole: "user",
+    }),
+  ],
 });
 
 // Type inference for client

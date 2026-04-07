@@ -1,20 +1,26 @@
 import { createAuthClient } from "better-auth/react"
-import type { Auth } from "./auth"
+import { adminClient } from "better-auth/client/plugins"
 
-// Create type-safe auth client
-export const authClient = createAuthClient<Auth>({
+// Create auth client with admin plugin
+export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL || (typeof window !== 'undefined' ? window.location.origin : ''),
+  plugins: [adminClient()],
 })
 
 // Custom hook for auth state
 export const useAuth = () => {
   const session = authClient.useSession()
+  const user = session.data?.user
   return {
     ...session,
-    user: session.data?.user,
-    isAuthenticated: !!session.data?.user,
+    user,
+    isAuthenticated: !!user,
     isLoading: session.isPending,
     isPending: session.isPending,
+    isAdmin: user?.role === 'admin',
+    isTeacher: user?.role === 'teacher',
+    isBanned: user?.banned === true,
+    role: user?.role ?? 'user',
   }
 }
 
@@ -31,6 +37,9 @@ export const {
   deleteUser,
 } = authClient
 
+// Admin plugin methods (user management, role assignment, ban/unban)
+export const authAdmin = authClient.admin
+
 // Sign out with redirect
 export async function signOutAndRedirect(redirectTo: string = "/sign-in") {
   await authClient.signOut()
@@ -42,35 +51,52 @@ export async function signOutAndRedirect(redirectTo: string = "/sign-in") {
 // Forgot password - calls API endpoint
 export async function requestPasswordReset(email: string) {
   const baseUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || (typeof window !== 'undefined' ? window.location.origin : '')
-  const response = await fetch(`${baseUrl}/api/auth/forgot-password`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email }),
-  })
+  try {
+    const response = await fetch(`${baseUrl}/api/auth/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    })
 
-  if (!response.ok) {
-    const data = await response.json()
-    throw new Error(data.error || "Failed to send reset email")
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      throw new Error(data.error || "Failed to send reset email")
+    }
+
+    return response.json()
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error("Network error. Please check your connection and try again.")
+    }
+    throw error
   }
-
-  return response.json()
 }
 
 // Reset password - calls API endpoint
 export async function confirmPasswordReset(token: string, newPassword: string) {
   const baseUrl = process.env.NEXT_PUBLIC_BETTER_AUTH_URL || (typeof window !== 'undefined' ? window.location.origin : '')
-  const response = await fetch(`${baseUrl}/api/auth/reset-password`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, newPassword }),
-  })
+  try {
+    const response = await fetch(`${baseUrl}/api/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, newPassword }),
+    })
 
-  if (!response.ok) {
-    const data = await response.json()
-    throw new Error(data.error || "Failed to reset password")
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}))
+      if (data.code === 'TOKEN_EXPIRED') {
+        throw new Error("Your reset link has expired. Please request a new one.")
+      }
+      throw new Error(data.error || "Failed to reset password")
+    }
+
+    return response.json()
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error("Network error. Please check your connection and try again.")
+    }
+    throw error
   }
-
-  return response.json()
 }
 
 // Change password - calls API endpoint
@@ -87,7 +113,7 @@ export async function updatePassword(
   })
 
   if (!response.ok) {
-    const data = await response.json()
+    const data = await response.json().catch(() => ({}))
     throw new Error(data.error || "Failed to change password")
   }
 
@@ -108,8 +134,9 @@ export async function verifyEmail(token: string) {
 
 // Resend verification email
 export async function resendVerificationEmail() {
-  const session = await getSession()
-  if (!session?.user?.email) {
+  const result = await getSession()
+  const email = result?.data?.user?.email
+  if (!email) {
     throw new Error('No user session found')
   }
 
@@ -117,17 +144,13 @@ export async function resendVerificationEmail() {
   const response = await fetch(`${baseUrl}/api/auth/send-verification-email`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email: session.user.email }),
+    body: JSON.stringify({ email }),
   })
 
   if (!response.ok) {
-    const data = await response.json()
+    const data = await response.json().catch(() => ({}))
     throw new Error(data.error || 'Failed to resend verification email')
   }
 
   return response.json()
 }
-
-// Type exports for convenience
-export type Session = Awaited<ReturnType<typeof getSession>>
-export type User = Session extends { user: infer U } ? U : never
