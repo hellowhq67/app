@@ -20,6 +20,8 @@ export interface AdminUser {
   dailyPracticeLimit: number
   practiceQuestionsUsed: number
   emailVerified: boolean
+  banned: boolean
+  banReason: string | null
   examDate: string | null
   createdAt: string
   image: string | null

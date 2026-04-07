@@ -45,8 +45,10 @@ export const users = pgTable('users', {
     .$onUpdate(() => new Date())
     .notNull(),
 
-  // Role field (user, admin, teacher)
+  // Role field (user, admin, teacher) - managed by better-auth admin plugin
   role: text('role').notNull().default('user'),
+  banned: boolean('banned').default(false),
+  banReason: text('ban_reason'),
 
   // Subscription fields
   subscriptionTier: subscriptionTierEnum('subscription_tier')
