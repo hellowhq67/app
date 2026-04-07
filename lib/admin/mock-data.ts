@@ -14,7 +14,8 @@ import type {
 export const mockUsers: AdminUser[] = [
   {
     id: 'usr_001', name: 'Aisha Rahman', email: 'aisha.rahman@gmail.com',
-    role: 'admin', subscriptionTier: 'unlimited', subscriptionStatus: 'active',
+    role: 'admin', banned: false, banReason: null,
+    subscriptionTier: 'unlimited', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-12-31', dailyAiCredits: 50, aiCreditsUsed: 12,
     dailyPracticeLimit: 100, practiceQuestionsUsed: 34, emailVerified: true,
     examDate: '2026-06-15', createdAt: '2025-01-10T08:00:00Z', image: null,
@@ -22,7 +23,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_002', name: 'Marco Silva', email: 'marco.silva@outlook.com',
-    role: 'teacher', subscriptionTier: 'premium', subscriptionStatus: 'active',
+    role: 'teacher', banned: false, banReason: null,
+    subscriptionTier: 'premium', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-09-30', dailyAiCredits: 30, aiCreditsUsed: 8,
     dailyPracticeLimit: 50, practiceQuestionsUsed: 21, emailVerified: true,
     examDate: null, createdAt: '2025-02-14T10:30:00Z', image: null,
@@ -30,7 +32,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_003', name: 'Priya Nair', email: 'priya.nair@yahoo.com',
-    role: 'user', subscriptionTier: 'premium', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'premium', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-07-01', dailyAiCredits: 30, aiCreditsUsed: 29,
     dailyPracticeLimit: 50, practiceQuestionsUsed: 48, emailVerified: true,
     examDate: '2026-05-20', createdAt: '2025-03-05T09:15:00Z', image: null,
@@ -38,7 +41,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_004', name: 'James Okafor', email: 'james.okafor@gmail.com',
-    role: 'user', subscriptionTier: 'basic', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'basic', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-05-15', dailyAiCredits: 15, aiCreditsUsed: 10,
     dailyPracticeLimit: 20, practiceQuestionsUsed: 18, emailVerified: true,
     examDate: '2026-04-10', createdAt: '2025-03-22T14:00:00Z', image: null,
@@ -46,7 +50,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_005', name: 'Liu Yang', email: 'liu.yang@hotmail.com',
-    role: 'user', subscriptionTier: 'free', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'free', subscriptionStatus: 'active',
     subscriptionExpiresAt: null, dailyAiCredits: 10, aiCreditsUsed: 10,
     dailyPracticeLimit: 3, practiceQuestionsUsed: 3, emailVerified: false,
     examDate: '2026-08-30', createdAt: '2025-04-01T07:45:00Z', image: null,
@@ -54,7 +59,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_006', name: 'Fatima Al-Hashimi', email: 'fatima.hash@gmail.com',
-    role: 'user', subscriptionTier: 'unlimited', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'unlimited', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2027-01-01', dailyAiCredits: 50, aiCreditsUsed: 41,
     dailyPracticeLimit: 100, practiceQuestionsUsed: 87, emailVerified: true,
     examDate: '2026-03-28', createdAt: '2025-01-28T11:20:00Z', image: null,
@@ -62,7 +68,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_007', name: 'Carlos Mendez', email: 'c.mendez@university.edu',
-    role: 'user', subscriptionTier: 'premium', subscriptionStatus: 'trial',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'premium', subscriptionStatus: 'trial',
     subscriptionExpiresAt: '2026-04-15', dailyAiCredits: 30, aiCreditsUsed: 5,
     dailyPracticeLimit: 50, practiceQuestionsUsed: 12, emailVerified: true,
     examDate: '2026-07-15', createdAt: '2025-04-08T13:30:00Z', image: null,
@@ -70,7 +77,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_008', name: 'Yuki Tanaka', email: 'yuki.tanaka@jp.com',
-    role: 'user', subscriptionTier: 'basic', subscriptionStatus: 'expired',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'basic', subscriptionStatus: 'expired',
     subscriptionExpiresAt: '2026-02-28', dailyAiCredits: 15, aiCreditsUsed: 0,
     dailyPracticeLimit: 20, practiceQuestionsUsed: 0, emailVerified: true,
     examDate: null, createdAt: '2025-02-01T06:00:00Z', image: null,
@@ -78,7 +86,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_009', name: 'Amara Diallo', email: 'amara.diallo@gmail.com',
-    role: 'user', subscriptionTier: 'free', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'free', subscriptionStatus: 'active',
     subscriptionExpiresAt: null, dailyAiCredits: 10, aiCreditsUsed: 7,
     dailyPracticeLimit: 3, practiceQuestionsUsed: 2, emailVerified: true,
     examDate: '2026-09-01', createdAt: '2025-04-10T15:00:00Z', image: null,
@@ -86,7 +95,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_010', name: 'Sofia Petrov', email: 'sofia.petrov@mail.ru',
-    role: 'user', subscriptionTier: 'premium', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'premium', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-11-30', dailyAiCredits: 30, aiCreditsUsed: 22,
     dailyPracticeLimit: 50, practiceQuestionsUsed: 35, emailVerified: true,
     examDate: '2026-05-10', createdAt: '2025-02-20T09:00:00Z', image: null,
@@ -94,7 +104,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_011', name: 'Ahmed Hassan', email: 'ahmed.h@arabmail.com',
-    role: 'user', subscriptionTier: 'unlimited', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'unlimited', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2027-03-01', dailyAiCredits: 50, aiCreditsUsed: 38,
     dailyPracticeLimit: 100, practiceQuestionsUsed: 72, emailVerified: true,
     examDate: '2026-04-25', createdAt: '2025-01-05T08:30:00Z', image: null,
@@ -102,7 +113,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_012', name: 'Isabella Costa', email: 'isa.costa@brasil.com',
-    role: 'user', subscriptionTier: 'basic', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'basic', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-06-30', dailyAiCredits: 15, aiCreditsUsed: 11,
     dailyPracticeLimit: 20, practiceQuestionsUsed: 15, emailVerified: false,
     examDate: '2026-10-01', createdAt: '2025-03-15T12:00:00Z', image: null,
@@ -110,7 +122,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_013', name: 'Raj Patel', email: 'raj.patel@techcorp.in',
-    role: 'user', subscriptionTier: 'premium', subscriptionStatus: 'cancelled',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'premium', subscriptionStatus: 'cancelled',
     subscriptionExpiresAt: '2026-03-01', dailyAiCredits: 30, aiCreditsUsed: 0,
     dailyPracticeLimit: 50, practiceQuestionsUsed: 0, emailVerified: true,
     examDate: null, createdAt: '2025-01-20T10:00:00Z', image: null,
@@ -118,7 +131,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_014', name: 'Emma Thompson', email: 'emma.t@london.uk',
-    role: 'teacher', subscriptionTier: 'unlimited', subscriptionStatus: 'active',
+    role: 'teacher', banned: false, banReason: null,
+    subscriptionTier: 'unlimited', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2027-06-01', dailyAiCredits: 50, aiCreditsUsed: 15,
     dailyPracticeLimit: 100, practiceQuestionsUsed: 28, emailVerified: true,
     examDate: null, createdAt: '2025-01-15T09:00:00Z', image: null,
@@ -126,7 +140,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_015', name: 'Kim Sung-jin', email: 'sungjin.kim@korea.net',
-    role: 'user', subscriptionTier: 'free', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'free', subscriptionStatus: 'active',
     subscriptionExpiresAt: null, dailyAiCredits: 10, aiCreditsUsed: 3,
     dailyPracticeLimit: 3, practiceQuestionsUsed: 1, emailVerified: true,
     examDate: '2026-12-01', createdAt: '2025-04-12T07:00:00Z', image: null,
@@ -134,7 +149,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_016', name: 'Nadia Volkov', email: 'nadia.v@gmail.com',
-    role: 'user', subscriptionTier: 'premium', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'premium', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-08-15', dailyAiCredits: 30, aiCreditsUsed: 18,
     dailyPracticeLimit: 50, practiceQuestionsUsed: 42, emailVerified: true,
     examDate: '2026-06-30', createdAt: '2025-02-25T14:30:00Z', image: null,
@@ -142,7 +158,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_017', name: 'Tariq Al-Amin', email: 'tariq.alamin@mail.com',
-    role: 'user', subscriptionTier: 'basic', subscriptionStatus: 'trial',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'basic', subscriptionStatus: 'trial',
     subscriptionExpiresAt: '2026-04-20', dailyAiCredits: 15, aiCreditsUsed: 9,
     dailyPracticeLimit: 20, practiceQuestionsUsed: 14, emailVerified: true,
     examDate: '2026-05-01', createdAt: '2025-04-05T11:00:00Z', image: null,
@@ -150,7 +167,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_018', name: 'Chiara Romano', email: 'chiara.r@italia.it',
-    role: 'user', subscriptionTier: 'free', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'free', subscriptionStatus: 'active',
     subscriptionExpiresAt: null, dailyAiCredits: 10, aiCreditsUsed: 10,
     dailyPracticeLimit: 3, practiceQuestionsUsed: 3, emailVerified: false,
     examDate: '2026-07-20', createdAt: '2025-04-11T16:00:00Z', image: null,
@@ -158,7 +176,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_019', name: 'David Osei', email: 'david.osei@ghana.com',
-    role: 'user', subscriptionTier: 'unlimited', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'unlimited', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-12-01', dailyAiCredits: 50, aiCreditsUsed: 44,
     dailyPracticeLimit: 100, practiceQuestionsUsed: 91, emailVerified: true,
     examDate: '2026-04-05', createdAt: '2025-01-30T08:00:00Z', image: null,
@@ -166,7 +185,8 @@ export const mockUsers: AdminUser[] = [
   },
   {
     id: 'usr_020', name: 'Mei Lin', email: 'mei.lin@china.cn',
-    role: 'user', subscriptionTier: 'premium', subscriptionStatus: 'active',
+    role: 'user', banned: false, banReason: null,
+    subscriptionTier: 'premium', subscriptionStatus: 'active',
     subscriptionExpiresAt: '2026-09-01', dailyAiCredits: 30, aiCreditsUsed: 25,
     dailyPracticeLimit: 50, practiceQuestionsUsed: 38, emailVerified: true,
     examDate: '2026-06-10', createdAt: '2025-02-10T10:00:00Z', image: null,
@@ -297,7 +317,7 @@ export const mockMockTests: AdminMockTest[] = [
   },
   {
     id: 'mt_007', testName: 'PTE Academic Full Mock #1', userId: 'usr_004', userName: 'James Okafor',
-    status: 'abandoned', overallScore: null, speakingScore: null, writingScore: null, readingScore: null, listeningScore: null,
+    status: 'expired', overallScore: null, speakingScore: null, writingScore: null, readingScore: null, listeningScore: null,
     totalQuestions: 68, completedQuestions: 15, totalDuration: null,
     startedAt: '2026-03-18T14:00:00Z', completedAt: null, createdAt: '2026-03-18T13:58:00Z',
     enablingSkills: null,
