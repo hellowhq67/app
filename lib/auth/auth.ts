@@ -4,15 +4,13 @@ import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins/admin";
 import { db } from "@/lib/db";
 import * as schema from "@/lib/db/schema";
-import { sendPasswordResetEmail, sendVerificationEmail, sendWelcomeEmail } from "./email";
+import { sendPasswordResetEmail, sendVerificationEmail } from "./email";
 
 export const auth = betterAuth({
-  // Core configuration
   appName: "PTE Academic",
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || "https://pedagogistsptev021.vercel.app/",
+  baseURL: process.env.BETTER_AUTH_URL,
 
-  // Database with Neon PostgreSQL
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: {
@@ -23,7 +21,6 @@ export const auth = betterAuth({
     },
   }),
 
-  // Email & Password authentication
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: process.env.NODE_ENV === 'production',
@@ -40,7 +37,6 @@ export const auth = betterAuth({
     maxPasswordLength: 128,
   },
 
-  // Email verification
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       try {
@@ -55,22 +51,18 @@ export const auth = betterAuth({
     expiresIn: 60 * 60 * 24, // 24 hours
   },
 
-  // Session management
   session: {
     expiresIn: 60 * 60 * 24 * 7, // 7 days
     updateAge: 60 * 60 * 24, // Refresh daily
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60, // 5 minutes
-      strategy: "compact", // Most efficient
+      strategy: "compact",
     },
-    // Store sessions in database for better control
     storeSessionInDatabase: true,
   },
 
-  // User configuration
   user: {
-    // Enable additional features
     changeEmail: {
       enabled: true,
       sendChangeEmailVerification: async ({ newEmail, url }) => {
@@ -81,7 +73,6 @@ export const auth = betterAuth({
       enabled: true,
     },
     additionalFields: {
-      // Map custom fields from your users table
       subscriptionTier: {
         type: "string",
         required: false,
@@ -115,7 +106,6 @@ export const auth = betterAuth({
     },
   },
 
-  // Account linking
   account: {
     accountLinking: {
       enabled: true,
@@ -123,53 +113,37 @@ export const auth = betterAuth({
     },
   },
 
-  // Social providers
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      redirectURI: `${process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com"}/api/auth/callback/google`,
     },
     linkedin: {
       clientId: process.env.LINKEDIN_CLIENT_ID!,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-      redirectURI: `${process.env.BETTER_AUTH_URL || "https://www.pedagogistspte.com"}/api/auth/callback/linkedin`,
     },
   },
 
-  // Security & Advanced settings
   advanced: {
-    // Use secure cookies in production
     useSecureCookies: process.env.NODE_ENV === 'production',
-
-    // Cross-subdomain cookies for *.pedagogistspte.com
-    crossSubDomainCookies: {
-      enabled: false, // Enable if you have subdomains
-    },
-
-    // IP address detection (Vercel uses x-forwarded-for)
     ipAddress: {
       ipAddressHeaders: ['x-forwarded-for', 'x-real-ip'],
     },
-
-    // CSRF protection enabled by default
-    disableCSRFCheck: false,
   },
 
-  // Rate limiting for security
   rateLimit: {
     enabled: true,
-    window: 60, // 60 seconds
-    max: 10, // 10 requests per window
-    storage: "database", // Use Neon DB for rate limit storage
+    window: 60,
+    max: 10,
+    storage: "memory",
     customRules: {
       "/sign-in": {
         window: 60,
-        max: 5, // More restrictive for login
+        max: 5,
       },
       "/sign-up": {
         window: 60,
-        max: 3, // Most restrictive for registration
+        max: 3,
       },
       "/forgot-password": {
         window: 60,
@@ -178,24 +152,10 @@ export const auth = betterAuth({
     },
   },
 
-  // CORS and trusted origins
-  trustedOrigins: [
-    "https://www.pedagogistspte.com",
-    "https://pedagogistspte.com",
-    "https://pedagogistspte-v-0-2.vercel.app",
-    "https://pedagogistspte-v-0-2-git-main-hellowhq67s-projects.vercel.app",
-    ...(process.env.NODE_ENV === "development"
-      ? ["http://localhost:3000", "http://localhost:3001"]
-      : []
-    ),
-  ],
-
-  // Database hooks for user lifecycle
   databaseHooks: {
     user: {
       create: {
         before: async (user) => {
-          // Set defaults for new users
           return {
             data: {
               ...user,
@@ -211,8 +171,7 @@ export const auth = betterAuth({
           };
         },
         after: async (user) => {
-          // Log user creation for monitoring
-          if (user.email && !user.emailVerified && process.env.NODE_ENV === 'production') {
+          if (user.email && process.env.NODE_ENV === 'production') {
             console.log(`User created: ${user.email}`);
           }
         },
@@ -221,16 +180,14 @@ export const auth = betterAuth({
     session: {
       create: {
         after: async (session) => {
-          // Log session creation for security monitoring
           if (process.env.NODE_ENV === 'production') {
-            console.log(`New session created for user: ${session.userId} from IP: ${session.ipAddress || 'unknown'}`);
+            console.log(`New session: ${session.userId} from ${session.ipAddress || 'unknown'}`);
           }
         },
       },
     },
   },
 
-  // Plugins
   plugins: [
     nextCookies(),
     admin({
@@ -239,5 +196,4 @@ export const auth = betterAuth({
   ],
 });
 
-// Type inference for client
 export type Auth = typeof auth;
