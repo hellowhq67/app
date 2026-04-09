@@ -146,7 +146,7 @@ export default function CheckoutCancelPage() {
               <div className="text-center">
                 <p className="text-sm text-muted-foreground">
                   Continue practicing with our{' '}
-                  <Link href="/pte/dashboard" className="underline hover:no-underline font-medium">
+                  <Link href="/dashboard" className="underline hover:no-underline font-medium">
                     free features
                   </Link>{' '}
                   while you consider upgrading.

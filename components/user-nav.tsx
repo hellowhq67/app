@@ -79,7 +79,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem asChild>
-            <a href="/pte/dashboard">
+            <a href="/dashboard">
               <GraduationCap className="mr-2 h-4 w-4" />
               <span>Dashboard</span>
             </a>

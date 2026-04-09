@@ -54,7 +54,7 @@ function PTELayoutContent({ children }: { children: React.ReactNode }) {
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden sm:block">
-                <BreadcrumbLink href="/pte/dashboard">PTE</BreadcrumbLink>
+                <BreadcrumbLink href="/dashboard">PTE</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden sm:block" />
               {pathname
