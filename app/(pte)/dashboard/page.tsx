@@ -10,9 +10,7 @@ import { redirect } from "next/navigation";
 import { getAllUserAttempts } from "@/lib/db/queries/pte-scoring";
 import { getUserDashboardStats } from "@/lib/pte/practice";
 import { PTEDashboard } from "@/components/pte/app-dashboard";
-import { useCopilotReadable } from "@copilotkit/react-core";
-
-import { CopilotPopup } from "@copilotkit/react-ui";
+import { PTECopilotAssistant } from "@/components/pte/copilot-assistant";
 export default async function DashboardPage() {
   const session = await auth.api.getSession({
     headers: await headers(),
@@ -91,16 +89,10 @@ export default async function DashboardPage() {
         stats={stats}
       />
 
-      <CopilotPopup
-        instructions={prompt}
-        defaultOpen
-        labels={{
-          title: "✨ Incident Report Assistant",
-          initial: [
-            "I'm an AI assistant built for guiding you through filing incident reports. How can I help?",
-          ],
-        }}
-      />
+      <PTECopilotAssistant userData={{
+        user: userProfile ? { id: userProfile.id, name: userProfile.name || '', email: userProfile.email } : null,
+        stats,
+      }} />
     </>
   );
 }

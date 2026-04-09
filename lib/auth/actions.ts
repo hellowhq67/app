@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { redirect } from "next/navigation"
 
-const DEFAULT_REDIRECT = "/pte/dashboard"
+const DEFAULT_REDIRECT = "/dashboard"
 
 export async function signInAction(prevState: any, formData: FormData) {
   const email = formData.get("email") as string

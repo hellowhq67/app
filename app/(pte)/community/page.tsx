@@ -32,7 +32,7 @@ export default async function CommunityPage({
 
         {/* Breadcrumbs */}
         <nav className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-          <Link href="/pte/dashboard" className="hover:text-primary">
+          <Link href="/dashboard" className="hover:text-primary">
             Dashboard
           </Link>
           <span>/</span>
